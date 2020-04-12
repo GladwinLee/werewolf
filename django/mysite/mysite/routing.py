@@ -1,5 +1,5 @@
 from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter, URLRouter, ChannelNameRouter
 import chat.routing
 
 application = ProtocolTypeRouter({
@@ -9,4 +9,7 @@ application = ProtocolTypeRouter({
             chat.routing.websocket_urlpatterns
         )
     ),
+    'channel': ChannelNameRouter(
+        chat.routing.bg_consumer_channels
+    )
 })
