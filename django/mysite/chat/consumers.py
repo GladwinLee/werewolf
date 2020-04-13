@@ -1,7 +1,9 @@
 # chat/consumers.py
 import json
-from .bg_consumer import WEREWOLF_CHANNEL
+
 from channels.generic.websocket import AsyncWebsocketConsumer
+
+from .worker import WEREWOLF_CHANNEL
 
 
 class ChatConsumer(AsyncWebsocketConsumer):

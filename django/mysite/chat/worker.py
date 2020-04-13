@@ -1,5 +1,4 @@
 # chat/consumers.py
-from asgiref.sync import async_to_sync
 from channels.consumer import AsyncConsumer
 
 WEREWOLF_CHANNEL = 'werewolf-channel'
@@ -12,8 +11,6 @@ class BackgroundConsumer(AsyncConsumer):
         room_group_name = message['message']
         player = self.num_players
         self.num_players += 1
-
-        print("received %s" % message)
 
         out_msg = {
             'type': 'chat_message',
