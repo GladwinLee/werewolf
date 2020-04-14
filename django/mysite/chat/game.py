@@ -30,7 +30,7 @@ class Game:
     def handle_special(self, type, player1=None, player2=None):
         self.role_manager.handle_special(type, player1, player2)
 
-    # generate winning team basewd on voted out
+    # generate winning team based on voted out
     def get_winner(self):
         # check all voted
         pass

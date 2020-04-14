@@ -8,6 +8,8 @@ from .worker import WEREWOLF_CHANNEL
 
 class ChatConsumer(AsyncWebsocketConsumer):
     player_name = ""
+    player_list = []
+
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % self.room_name
@@ -29,6 +31,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
+        if self.player_name == "":
+            return
         await self.channel_layer.send(
             WEREWOLF_CHANNEL,
             {
@@ -47,7 +51,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data=None, byte_data=None):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
 
         print("client sent: %s" % text_data)
 
@@ -57,13 +60,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 # send error to client
                 return
 
-            self.player_name = message
-            # Send message to room group
+            self.player_name = text_data_json['message']
             await self.channel_layer.send(
                 WEREWOLF_CHANNEL,
                 {
                     'type': 'name_select',
-                    'name': message,
+                    'name': text_data_json['message'],
+                    'room_group_name': self.room_group_name,
+                }
+            )
+        elif type == "vote":
+            vote = text_data_json['vote']
+            if vote not in self.player_list or vote == self.player_name:
+                # send error to client
+                return
+
+            await self.channel_layer.send(
+                WEREWOLF_CHANNEL,
+                {
+                    'type': 'vote',
+                    'name': self.player_name,
+                    'vote': vote,
                     'room_group_name': self.room_group_name,
                 }
             )
@@ -79,11 +96,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def player_list_change(self, event):
-        player_list = event['player_list']
+        self.player_list = event['player_list']
 
         msg = {
             'type': 'player_list_change',
-            'message': player_list,
+            'message': self.player_list,
         }
 
         # Send message to WebSocket
