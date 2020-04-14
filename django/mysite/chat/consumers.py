@@ -84,6 +84,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'room_group_name': self.room_group_name,
                 }
             )
+        elif type == "start":
+            name = text_data_json['name']
+
+            await self.channel_layer.send(
+                WEREWOLF_CHANNEL,
+                {
+                    'type': 'start',
+                    'name': self.player_name,
+                    'room_group_name': self.room_group_name,
+                }
+            )
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -95,12 +106,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     # Receive message from room group
-    async def player_list_change(self, event):
-        self.player_list = event['player_list']
+    async def player_list_change(self, data):
+        self.player_list = data['player_list']
 
         msg = {
             'type': 'player_list_change',
             'message': self.player_list,
+        }
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps(msg))
+        print("Sent %s" % msg)
+
+    # Receive message from room group
+    async def start(self, data):
+        roles = data['roles']
+
+        msg = {
+            'type': 'start',
+            'message': 'temp message to be replaced by visible roles',
         }
 
         # Send message to WebSocket

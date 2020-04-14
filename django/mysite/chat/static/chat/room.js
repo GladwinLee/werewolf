@@ -42,9 +42,12 @@ class Game extends React.Component {
                 case 'player_list_change':
                     this.setState({players: data['message']});
                     break;
-                // case 'vote_start':
-                //     this.setState({show_vote_input: true});
-                //     break;
+                case 'start':
+                    this.setState({show_game_setup: false});
+                    if (this.state.name) {
+                        this.setState({show_vote_input: true});
+                    }
+                    break;
                 default:
                     alert(data['message']);
             }
@@ -67,7 +70,7 @@ class Game extends React.Component {
         this.setState({show_game_setup: false, show_vote_input: true})
         chatSocket.send(JSON.stringify({
             'type': "start",
-            'message': this.state.name,
+            'name': this.state.name,
         }));
     }
 

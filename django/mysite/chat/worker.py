@@ -56,6 +56,18 @@ class BackgroundConsumer(AsyncConsumer):
         print("%s voted %s" % (name, vote))
         self.game.vote(name, vote)
 
+    async def start(self, data):
+        name = data['name']
+        room_group_name = data['room_group_name']
+        print("%s started the game", name)
+
+        roles = self.game.start_game()
+        msg = {
+            'type': 'start',
+            'roles': roles
+        }
+        await self.group_send(room_group_name, msg)
+
     async def group_send(self, room, msg):
         print("send room:%s" % room)
         print(msg)
