@@ -1,7 +1,7 @@
 # Server side
 class RoleManager:
     def __init__(self):
-        self.players_to_roles = {}
+        self.players_to_roles = {}  # name to role
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG

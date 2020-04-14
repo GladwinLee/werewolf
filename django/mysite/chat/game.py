@@ -5,7 +5,7 @@ from .role_manager import RoleManager
 class Game:
     def __init__(self):
         self.num_players = 0
-        self.player_names = []  # map name to role
+        self.player_names = []
         self.role_manager = RoleManager()
 
     def add_player(self, name):
