@@ -115,13 +115,19 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+REDIS_ADDRESS = os.environ.get('')
+if not REDIS_ADDRESS:
+    print("REDIS_IP not set")
+    REDIS_ADDRESS = 'redis'
+
 # KEN DOCKER TOOLBOX SETTINGS
 ASGI_APPLICATION = 'werewolf.routing.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('192.168.99.100', 6379)],
+            "hosts": [(REDIS_ADDRESS, 6379)],
+            # "hosts": [('192.168.99.100', 6379)],
         },
     },
 }

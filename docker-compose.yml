@@ -8,11 +8,15 @@ services:
       - .:/code
     ports:
       - "8000:8000"
+    links:
+      - redis
   worker:
     build: .
     command: python src/werewolf/manage.py runworker werewolf-channel
     volumes:
       - .:/code
+    links:
+      - redis
   redis:
     image: redis:5
     ports:
