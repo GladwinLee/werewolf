@@ -1,12 +1,11 @@
 # chat/consumers.py
-import json
 
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .worker import WEREWOLF_CHANNEL
 
 
-class ChatConsumer(AsyncWebsocketConsumer):
+class ChatConsumer(AsyncJsonWebsocketConsumer):
     player_name = ""
     player_list = []
 
@@ -22,25 +21,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        await self.channel_layer.send(
-            WEREWOLF_CHANNEL,
-            {
-                'type': 'player_join',
-                'channel_name': self.channel_name
-            }
-        )
+        await self.send_to_worker({
+            'type': 'player_join',
+            'channel_name': self.channel_name
+        })
 
     async def disconnect(self, close_code):
         if self.player_name == "":
             return
-        await self.channel_layer.send(
-            WEREWOLF_CHANNEL,
-            {
-                'type': 'player_leave',
-                'name': self.player_name,
-                'room_group_name': self.room_group_name,
-            }
-        )
+        await self.send_to_worker({
+            'type': 'player_leave',
+            'name': self.player_name,
+            'room_group_name': self.room_group_name,
+        })
 
         # Leave room group
         await self.channel_layer.group_discard(
@@ -49,84 +42,72 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     # Receive message from WebSocket
-    async def receive(self, text_data=None, byte_data=None):
-        text_data_json = json.loads(text_data)
+    async def receive_json(self, content, **kwargs):
+        print("client sent: %s" % content)
 
-        print("client sent: %s" % text_data)
-
-        type = text_data_json['type']
-        if type == "name_select":
+        msg_type = content['type']
+        if msg_type == "name_select":
             if self.player_name != "":
                 # send error to client
                 return
 
-            self.player_name = text_data_json['message']
-            await self.channel_layer.send(
-                WEREWOLF_CHANNEL,
-                {
-                    'type': 'name_select',
-                    'name': text_data_json['message'],
-                    'room_group_name': self.room_group_name,
-                }
-            )
-        elif type == "vote":
-            vote = text_data_json['vote']
+            self.player_name = content['message']
+
+            await self.send_to_worker({
+                'type': 'name_select',
+                'name': content['message'],
+                'room_group_name': self.room_group_name,
+            })
+        elif msg_type == "vote":
+            vote = content['vote']
             if vote not in self.player_list or vote == self.player_name:
                 # send error to client
                 return
 
-            await self.channel_layer.send(
-                WEREWOLF_CHANNEL,
-                {
-                    'type': 'vote',
-                    'name': self.player_name,
-                    'vote': vote,
-                    'room_group_name': self.room_group_name,
-                }
-            )
-        elif type == "start":
-            name = text_data_json['name']
-
-            await self.channel_layer.send(
-                WEREWOLF_CHANNEL,
-                {
-                    'type': 'start',
-                    'name': self.player_name,
-                    'room_group_name': self.room_group_name,
-                }
-            )
-
+            await self.send_to_worker({
+                'type': 'vote',
+                'name': self.player_name,
+                'vote': vote,
+                'room_group_name': self.room_group_name,
+            })
+        elif msg_type == "start":
+            await self.send_to_worker({
+                'type': 'start',
+                'name': self.player_name,
+                'room_group_name': self.room_group_name,
+            })
     # Receive message from room group
     async def chat_message(self, event):
-        message = event['message']
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        await self.send_json({
+            'message': event['message']
+        })
 
     # Receive message from room group
     async def player_list_change(self, data):
         self.player_list = data['player_list']
-
-        msg = {
+        await self.send_json({
             'type': 'player_list_change',
             'message': self.player_list,
-        }
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps(msg))
-        print("Sent %s" % msg)
+        })
 
     # Receive message from room group
     async def start(self, data):
         roles = data['roles']
 
-        msg = {
+        # Send message to WebSocket
+        await self.send_json({
             'type': 'start',
             'message': 'temp message to be replaced by visible roles',
-        }
+        })
 
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps(msg))
-        print("Sent %s" % msg)
+    async def send_to_worker(self, msg):
+        print("To worker name:%s :%s" % (self.player_name, msg))
+        await self.channel_layer.send(
+            WEREWOLF_CHANNEL,
+            msg
+        )
+
+    # Send message to WebSocket
+    async def send_json(self, msg, close=False):
+        print("To client name:%s :%s" % (self.player_name, msg))
+        await super().send_json(msg, close)

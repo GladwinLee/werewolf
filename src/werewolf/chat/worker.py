@@ -41,13 +41,13 @@ class BackgroundConsumer(AsyncConsumer):
         self.num_players += 1
         self.player_list.append(name)
 
-        out_msg = {
-            'type': 'player_list_change',
-            'player_list': self.player_list
-        }
-
         # Send message to room group
-        await self.group_send(room_group_name, out_msg)
+        await self.group_send(
+            room_group_name,
+            {
+                'type': 'player_list_change',
+                'player_list': self.player_list
+            })
 
     async def vote(self, data):
         name = data['name']
@@ -59,7 +59,7 @@ class BackgroundConsumer(AsyncConsumer):
     async def start(self, data):
         name = data['name']
         room_group_name = data['room_group_name']
-        print("%s started the game", name)
+        print("%s started the game" % name)
 
         roles = self.game.start_game()
         msg = {
