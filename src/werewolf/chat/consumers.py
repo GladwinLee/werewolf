@@ -23,7 +23,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_to_worker({
             'type': 'player_join',
-            'channel_name': self.channel_name
+            'channel_name': self.channel_name,
+            'room_name': self.room_group_name,
         })
 
     async def disconnect(self, close_code):

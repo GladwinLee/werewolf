@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Werewolf</title>
+</head>
+<body>
+
+{{ room_name | json_script:"room_name" }}
+<div id="root"></div>
+
+{% load static %}
+<script src="{% static 'frontend/main.js' %}"></script>
+</body>
+</html>

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'channels',
     'chat',
+    'frontend',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -115,9 +116,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-REDIS_ADDRESS = os.environ.get('')
+REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS')
 if not REDIS_ADDRESS:
-    print("REDIS_IP not set")
     REDIS_ADDRESS = 'redis'
 
 # KEN DOCKER TOOLBOX SETTINGS

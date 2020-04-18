@@ -9,44 +9,46 @@ WEREWOLF_CHANNEL = 'werewolf-channel'
 # This probably doesn't work with multiple rooms atm
 class BackgroundConsumer(AsyncConsumer):
     num_players = 0
-    player_list = []
+    player_list = {}
     game = Game()
 
     async def player_join(self, data):
-        channel_name = data['channel_name']
+        channel = data['channel_name']
+        room = data['room_name']
 
         await self.channel_send(
-            channel_name,
+            channel,
             {
                 'type': 'player_list_change',
-                'player_list': self.player_list,
+                'player_list': self.player_list.setdefault(room, []),
             }
         )
 
     async def player_leave(self, data):
         name = data['name']
-        self.player_list.remove(name)
+        room = data['room_group_name']
+        self.player_list[room].remove(name)
 
         await self.group_send(
             data['room_group_name'],
             {
                 'type': 'player_list_change',
-                'player_list': self.player_list,
+                'player_list': self.player_list[room],
             }
         )
 
     async def name_select(self, data):
-        room_group_name = data['room_group_name']
+        room = data['room_group_name']
         name = data['name']
         self.num_players += 1
-        self.player_list.append(name)
+        self.player_list.setdefault(room, []).append(name)
 
         # Send message to room group
         await self.group_send(
-            room_group_name,
+            room,
             {
                 'type': 'player_list_change',
-                'player_list': self.player_list
+                'player_list': self.player_list[room]
             })
 
     async def vote(self, data):
@@ -77,9 +79,12 @@ class BackgroundConsumer(AsyncConsumer):
         )
 
     async def channel_send(self, channel, msg):
-        print("send channel:%s" % channel)
-        print(msg)
+        print("Send channel:%s, %s" % (channel, msg))
         await self.channel_layer.send(
             channel,
             msg
         )
+
+    async def dispatch(self, message):
+        print("Received ", message)
+        await super().dispatch(message)
