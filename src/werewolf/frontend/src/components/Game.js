@@ -13,6 +13,10 @@ class Game extends Component {
             show_game_setup: true,
         };
 
+        this.chatSocket = new WebSocket(
+            'ws://' + window.location.host + "/ws/werewolf/" + this.props.roomName + "/"
+        );
+
         this.chatSocket.onmessage = (e) => {
             this.receiveMessage(JSON.parse(e.data));
         };
