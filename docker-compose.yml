@@ -1,23 +1,32 @@
 version: "3.7"
 
 services:
-  web:
-    build: .
+  frontend:
+    build: ./src/werewolf/frontend
+    volumes:
+      - /code/node_modules
+      - static:/code/static
+  backend:
+    build: ./src/werewolf
     command: python src/werewolf/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
+      - static:/code/src/werewolf/frontend/static
     ports:
       - "80:8000"
-    links:
+    depends_on:
+      - frontend
       - redis
   worker:
-    build: .
+    build: ./src/werewolf
     command: python src/werewolf/manage.py runworker werewolf-channel
     volumes:
       - .:/code
-    links:
+    depends_on:
       - redis
   redis:
     image: redis:5
     ports:
       - "6379:6379"
+volumes:
+  static:
