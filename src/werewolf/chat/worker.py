@@ -68,7 +68,7 @@ class BackgroundConsumer(AsyncConsumer):
         werewolves = self.game.get_werewolves()
 
         msg = {
-            'type': 'start',
+            'type': 'worker.start',
             'roles': roles,
             'werewolves': werewolves
         }

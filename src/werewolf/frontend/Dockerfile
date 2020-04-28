@@ -4,6 +4,3 @@ WORKDIR /code
 COPY package.json package-lock.json /code/
 RUN npm install
 COPY . /code/
-RUN npm run build
-RUN ls
-RUN pwd

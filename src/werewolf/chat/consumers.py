@@ -93,9 +93,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         })
 
     # Receive message from room group
-    async def start(self, data):
+    async def worker_start(self, data):
         roles = data['roles']
         werewolves = data['werewolves']
+        print("Starting for %s" % self.player_name)
         self.player_role = roles[self.player_name]
 
         msg = {

@@ -15,7 +15,9 @@ class Game extends Component {
             show_vote_input: false,
             show_game_setup: true,
         };
+    }
 
+    componentDidMount() {
         this.chatSocket = new WebSocket(
             'ws://' + window.location.host + "/ws/werewolf/" + this.props.roomName + "/"
         );
@@ -30,6 +32,8 @@ class Game extends Component {
     }
 
     receiveMessage(data) {
+        console.log("Received message " + data.type)
+        console.log(data);
         switch (data.type) {
             case 'player_list_change':
                 this.setState({players: data['message']});
@@ -38,8 +42,8 @@ class Game extends Component {
                 this.setState({show_game_setup: false});
                 if (!this.state.name) return;
 
-                // this.setState({show_vote_input: true});
                 this.setState({
+                    show_vote_input: true,
                     player_role:data['player_role'],
                     werewolves:data['werewolves'],
                 })
@@ -58,7 +62,6 @@ class Game extends Component {
     }
 
     startSubmit() {
-        this.setState({show_game_setup: false, show_vote_input: true})
         this.chatSocket.send(JSON.stringify({
             'type': "start",
             'name': this.state.name,
@@ -85,7 +88,7 @@ class Game extends Component {
                 />
                 <GameInfo
                     name={this.state.name}
-                    role={this.state.role}
+                    role={this.state.player_role}
                     werewolves={this.state.werewolves}
                 />
                 <Vote
