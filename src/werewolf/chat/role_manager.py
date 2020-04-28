@@ -5,9 +5,7 @@
 import random
 
 SEER = 'seer'
-
 WEREWOLF = 'werewolf'
-
 VILLAGER = 'villager'
 
 class RoleManager:
@@ -54,9 +52,9 @@ class RoleManager:
         return werewolves
 
     def handle_special(self, type, player1, player2):
-        if type == seer:
+        if type == SEER:
             return self.seer(player1)
-        elif type == werewolf:
+        elif type == WEREWOLF:
             return self.get_werewolves()
         else:
             print("Not a special type")
@@ -64,5 +62,3 @@ class RoleManager:
     def seer(self, player):
         # check if it is seer's turn (later feature when added more)
         return self.players_to_roles[player]
-
-    def get_werewolves(self):
