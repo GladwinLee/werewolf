@@ -51,7 +51,7 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, type, player1, player2):
+    def handle_special(self, type, player1, player2=None):
         if type == SEER:
             return self.seer(player1)
         elif type == WEREWOLF:
@@ -62,3 +62,11 @@ class RoleManager:
     def seer(self, player):
         # check if it is seer's turn (later feature when added more)
         return self.players_to_roles[player]
+
+    def get_winner(self, vote_matrix):
+        highest_voted = max(vote_matrix, key=vote_matrix.get)
+        if self.get_roles()[highest_voted] == WEREWOLF:
+            return VILLAGER
+        else:
+            return WEREWOLF
+
