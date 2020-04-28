@@ -51,7 +51,7 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, type, player1, player2):
+    def handle_special(self, type, player1, player2=None):
         if type == SEER:
             return self.seer(player1)
         elif type == WEREWOLF:
