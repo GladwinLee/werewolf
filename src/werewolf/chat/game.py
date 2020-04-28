@@ -31,7 +31,11 @@ class Game:
 
     def get_werewolves(self):
         return self.role_manager.get_werewolves()
-    
+
+    def get_next_action(self):
+        # return next action, "seer", "vote"?
+        return "vote"  # replace this
+
     # vote to kill
     def vote(self, voter, votee):
         self.vote_actions[voter] = votee
