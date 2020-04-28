@@ -85,12 +85,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         })
 
     # Receive message from room group
-    async def player_list_change(self, data):
+    async def worker_player_list_change(self, data):
         self.player_list = data['player_list']
-        await self.send_json({
-            'type': 'player_list_change',
-            'message': self.player_list,
-        })
+        await self.send_json(data)
 
     # Receive message from room group
     async def worker_start(self, data):
@@ -100,7 +97,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.player_role = roles[self.player_name]
 
         msg = {
-            'type': 'start',
+            'type': data['type'],
             'player_role': self.player_role,
         }
 
@@ -111,11 +108,25 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(msg)
 
     # Receive message from room group
-    async def players_not_voted_list_change(self, data):
+    async def worker_players_not_voted_list_change(self, data):
         await self.send_json(data)
 
-    async def winner(self, data):
-        await self.send_json(data)
+    async def worker_action(self, data):
+        action = data['action']
+        if action == 'vote':
+            await self.send_json(data)
+
+    async def worker_winner(self, data):
+        msg = {
+            'type': data['type'],
+            'winner': data['winner'],
+            'vote_result': data['vote_results'],
+            'known_roles': data['roles'],
+            'player_role': data['roles'][self.player_name],
+        }
+        await self.send_json(msg)
+
+    # Private helpers
 
     async def send_to_worker(self, msg):
         print("To worker name:%s :%s" % (self.player_name, msg))

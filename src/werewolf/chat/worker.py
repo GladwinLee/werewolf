@@ -19,7 +19,7 @@ class BackgroundConsumer(AsyncConsumer):
         await self.channel_send(
             channel,
             {
-                'type': 'player_list_change',
+                'type': 'worker.player_list_change',
                 'player_list': player_list,
             }
         )
@@ -32,7 +32,7 @@ class BackgroundConsumer(AsyncConsumer):
         await self.group_send(
             data['room_group_name'],
             {
-                'type': 'player_list_change',
+                'type': 'worker.player_list_change',
                 'player_list': player_list,
             }
         )
@@ -47,7 +47,7 @@ class BackgroundConsumer(AsyncConsumer):
         await self.group_send(
             room,
             {
-                'type': 'player_list_change',
+                'type': 'worker.player_list_change',
                 'player_list': player_list
             })
 
@@ -62,7 +62,7 @@ class BackgroundConsumer(AsyncConsumer):
         await self.group_send(
             room,
             {
-                'type': 'players_not_voted_list_change',
+                'type': 'worker.players_not_voted_list_change',
                 'players_not_voted': players_not_voted
             })
 
@@ -71,7 +71,7 @@ class BackgroundConsumer(AsyncConsumer):
             await self.group_send(
                 room,
                 {
-                    'type': 'winner',
+                    'type': 'worker.winner',
                     'winner': winner,
                     'vote_result': vote_results,
                     'roles': roles,
@@ -89,10 +89,21 @@ class BackgroundConsumer(AsyncConsumer):
         msg = {
             'type': 'worker.start',
             'roles': roles,
-            'werewolves': werewolves
+            'werewolves': werewolves,
+        }
+        await self.group_send(room_group_name, msg)
+        await self.next_action(room_group_name)
+
+    async def next_action(self, room_group_name):
+        next_action = self.game.get_next_action()
+
+        msg = {
+            'type': 'worker.action',
+            'action': next_action
         }
         await self.group_send(room_group_name, msg)
 
+    ## Private helpers
     async def group_send(self, room, msg):
         print("send room:%s" % room)
         print(msg)

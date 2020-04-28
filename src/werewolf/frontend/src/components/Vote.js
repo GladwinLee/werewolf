@@ -15,8 +15,7 @@ class Vote extends Component {
     }
 
     render() {
-        if (!this.props.visible) return null;
-        if (this.state.vote) return <div>You voted {this.state.vote}</div>
+        if (this.state.vote) return <div>You voted {this.state.vote}</div>;
 
         const vote_choices = this.props.players.slice();
         const i = vote_choices.indexOf(this.props.name)
