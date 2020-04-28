@@ -46,11 +46,15 @@ class RoleManager:
         return self.players_to_roles
 
     def handle_special(self, type, player1, player2):
-        if type == 'seer':
+        if type == seer:
             return self.seer(player1)
+        elif type == werewolf:
+            return self.get_werewolves()
         else:
-            print("ERROR: Invalid type")
+            print("Not a special type")
 
     def seer(self, player):
         # check if it is seer's turn (later feature when added more)
         return self.players_to_roles[player]
+
+    def get_werewolves(self):
