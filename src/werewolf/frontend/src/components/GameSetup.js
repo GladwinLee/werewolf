@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class GameSetup extends Component {
+class   GameSetup extends Component {
     constructor(props) {
         super(props);
         this.state = {

@@ -105,7 +105,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         }
 
         if self.player_name in werewolves:
-            msg['werewolves'] = werewolves
+            msg['known_roles'] = {name: role for name, role in roles.items() if name in werewolves}
 
         # Send message to WebSocket
         await self.send_json(msg)

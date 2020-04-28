@@ -67,13 +67,14 @@ class BackgroundConsumer(AsyncConsumer):
             })
 
         if len(players_not_voted) == 0:
-            winner, vote_results = self.game.get_winner()
+            winner, vote_results, roles = self.game.get_winner()
             await self.group_send(
                 room,
                 {
                     'type': 'winner',
                     'winner': winner,
-                    'vote_result': vote_results
+                    'vote_result': vote_results,
+                    'roles': roles,
                 })
 
     async def start(self, data):

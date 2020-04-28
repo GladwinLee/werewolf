@@ -11,7 +11,7 @@ class Game extends Component {
             name: "",
             players: [],
             player_role: "",
-            werewolves: [],
+            known_roles: {},
             show_vote_input: false,
             show_game_setup: true,
             winner: "",
@@ -47,14 +47,15 @@ class Game extends Component {
                 this.setState({
                     show_vote_input: true,
                     player_role:data['player_role'],
-                    werewolves:data['werewolves'],
+                    known_roles:data['known_roles'],
                 })
                 break;
             case 'winner':
                 this.setState({
                     show_vote_input:false,
                     winner:data['winner'],
-                    vote_result:data['vote_result']
+                    vote_result:data['vote_result'],
+                    known_roles:data['roles'],
                 });
                 break;
             case 'players_not_voted_list_change':
@@ -94,7 +95,7 @@ class Game extends Component {
                 <PlayerList
                     players={this.state.players}
                     vote_result={this.state.vote_result}
-                    werewolves={this.state.werewolves}
+                    known_roles={this.state.known_roles}
                 />
                 <GameSetup
                     nameSubmit={(n) => this.nameSubmit(n)}

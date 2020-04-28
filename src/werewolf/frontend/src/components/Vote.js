@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import ChoosePlayer from "./ChoosePlayer";
 
 class Vote extends Component {
     constructor(props) {
@@ -22,20 +23,15 @@ class Vote extends Component {
         if (i > -1) {
             vote_choices.splice(i, 1);
         }
-        const players = vote_choices.map((p) => {
-            return (
-                <li key={"vote-" + p}>
-                    <button onClick={() => this.onVote(p)}>{p}</button>
-                </li>
-            )
-        });
+
         return (
-            <div>
+            <ChoosePlayer
+                choices={vote_choices}
+                choiceType={"vote"}
+                onChoice={(p) => this.onVote(p)}
+            >
                 Vote
-                <ul>
-                    {players}
-                </ul>
-            </div>
+            </ChoosePlayer>
         );
     }
 }

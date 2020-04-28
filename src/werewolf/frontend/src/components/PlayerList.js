@@ -4,10 +4,13 @@ function PlayerList(props) {
     const players = props.players.map((p) => {
         let text = p;
 
-        if (props.werewolves && props.werewolves.includes(p)) {
-            text += " (werewolf)";
+        if (props.known_roles) {
+            const role = props.known_roles[p]
+            if (role) {
+                text += " (" + role + ")";
+            }
         }
-        if (props.vote_result && Object.keys(props.vote_result).length > 0) {
+        if (props.vote_result) {
             const votes = props.vote_result[p];
             if (votes) {
                 text +=  " " + votes;
