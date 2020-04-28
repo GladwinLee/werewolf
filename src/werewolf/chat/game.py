@@ -9,6 +9,7 @@ class Game:
         self.role_manager = RoleManager()
         self.vote_results = {}
         self.vote_actions = {}
+
     def add_player(self, name):
         self.player_names.append(name)
         return self.player_names
@@ -38,12 +39,13 @@ class Game:
             self.vote_results[votee] += 1
         else:
             self.vote_results[votee] = 1
-        pass
-        # return list of who did not vote
+        voted_players = self.vote_actions.keys()
+        non_voters = [player for player in self.player_names if player not in voted_players]
+        return non_voters
 
     def handle_special(self, type, player1=None, player2=None):
         self.role_manager.handle_special(type, player1, player2)
 
     def get_winner(self):
 
-        return self.RoleManager.get_winner(self.vote_results)
+        return self.role_manager.get_winner(self.vote_results)
