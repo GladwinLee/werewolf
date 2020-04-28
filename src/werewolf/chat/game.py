@@ -47,5 +47,4 @@ class Game:
         self.role_manager.handle_special(type, player1, player2)
 
     def get_winner(self):
-
-        return self.role_manager.get_winner(self.vote_results)
+        return self.role_manager.get_winner(self.vote_results), self.vote_results

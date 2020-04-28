@@ -110,6 +110,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Send message to WebSocket
         await self.send_json(msg)
 
+    # Receive message from room group
+    async def players_not_voted_list_change(self, data):
+        await self.send_json(data)
+
+    async def winner(self, data):
+        await self.send_json(data)
+
     async def send_to_worker(self, msg):
         print("To worker name:%s :%s" % (self.player_name, msg))
         await self.channel_layer.send(

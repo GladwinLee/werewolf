@@ -14,6 +14,8 @@ class Game extends Component {
             werewolves: [],
             show_vote_input: false,
             show_game_setup: true,
+            winner: "",
+            vote_result: {},
         };
     }
 
@@ -48,6 +50,15 @@ class Game extends Component {
                     werewolves:data['werewolves'],
                 })
                 break;
+            case 'winner':
+                this.setState({
+                    show_vote_input:false,
+                    winner:data['winner'],
+                    vote_result:data['vote_result']
+                });
+                break;
+            case 'players_not_voted_list_change':
+                break;
             default:
                 alert(data);
         }
@@ -80,7 +91,11 @@ class Game extends Component {
         return (
             <div>
                 Connected Players
-                <PlayerList players={this.state.players}/>
+                <PlayerList
+                    players={this.state.players}
+                    vote_result={this.state.vote_result}
+                    werewolves={this.state.werewolves}
+                />
                 <GameSetup
                     nameSubmit={(n) => this.nameSubmit(n)}
                     onStart={() => this.startSubmit()}
@@ -89,7 +104,7 @@ class Game extends Component {
                 <GameInfo
                     name={this.state.name}
                     role={this.state.player_role}
-                    werewolves={this.state.werewolves}
+                    winner={this.state.winner}
                 />
                 <Vote
                     vote={(v) => this.voteSubmit(v)}

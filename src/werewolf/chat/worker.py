@@ -54,9 +54,27 @@ class BackgroundConsumer(AsyncConsumer):
     async def vote(self, data):
         name = data['name']
         vote = data['vote']
+        room = data['room_group_name']
 
         print("%s voted %s" % (name, vote))
-        self.game.vote(name, vote)
+        players_not_voted = self.game.vote(name, vote)
+
+        await self.group_send(
+            room,
+            {
+                'type': 'players_not_voted_list_change',
+                'players_not_voted': players_not_voted
+            })
+
+        if len(players_not_voted) == 0:
+            winner, vote_results = self.game.get_winner()
+            await self.group_send(
+                room,
+                {
+                    'type': 'winner',
+                    'winner': winner,
+                    'vote_result': vote_results
+                })
 
     async def start(self, data):
         name = data['name']
