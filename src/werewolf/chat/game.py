@@ -8,7 +8,7 @@ class Game:
         self.player_names = []
         self.role_manager = RoleManager()
         self.vote_results = {}
-        self.vote_actions = []
+        self.vote_actions = {}
     def add_player(self, name):
         self.player_names.append(name)
         return self.player_names
@@ -44,12 +44,6 @@ class Game:
     def handle_special(self, type, player1=None, player2=None):
         self.role_manager.handle_special(type, player1, player2)
 
-    # generate winning team based on voted out
     def get_winner(self):
-        highest_voted = max(self.vote_results, key=self.vote_results.get)
-        if self.get_roles()[highest_voted] == WEREWOLF:
-            return VILLAGER
-        else:
-            return WEREWOLF
-        pass
-        # return Werewolf or Village
+
+        return self.RoleManager.get_winner(self.vote_results)
