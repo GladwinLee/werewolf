@@ -4,15 +4,15 @@
 # import numpy as np
 import random
 
-seer = 'seer'
+SEER = 'seer'
 
-werewolf = 'werewolf'
+WEREWOLF = 'werewolf'
 
 VILLAGER = 'villager'
 
 class RoleManager:
     def __init__(self):
-        self.players_to_roles = None  # name to role
+        self.players_to_roles = {}  # name to role
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG
@@ -21,19 +21,19 @@ class RoleManager:
         Doesn't return anything, but changes players_to_roles dict to map player to roles
         """
         roles_matrix = {5:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           werewolf],
+                           WEREWOLF],
                         6:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            seer, werewolf],
+                           SEER, WEREWOLF],
                         7:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           seer, werewolf, werewolf],
+                           SEER, WEREWOLF, WEREWOLF],
                         8:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           VILLAGER, VILLAGER, seer, werewolf],
+                           VILLAGER, VILLAGER, SEER, WEREWOLF],
                         9:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           VILLAGER, seer, werewolf, werewolf, werewolf, ],
+                           VILLAGER, SEER, WEREWOLF, WEREWOLF, WEREWOLF, ],
                         10:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            VILLAGER, VILLAGER, seer, werewolf, werewolf, werewolf],
+                            VILLAGER, VILLAGER, SEER, WEREWOLF, WEREWOLF, WEREWOLF],
                         11:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            VILLAGER, VILLAGER, seer, werewolf, werewolf, werewolf, werewolf]
+                            VILLAGER, VILLAGER, SEER, WEREWOLF, WEREWOLF, WEREWOLF, WEREWOLF]
                         }
 
         player_count = len(players)
@@ -44,6 +44,14 @@ class RoleManager:
 
     def get_roles(self):
         return self.players_to_roles
+
+    def get_werewolves(self):
+        werewolf_roles = [WEREWOLF]
+        werewolves = []
+        for name, role in self.players_to_roles.items():
+            if role in werewolf_roles:
+                werewolves.append(name)
+        return werewolves
 
     def handle_special(self, type, player1, player2):
         if type == 'seer':

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import GameSetup from './GameSetup'
 import Vote from './Vote';
 import PlayerList from './PlayerList';
+import GameInfo from "./GameInfo";
 
 class Game extends Component {
     constructor(props) {
@@ -9,6 +10,8 @@ class Game extends Component {
         this.state = {
             name: "",
             players: [],
+            player_role: "",
+            werewolves: [],
             show_vote_input: false,
             show_game_setup: true,
         };
@@ -33,9 +36,13 @@ class Game extends Component {
                 break;
             case 'start':
                 this.setState({show_game_setup: false});
-                if (this.state.name) {
-                    this.setState({show_vote_input: true});
-                }
+                if (!this.state.name) return;
+
+                // this.setState({show_vote_input: true});
+                this.setState({
+                    player_role:data['player_role'],
+                    werewolves:data['werewolves'],
+                })
                 break;
             default:
                 alert(data);
@@ -67,17 +74,20 @@ class Game extends Component {
     }
 
     render() {
-        let name_display;
-        if (this.state.name) name_display = <div>Name: {this.state.name}</div>
         return (
             <div>
+                Connected Players
                 <PlayerList players={this.state.players}/>
                 <GameSetup
                     nameSubmit={(n) => this.nameSubmit(n)}
                     onStart={() => this.startSubmit()}
                     visible={this.state.show_game_setup}
                 />
-                {name_display}
+                <GameInfo
+                    name={this.state.name}
+                    role={this.state.role}
+                    werewolves={this.state.werewolves}
+                />
                 <Vote
                     vote={(v) => this.voteSubmit(v)}
                     name={this.state.name}

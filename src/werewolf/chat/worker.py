@@ -9,31 +9,31 @@ WEREWOLF_CHANNEL = 'werewolf-channel'
 # This probably doesn't work with multiple rooms atm
 class BackgroundConsumer(AsyncConsumer):
     num_players = 0
-    player_list = {}
     game = Game()
 
     async def player_join(self, data):
         channel = data['channel_name']
         room = data['room_name']
+        player_list = self.game.get_player_names()
 
         await self.channel_send(
             channel,
             {
                 'type': 'player_list_change',
-                'player_list': self.player_list.setdefault(room, []),
+                'player_list': player_list,
             }
         )
 
     async def player_leave(self, data):
         name = data['name']
         room = data['room_group_name']
-        self.player_list[room].remove(name)
+        player_list = self.game.remove_player(name)
 
         await self.group_send(
             data['room_group_name'],
             {
                 'type': 'player_list_change',
-                'player_list': self.player_list[room],
+                'player_list': player_list,
             }
         )
 
@@ -41,14 +41,14 @@ class BackgroundConsumer(AsyncConsumer):
         room = data['room_group_name']
         name = data['name']
         self.num_players += 1
-        self.player_list.setdefault(room, []).append(name)
+        player_list = self.game.add_player(name)
 
         # Send message to room group
         await self.group_send(
             room,
             {
                 'type': 'player_list_change',
-                'player_list': self.player_list[room]
+                'player_list': player_list
             })
 
     async def vote(self, data):
@@ -63,10 +63,14 @@ class BackgroundConsumer(AsyncConsumer):
         room_group_name = data['room_group_name']
         print("%s started the game" % name)
 
-        roles = self.game.start_game()
+        self.game.start_game()
+        roles = self.game.get_roles()
+        werewolves = self.game.get_werewolves()
+
         msg = {
             'type': 'start',
-            'roles': roles
+            'roles': roles,
+            'werewolves': werewolves
         }
         await self.group_send(room_group_name, msg)
 

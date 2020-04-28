@@ -6,7 +6,6 @@ function PlayerList(props) {
     });
     return (
         <div>
-            Connected Players
             <ul>
                 {players}
             </ul>

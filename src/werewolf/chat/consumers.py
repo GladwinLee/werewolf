@@ -8,6 +8,7 @@ from .worker import WEREWOLF_CHANNEL
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     player_name = ""
     player_list = []
+    player_role = ""
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -94,12 +95,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     # Receive message from room group
     async def start(self, data):
         roles = data['roles']
+        werewolves = data['werewolves']
+        self.player_role = roles[self.player_name]
+
+        msg = {
+            'type': 'start',
+            'player_role': self.player_role,
+        }
+
+        if self.player_name in werewolves:
+            msg['werewolves'] = werewolves
 
         # Send message to WebSocket
-        await self.send_json({
-            'type': 'start',
-            'message': 'temp message to be replaced by visible roles',
-        })
+        await self.send_json(msg)
 
     async def send_to_worker(self, msg):
         print("To worker name:%s :%s" % (self.player_name, msg))
