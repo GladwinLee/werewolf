@@ -25,8 +25,9 @@ class GameAction extends Component {
     }
 
     render() {
+        if (!this.props.actionData) return null;
         let display;
-        switch (this.props.action) {
+        switch (this.props.actionData['action']) {
             case 'vote':
                 display = <Vote
                     onVote={(v) => this.onVote(v)}
@@ -43,10 +44,8 @@ class GameAction extends Component {
                 </ChoosePlayer>
                 break;
             case 'wait':
-                display = "Waiting on " + this.props.action;
+                display = <h1>"Waiting on " + this.props.actionData['waiting_on']</h1>
                 break;
-            default:
-                display = null;
         }
 
         return display;

@@ -129,9 +129,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json(data)
             else:
                 msg = {
-                    "type": "wait",
-                    "action": action
+                    "type": data['type'],
+                    "action": "wait",
+                    "waiting_on": action
                 }
+                await self.send_json(msg)
 
     async def worker_role_special(self, data):
         result_type = data['result_type']

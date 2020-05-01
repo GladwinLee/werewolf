@@ -50,7 +50,7 @@ class Game extends Component {
                 break;
             case 'worker.action':
                 this.setState({
-                    action:data['action']
+                    actionData:data
                 });
                 break;
             case 'worker.role_special':
@@ -109,7 +109,7 @@ class Game extends Component {
                 />
                 <GameAction
                     socket={this.socket}
-                    action={this.state.action}
+                    actionData={this.state.actionData}
                     name={this.state.name}
                     players={this.state.players}
                 />
