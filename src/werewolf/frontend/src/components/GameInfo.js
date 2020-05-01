@@ -6,7 +6,7 @@ function GameInfo(props) {
     let winner_display;
     if (props.name) name_display = <div>Name: {props.name}</div>
     if (props.role) role_display = <div>Role: {props.role}</div>
-    if (props.winner) winner_display = <div>Winner: {props.winner}</div>
+    if (props.winner) winner_display = <h1>Winner: {props.winner}</h1>
 
     return (
         <div>

@@ -14,7 +14,7 @@ class Game extends Component {
             known_roles: {},
             show_game_setup: true,
             winner: "",
-            vote_result: {},
+            vote_results: {},
         };
     }
 
@@ -53,10 +53,14 @@ class Game extends Component {
                     action:data['action']
                 });
                 break;
+            case 'worker.role_special':
+                const new_known_roles = {...this.state.known_roles, ...data['result']}
+                this.setState({known_roles:new_known_roles});
+                break;
             case 'worker.winner':
                 this.setState({
                     winner:data['winner'],
-                    vote_result:data['vote_result'],
+                    vote_results:data['vote_results'],
                     player_role:data['player_role'],
                     known_roles:data['known_roles'],
                 });
@@ -90,7 +94,7 @@ class Game extends Component {
                 Connected Players
                 <PlayerList
                     players={this.state.players}
-                    vote_result={this.state.vote_result}
+                    vote_results={this.state.vote_results}
                     known_roles={this.state.known_roles}
                 />
                 <GameSetup

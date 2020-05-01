@@ -10,8 +10,8 @@ function PlayerList(props) {
                 text += " (" + role + ")";
             }
         }
-        if (props.vote_result) {
-            const votes = props.vote_result[p];
+        if (props.vote_results) {
+            const votes = props.vote_results[p];
             if (votes) {
                 text +=  " " + votes;
             }

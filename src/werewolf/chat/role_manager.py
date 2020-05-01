@@ -11,6 +11,7 @@ VILLAGER = 'villager'
 class RoleManager:
     def __init__(self):
         self.players_to_roles = {}  # name to role
+        self.action_order = [SEER]
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG
@@ -40,6 +41,10 @@ class RoleManager:
 
         self.players_to_roles = dict(zip(players, roles))
 
+    def get_action_order(self):
+        current_roles = {role for _, role in self.players_to_roles.items()}
+        return [role for role in self.action_order if role in current_roles] + ["vote"]
+
     def get_roles(self):
         return self.players_to_roles
 
@@ -53,15 +58,15 @@ class RoleManager:
 
     def handle_special(self, type, player1, player2=None):
         if type == SEER:
-            return self.seer(player1)
-        elif type == WEREWOLF:
-            return self.get_werewolves()
+            result_type = "role"
+            return result_type, self.seer(player1)
         else:
-            print("Not a special type")
+            print("Not a special type:", type)
+            return None, None
 
     def seer(self, player):
         # check if it is seer's turn (later feature when added more)
-        return self.players_to_roles[player]
+        return {player: self.players_to_roles[player]}
 
     def get_winner(self, vote_matrix):
         highest_voted = max(vote_matrix, key=vote_matrix.get)

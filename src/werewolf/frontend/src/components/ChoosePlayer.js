@@ -10,7 +10,7 @@ function ChoosePlayer (props) {
     });
     return (
         <div>
-            {props.children}
+            <h2>{props.children}</h2>
             <ul>
                 {players}
             </ul>

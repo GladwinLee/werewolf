@@ -73,7 +73,7 @@ class BackgroundConsumer(AsyncConsumer):
                 {
                     'type': 'worker.winner',
                     'winner': winner,
-                    'vote_result': vote_results,
+                    'vote_results': vote_results,
                     'roles': roles,
                 })
 
@@ -92,9 +92,29 @@ class BackgroundConsumer(AsyncConsumer):
             'werewolves': werewolves,
         }
         await self.group_send(room_group_name, msg)
-        await self.next_action(room_group_name)
+        await self.send_next_action(room_group_name)
 
-    async def next_action(self, room_group_name):
+    async def role_special(self, data):
+        name = data['name']
+        room_group_name = data['room_group_name']
+        channel_name = data['channel_name']
+        role_special = data['role_special']
+        player1 = data['player1']
+        player2 = data.setdefault('player2', None)
+
+        print("%s used special: %s" % (name, role_special))
+
+        result_type, result = self.game.handle_special(role_special, player1, player2)
+
+        msg = {
+            'type': 'worker.role_special',
+            'result_type': result_type,
+            'result': result,
+        }
+        await self.channel_send(channel_name, msg)
+        await self.send_next_action(room_group_name)
+
+    async def send_next_action(self, room_group_name):
         next_action = self.game.get_next_action()
 
         msg = {
@@ -103,7 +123,8 @@ class BackgroundConsumer(AsyncConsumer):
         }
         await self.group_send(room_group_name, msg)
 
-    ## Private helpers
+    # Private helpers
+
     async def group_send(self, room, msg):
         print("send room:%s" % room)
         print(msg)

@@ -67,15 +67,24 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 return
 
             await self.send_to_worker({
-                'type': 'vote',
+                'type': msg_type,
                 'name': self.player_name,
                 'vote': vote,
                 'room_group_name': self.room_group_name,
             })
         elif msg_type == "start":
             await self.send_to_worker({
-                'type': 'start',
+                'type': msg_type,
                 'name': self.player_name,
+                'room_group_name': self.room_group_name,
+            })
+        elif msg_type == "role_special":
+            await self.send_to_worker({
+                'type': msg_type,
+                'name': self.player_name,
+                'channel_name': self.channel_name,
+                'role_special': content['role_special'],
+                'player1': content['player1'],
                 'room_group_name': self.room_group_name,
             })
     # Receive message from room group
@@ -115,12 +124,25 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         action = data['action']
         if action == 'vote':
             await self.send_json(data)
+        else:
+            if self.player_role == action:
+                await self.send_json(data)
+            else:
+                msg = {
+                    "type": "wait",
+                    "action": action
+                }
+
+    async def worker_role_special(self, data):
+        result_type = data['result_type']
+        if result_type == "role":
+            await self.send_json(data)
 
     async def worker_winner(self, data):
         msg = {
             'type': data['type'],
             'winner': data['winner'],
-            'vote_result': data['vote_results'],
+            'vote_results': data['vote_results'],
             'known_roles': data['roles'],
             'player_role': data['roles'][self.player_name],
         }
