@@ -8,6 +8,7 @@ SEER = 'seer'
 WEREWOLF = 'werewolf'
 VILLAGER = 'villager'
 
+
 class RoleManager:
     def __init__(self):
         self.players_to_roles = {}  # name to role
@@ -17,25 +18,21 @@ class RoleManager:
         # fill players_to_roles map by RNG
         """
         :param players: list of names
-        Doesn't return anything, but changes players_to_roles dict to map player to roles
+        Returns list of roles selected by the players, according to number of players
+
+        ROLES GUIDE: http://onenightultimate.com/?p=27
         """
-        roles_matrix = {5:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           WEREWOLF],
-                        6:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           SEER, WEREWOLF],
-                        7:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           SEER, WEREWOLF, WEREWOLF],
-                        8:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           VILLAGER, VILLAGER, SEER, WEREWOLF],
-                        9:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                           VILLAGER, SEER, WEREWOLF, WEREWOLF, WEREWOLF, ],
-                        10:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            VILLAGER, VILLAGER, SEER, WEREWOLF, WEREWOLF, WEREWOLF],
-                        11:[VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            VILLAGER, VILLAGER, SEER, WEREWOLF, WEREWOLF, WEREWOLF, WEREWOLF]
+        player_count = len(players)
+        players += ['middle_1', 'middle_2', 'middle_3']
+
+        roles_matrix = {5: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
+                            SEER,
+                            WEREWOLF, WEREWOLF],
+                        6: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
+                            SEER,
+                            WEREWOLF, WEREWOLF],
                         }
 
-        player_count = len(players)
         roles = roles_matrix[player_count]
         random.shuffle(roles)
 
@@ -75,3 +72,8 @@ class RoleManager:
         else:
             return WEREWOLF
 
+
+test = RoleManager()
+test.generate_roles(['a', 'b', 'c', 'd', 'e', 'f'])
+
+print(test.get_roles())
