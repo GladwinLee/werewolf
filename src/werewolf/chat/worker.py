@@ -51,14 +51,25 @@ class BackgroundConsumer(AsyncConsumer):
                 'player_list': player_list
             })
 
-    async def vote(self, data):
-        name = data['name']
-        vote = data['vote']
-        room = data['room_group_name']
+    async def action(self, content):
+        name = content['name']
+        action_type = content['action_type']
+        choice = content['choice']
 
-        print("%s voted %s" % (name, vote))
+        print("%s %s: %s" % (name, action_type, choice))
+        if action_type == 'vote':
+            await self.vote(content)
+        elif self.is_role_action(action_type):
+            await self.role_action(content)
+        else:
+            print(action_type, " not supported")
+
+    async def vote(self, content):
+        name = content['name']
+        room = content['room_group_name']
+        vote = content['choice']
+
         players_not_voted = self.game.vote(name, vote)
-
         await self.group_send(
             room,
             {
@@ -67,7 +78,8 @@ class BackgroundConsumer(AsyncConsumer):
             })
 
         if len(players_not_voted) == 0:
-            winner, vote_results, roles = self.game.get_winner()
+            winner, vote_results = self.game.get_winner()
+            roles = self.game.get_roles()
             await self.group_send(
                 room,
                 {
@@ -83,7 +95,10 @@ class BackgroundConsumer(AsyncConsumer):
         print("%s started the game" % name)
 
         self.game.start_game()
-        roles = self.game.get_roles()
+        roles = self.game.get_roles().copy()
+        roles.pop("Middle 1")
+        roles.pop("Middle 2")
+        roles.pop("Middle 3")
         werewolves = self.game.get_werewolves()
 
         msg = {
@@ -94,17 +109,16 @@ class BackgroundConsumer(AsyncConsumer):
         await self.group_send(room_group_name, msg)
         await self.send_next_action(room_group_name)
 
-    async def role_special(self, data):
-        name = data['name']
-        room_group_name = data['room_group_name']
-        channel_name = data['channel_name']
-        role_special = data['role_special']
-        player1 = data['player1']
-        player2 = data.setdefault('player2', None)
+    def is_role_action(self, action_type):
+        return action_type in {'seer'}
 
-        print("%s used special: %s" % (name, role_special))
+    async def role_action(self, content):
+        room_group_name = content['room_group_name']
+        channel_name = content['channel_name']
+        action_type = content['action_type']
+        choice = content['choice']
 
-        result_type, result = self.game.handle_special(role_special, player1, player2)
+        result_type, result = self.game.handle_special(action_type, choice)
 
         msg = {
             'type': 'worker.role_special',

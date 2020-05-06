@@ -1,7 +1,12 @@
 import React from 'react';
 
 function PlayerList(props) {
-    const players = props.players.map((p) => {
+    const playerList = props.players.slice()
+    if (props.known_roles && props.known_roles["Middle 1"]) {
+        playerList.push("Middle 1", "Middle 2", "Middle 3");
+    }
+
+    const players = playerList.map((p) => {
         let text = p;
 
         if (props.known_roles) {

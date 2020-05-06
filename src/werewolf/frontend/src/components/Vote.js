@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import ChoosePlayer from "./ChoosePlayer";
+import ActionChoice from "./ActionChoice";
 
 class Vote extends Component {
     constructor(props) {
@@ -17,13 +17,13 @@ class Vote extends Component {
     render() {
         if (this.state.vote) return <div>You voted {this.state.vote}</div>;
         return (
-            <ChoosePlayer
+            <ActionChoice
                 choices={this.props.players}
                 choiceType={"vote"}
                 onChoice={(p) => this.onVote(p)}
             >
                 Vote
-            </ChoosePlayer>
+            </ActionChoice>
         );
     }
 }

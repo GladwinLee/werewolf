@@ -1,6 +1,4 @@
 from .role_manager import RoleManager
-from .role_manager import WEREWOLF
-from .role_manager import VILLAGER
 
 # Server side
 class Game:
@@ -53,4 +51,4 @@ class Game:
         return self.role_manager.handle_special(role, player1, player2)
 
     def get_winner(self):
-        return self.role_manager.get_winner(self.vote_results), self.vote_results, self.role_manager.get_roles()
+        return self.role_manager.get_winner(self.vote_results), self.vote_results

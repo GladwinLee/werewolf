@@ -15,6 +15,10 @@ class   GameSetup extends Component {
     }
 
     nameSubmit() {
+        if (this.state.name === "") {
+            alert("Name can't be empty")
+            return;
+        }
         this.props.nameSubmit(this.state.name);
         this.setState({show_name_input: false, show_start_button: true});
     }

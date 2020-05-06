@@ -23,7 +23,6 @@ class RoleManager:
         ROLES GUIDE: http://onenightultimate.com/?p=27
         """
         player_count = len(players)
-        players += ['middle_1', 'middle_2', 'middle_3']
 
         roles_matrix = {5: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
                             SEER,
@@ -36,7 +35,7 @@ class RoleManager:
         roles = roles_matrix[player_count]
         random.shuffle(roles)
 
-        self.players_to_roles = dict(zip(players, roles))
+        self.players_to_roles = dict(zip(players + ['Middle 1', 'Middle 2', 'Middle 3'], roles))
 
     def get_action_order(self):
         current_roles = {role for _, role in self.players_to_roles.items()}
@@ -53,12 +52,12 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, type, player1, player2=None):
-        if type == SEER:
+    def handle_special(self, role, player1, player2=None):
+        if role == SEER:
             result_type = "role"
             return result_type, self.seer(player1)
         else:
-            print("Not a special type:", type)
+            print("Not a special type:", role)
             return None, None
 
     def seer(self, player):
@@ -71,9 +70,3 @@ class RoleManager:
             return VILLAGER
         else:
             return WEREWOLF
-
-
-test = RoleManager()
-test.generate_roles(['a', 'b', 'c', 'd', 'e', 'f'])
-
-print(test.get_roles())

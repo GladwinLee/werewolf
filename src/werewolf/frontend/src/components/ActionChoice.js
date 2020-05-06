@@ -1,7 +1,7 @@
 import React from 'react';
 
-function ChoosePlayer (props) {
-    const players = props.choices.map((p) => {
+function ActionChoice (props) {
+    const choices = props.choices.map((p) => {
         return (
             <li key={props.choiceType + "-" + p}>
                 <button onClick={() => props.onChoice(p)}>{p}</button>
@@ -12,10 +12,10 @@ function ChoosePlayer (props) {
         <div>
             <h2>{props.children}</h2>
             <ul>
-                {players}
+                {choices}
             </ul>
         </div>
     );
 }
 
-export default ChoosePlayer;
+export default ActionChoice;

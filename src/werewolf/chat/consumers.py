@@ -12,7 +12,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = 'chat_%s' % self.room_name
+        self.room_group_name = 'werewolf_%s' % self.room_name
 
         # Join room group
         await self.channel_layer.group_add(
@@ -60,17 +60,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'name': content['message'],
                 'room_group_name': self.room_group_name,
             })
-        elif msg_type == "vote":
-            vote = content['vote']
-            if vote not in self.player_list or vote == self.player_name:
-                # send error to client
-                return
-
+        elif msg_type == "action":
             await self.send_to_worker({
                 'type': msg_type,
+                'action_type': content['action_type'],
+                'choice': content['choice'],
                 'name': self.player_name,
-                'vote': vote,
                 'room_group_name': self.room_group_name,
+                'channel_name': self.channel_name,
             })
         elif msg_type == "start":
             await self.send_to_worker({
@@ -108,6 +105,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         msg = {
             'type': data['type'],
             'player_role': self.player_role,
+            'known_roles': {self.player_name: self.player_role},
         }
 
         if self.player_name in werewolves:
@@ -120,20 +118,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def worker_players_not_voted_list_change(self, data):
         await self.send_json(data)
 
-    async def worker_action(self, data):
-        action = data['action']
+    async def worker_action(self, content):
+        action = content['action']
         if action == 'vote':
-            await self.send_json(data)
+            choices = self.player_list.copy()
+            choices.remove(self.player_name)
+            content['choices'] = choices
+            await self.send_json(content)
+        elif self.player_role == action:
+            # move to role_manager_actions.py
+            if action == 'seer':
+                choices = self.player_list.copy()
+                choices.remove(self.player_name)
+                choices += ["Middle 1,2", "Middle 1,3", "Middle 2,3"]
+                content['choices'] = choices
+                await self.send_json(content)
         else:
-            if self.player_role == action:
-                await self.send_json(data)
-            else:
-                msg = {
-                    "type": data['type'],
-                    "action": "wait",
-                    "waiting_on": action
-                }
-                await self.send_json(msg)
+            msg = {
+                "type": content['type'],
+                "action": "wait",
+                "waiting_on": action
+            }
+            await self.send_json(msg)
 
     async def worker_role_special(self, data):
         result_type = data['result_type']
