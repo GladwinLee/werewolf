@@ -53,10 +53,10 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, type, player1, player2=None):
+    def handle_special(self, type, player_1, player2=None):
         if type == SEER:
             result_type = "role"
-            return result_type, self.seer(player1)
+            return result_type, self.seer(player_1)
         else:
             print("Not a special type:", type)
             return None, None
@@ -64,6 +64,12 @@ class RoleManager:
     def seer(self, player):
         # check if it is seer's turn (later feature when added more)
         return {player: self.players_to_roles[player]}
+
+    def troublemaker(self, player_1, player_2):
+        player_2_new = self.players_to_roles[player_1]
+        player_1_new = self.players_to_roles[player_2]
+        self.players_to_roles[player_1] = player_1_new
+        self.players_to_roles[player_2] = player_2_new
 
     def get_winner(self, vote_matrix):
         highest_voted = max(vote_matrix, key=vote_matrix.get)
@@ -75,5 +81,6 @@ class RoleManager:
 
 test = RoleManager()
 test.generate_roles(['a', 'b', 'c', 'd', 'e', 'f'])
-
+print(test.get_roles())
+test.troublemaker('a','b')
 print(test.get_roles())
