@@ -7,7 +7,7 @@ import random
 SEER = 'seer'
 WEREWOLF = 'werewolf'
 VILLAGER = 'villager'
-
+ROBBER = 'robber'
 
 class RoleManager:
     def __init__(self):
@@ -27,7 +27,7 @@ class RoleManager:
         roles_matrix = {5: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
                             SEER,
                             WEREWOLF, WEREWOLF],
-                        6: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
+                        6: [ROBBER, VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
                             SEER,
                             WEREWOLF, WEREWOLF],
                         }
@@ -70,6 +70,14 @@ class RoleManager:
         self.players_to_roles[player_1] = player_1_new
         self.players_to_roles[player_2] = player_2_new
 
+    def robber(self, player):
+        players = list(self.players_to_roles.keys())
+        roles = list(self.players_to_roles.values())
+        old_robber = players[roles.index(ROBBER)]
+        switch_role = self.players_to_roles[player]
+        self.players_to_roles[player] = ROBBER
+        self.players_to_roles[old_robber] = switch_role
+
     def get_winner(self, vote_matrix):
         highest_voted = max(vote_matrix, key=vote_matrix.get)
         if self.get_roles()[highest_voted] == WEREWOLF:
@@ -81,6 +89,7 @@ class RoleManager:
 # test.generate_roles(['a', 'b', 'c', 'd', 'e', 'f'])
 # print(test.get_roles())
 # test.troublemaker('a','b')
+# test.robber('a')
 # print(test.get_roles())
 
 
