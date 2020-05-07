@@ -70,12 +70,12 @@ class RoleManager:
         self.players_to_roles[player_1] = player_1_new
         self.players_to_roles[player_2] = player_2_new
 
-    def robber(self, player):
+    def robber(self, target):
         players = list(self.players_to_roles.keys())
         roles = list(self.players_to_roles.values())
         old_robber = players[roles.index(ROBBER)]
-        switch_role = self.players_to_roles[player]
-        self.players_to_roles[player] = ROBBER
+        switch_role = self.players_to_roles[target]
+        self.players_to_roles[target] = ROBBER
         self.players_to_roles[old_robber] = switch_role
 
     def get_winner(self, vote_matrix):
