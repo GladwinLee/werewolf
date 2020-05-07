@@ -70,6 +70,8 @@ class RoleManager:
         self.players_to_roles[player_1] = player_1_new
         self.players_to_roles[player_2] = player_2_new
 
+    def robber
+
     def get_winner(self, vote_matrix):
         highest_voted = max(vote_matrix, key=vote_matrix.get)
         if self.get_roles()[highest_voted] == WEREWOLF:
