@@ -6,6 +6,9 @@ from time import sleep
 
 from .game import Game
 
+start_wait_time = 2
+role_wait_time = 4.0
+
 WEREWOLF_CHANNEL = 'werewolf-channel'
 
 
@@ -111,7 +114,7 @@ class BackgroundConsumer(AsyncConsumer):
         }
         await self.group_send(room_group_name, msg)
 
-        sleep(3)
+        sleep(start_wait_time)
         await self.send_next_action(room_group_name)
 
     def is_role_action(self, action_type):
@@ -135,21 +138,22 @@ class BackgroundConsumer(AsyncConsumer):
     async def action_timeout(self, action, room_group_name):
         timed_out = self.game.handle_special_timeout(action)
         if timed_out:
+            print("%s timed out" % action)
             await self.send_next_action(room_group_name)
 
     async def send_next_action(self, room_group_name):
         next_action = self.game.get_next_action()
         await self.group_send(room_group_name, {
             'type': 'worker.action',
-            'action': next_action
+            'action': next_action,
+            'role_wait_time': role_wait_time
         })
 
         if next_action != 'vote':
             def current_action_timeout():
-                print("%s timed out" % next_action)
                 run(self.action_timeout(next_action, room_group_name))
 
-            action_timer = Timer(3.0, current_action_timeout)
+            action_timer = Timer(role_wait_time, current_action_timeout)
             action_timer.start()
 
     # Private helpers

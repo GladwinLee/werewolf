@@ -52,10 +52,10 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, role, player1, player2=None):
+    def handle_special(self, role, choice):
         if role == SEER:
             result_type = "role"
-            return result_type, self.seer(player_1)
+            return result_type, self.seer(choice)
         else:
             print("Not a special type:", role)
             return None, None

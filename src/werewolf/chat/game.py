@@ -44,11 +44,11 @@ class Game:
         non_voters = [player for player in self.player_names if player not in voted_players]
         return non_voters
 
-    def handle_special(self, role, player1=None, player2=None):
+    def handle_special(self, role, choice):
         if role != self.get_next_action():
             return "ERROR", "Not expecting action %s" % role
         self.action_order.pop(0)
-        return self.role_manager.handle_special(role, player1, player2)
+        return self.role_manager.handle_special(role, choice)
 
     def handle_special_timeout(self, action):
         if action != self.get_next_action():

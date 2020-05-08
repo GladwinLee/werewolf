@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
-import Vote from "./Vote";
 import ActionChoice from "./ActionChoice";
+import Timer from "./Timer";
 
 class GameAction extends Component {
     constructor(props) {
         super(props)
         this.state = {
             lastActionSent: "",
+            timeLeft: 0
         }
     }
 
@@ -27,15 +28,20 @@ class GameAction extends Component {
         if (actionData['action'] === 'wait') {
             display = <h1>{"Waiting on " + this.props.actionData['waiting_on']}</h1>
         } else {
-            display = <ActionChoice
-                choices={actionData['choices']}
-                choiceType={actionData['action']}
-                onChoice={(c) => this.onChoice(c, actionData['action'])}
-            >
-                {actionData['action']}
-            </ActionChoice>
+            display =
+                <div>
+                    <Timer start={actionData['role_wait_time']}/>
+                    <ActionChoice
+                        choices={actionData['choices']}
+                        choiceType={actionData['action']}
+                        onChoice={(c) => this.onChoice(c, actionData['action'])}
+                    >
+                        {actionData['action']}
+                    </ActionChoice>
+                </div>
         }
         return display;
     }
 }
+
 export default GameAction;
