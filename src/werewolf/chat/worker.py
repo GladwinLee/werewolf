@@ -1,5 +1,8 @@
 # chat/consumers.py
 from channels.consumer import AsyncConsumer
+from threading import Timer
+from asyncio import run
+from time import sleep
 
 from .game import Game
 
@@ -107,6 +110,8 @@ class BackgroundConsumer(AsyncConsumer):
             'werewolves': werewolves,
         }
         await self.group_send(room_group_name, msg)
+
+        sleep(3)
         await self.send_next_action(room_group_name)
 
     def is_role_action(self, action_type):
@@ -120,25 +125,34 @@ class BackgroundConsumer(AsyncConsumer):
 
         result_type, result = self.game.handle_special(action_type, choice)
 
-        msg = {
+        await self.channel_send(channel_name, {
             'type': 'worker.role_special',
             'result_type': result_type,
             'result': result,
-        }
-        await self.channel_send(channel_name, msg)
+        })
         await self.send_next_action(room_group_name)
+
+    async def action_timeout(self, action, room_group_name):
+        timed_out = self.game.handle_special_timeout(action)
+        if timed_out:
+            await self.send_next_action(room_group_name)
 
     async def send_next_action(self, room_group_name):
         next_action = self.game.get_next_action()
-
-        msg = {
+        await self.group_send(room_group_name, {
             'type': 'worker.action',
             'action': next_action
-        }
-        await self.group_send(room_group_name, msg)
+        })
+
+        if next_action != 'vote':
+            def current_action_timeout():
+                print("%s timed out" % next_action)
+                run(self.action_timeout(next_action, room_group_name))
+
+            action_timer = Timer(3.0, current_action_timeout)
+            action_timer.start()
 
     # Private helpers
-
     async def group_send(self, room, msg):
         print("send room:%s" % room)
         print(msg)

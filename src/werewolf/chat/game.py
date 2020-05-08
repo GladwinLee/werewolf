@@ -50,5 +50,12 @@ class Game:
         self.action_order.pop(0)
         return self.role_manager.handle_special(role, player1, player2)
 
+    def handle_special_timeout(self, action):
+        if action != self.get_next_action():
+            return False
+
+        self.action_order.pop(0)
+        return True
+
     def get_winner(self):
         return self.role_manager.get_winner(self.vote_results), self.vote_results
