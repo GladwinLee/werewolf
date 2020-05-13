@@ -5,7 +5,7 @@ services:
     build: ./src/werewolf/frontend
     command: npm run dev
     volumes:
-      - /code/node_modules
+      - /code/node_modules/
       - ./src/werewolf/frontend:/code
       - static:/code/static
   backend:
