@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import Paper from "@material-ui/core/Paper";
 
 function Timer(props) {
     const [time, setTime] = React.useState(props.start);
@@ -10,13 +11,13 @@ function Timer(props) {
         }, 1000);
     }, [time])
 
-    if (time === 0) {
+    if (!time || time === 0) {
         return null;
     }
     return (
-        <div>
+        <Paper>
             Time remaining: {time}
-        </div>
+        </Paper>
     )
 }
 

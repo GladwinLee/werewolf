@@ -1,17 +1,20 @@
 import React from 'react';
+import Typography from "@material-ui/core/Typography";
+import WinnerAlert from "./WinnerAlert";
 
 function GameInfo(props) {
-    let name_display;
-    let role_display;
+    const display = [];
     let winner_display;
-    if (props.name) name_display = <div>Name: {props.name}</div>
-    if (props.role) role_display = <div>Role: {props.role}</div>
-    if (props.winner) winner_display = <h1>Winner: {props.winner}</h1>
+    if (props.name) display.push(<Typography>Name: {props.name}</Typography>);
+    if (props.role) display.push(<Typography>Role: {props.role}</Typography>);
+    if (props.winner) winner_display =
+        <WinnerAlert
+            winner={props.winner}
+        />
 
     return (
         <div>
-            {name_display}
-            {role_display}
+            {display}
             {winner_display}
         </div>
     );

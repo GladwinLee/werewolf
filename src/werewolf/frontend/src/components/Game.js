@@ -3,11 +3,20 @@ import GameSetup from './GameSetup'
 import PlayerList from './PlayerList';
 import GameInfo from "./GameInfo";
 import GameAction from "./GameAction";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
+
 
 class Game extends Component {
     constructor(props) {
         super(props);
-        this.state = {
+        this.state = this.getInitialState();
+    }
+
+    getInitialState() {
+        return {
             name: "",
             players: [],
             player_role: "",
@@ -15,7 +24,7 @@ class Game extends Component {
             show_game_setup: true,
             winner: "",
             vote_results: {},
-        };
+        }
     }
 
     componentDidMount() {
@@ -44,29 +53,32 @@ class Game extends Component {
                 if (!this.state.name) return;
 
                 this.setState({
-                    player_role:data['player_role'],
-                    known_roles:data['known_roles'],
+                    player_role: data['player_role'],
+                    known_roles: data['known_roles'],
                 })
                 break;
             case 'worker.action':
                 this.setState({
-                    actionData:data
+                    actionData: data
                 });
                 break;
             case 'worker.role_special':
                 const new_known_roles = {...this.state.known_roles, ...data['result']}
-                this.setState({known_roles:new_known_roles});
+                this.setState({known_roles: new_known_roles});
                 break;
             case 'worker.winner':
                 this.setState({
-                    winner:data['winner'],
-                    vote_results:data['vote_results'],
-                    player_role:data['player_role'],
-                    known_roles:data['known_roles'],
+                    winner: data['winner'],
+                    vote_results: data['vote_results'],
+                    player_role: data['player_role'],
+                    known_roles: data['known_roles'],
                 });
                 break;
             case 'worker.players_not_voted_list_change':
                 // todo
+                break;
+            case 'worker.reset':
+                this.setState(this.getInitialState());
                 break;
             default:
                 console.log(data);
@@ -81,6 +93,12 @@ class Game extends Component {
         }));
     }
 
+    resetSubmit() {
+        this.socket.send(JSON.stringify({
+            'type': "reset",
+        }));
+    }
+
     startSubmit() {
         this.socket.send(JSON.stringify({
             'type': "start",
@@ -90,30 +108,43 @@ class Game extends Component {
 
     render() {
         return (
-            <div>
-                Connected Players
-                <PlayerList
-                    players={this.state.players}
-                    vote_results={this.state.vote_results}
-                    known_roles={this.state.known_roles}
-                />
-                <GameSetup
-                    nameSubmit={(n) => this.nameSubmit(n)}
-                    onStart={() => this.startSubmit()}
-                    visible={this.state.show_game_setup}
-                />
-                <GameInfo
-                    name={this.state.name}
-                    role={this.state.player_role}
-                    winner={this.state.winner}
-                />
-                <GameAction
-                    socket={this.socket}
-                    actionData={this.state.actionData}
-                    name={this.state.name}
-                    players={this.state.players}
-                />
-            </div>
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <Paper>
+                        <Typography variant="h3">One-night Werewolf</Typography>
+                    </Paper>
+                </Grid>
+                <Grid item xs={6}>
+                    <Paper>
+                        <GameSetup
+                            nameSubmit={(n) => this.nameSubmit(n)}
+                            onStart={() => this.startSubmit()}
+                            visible={this.state.show_game_setup}
+                        />
+                        <GameInfo
+                            name={this.state.name}
+                            role={this.state.player_role}
+                            winner={this.state.winner}
+                        />
+                        <GameAction
+                            socket={this.socket}
+                            actionData={this.state.actionData}
+                            name={this.state.name}
+                            players={this.state.players}
+                        />
+                    </Paper>
+                </Grid>
+                <Grid item xs={6}>
+                    <Paper>
+                        <PlayerList
+                            players={this.state.players}
+                            vote_results={this.state.vote_results}
+                            known_roles={this.state.known_roles}
+                        />
+                    </Paper>
+                </Grid>
+                <Button onClick={() => this.resetSubmit()}>Reset</Button>
+            </Grid>
         )
     }
 }

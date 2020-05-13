@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
-class   GameSetup extends Component {
+class GameSetup extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +39,7 @@ class   GameSetup extends Component {
 
         let start_button_display;
         if (this.state.show_start_button) {
-            start_button_display = <button onClick={this.props.onStart}>Start</button>
+            start_button_display = <Button variant="contained" onClick={this.props.onStart}>Start</Button>
         }
 
         return (
@@ -52,14 +54,16 @@ class   GameSetup extends Component {
 function NameInput(props) {
     return (
         <div>
-            <input
+            <TextField
                 id="chat-message-input" type="text"
                 onKeyPress={(e) => e.key === "Enter" ? props.onSubmit() : null}
                 onChange={props.handleChange}
                 value={props.value}
+                label="Name"
+                variant="outlined"
             />
             <br/>
-            <button onClick={props.onSubmit}>Choose name</button>
+            <Button variant="contained" onClick={props.onSubmit}>Choose name</Button>
         </div>
     );
 }

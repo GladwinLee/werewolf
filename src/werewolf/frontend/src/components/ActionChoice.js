@@ -1,19 +1,27 @@
 import React from 'react';
+import Button from "@material-ui/core/Button";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Typography from "@material-ui/core/Typography";
 
 function ActionChoice (props) {
     const choices = props.choices.map((p) => {
         return (
-            <li key={props.choiceType + "-" + p}>
-                <button onClick={() => props.onChoice(p)}>{p}</button>
-            </li>
+            <Button
+                onClick={() => props.onChoice(p)}
+            >
+                {p}
+            </Button>
         )
     });
     return (
         <div>
-            <h2>{props.children}</h2>
-            <ul>
+            <Typography variant="h4">{props.children}</Typography>
+            <ButtonGroup
+                orientation="vertical"
+                color="primary"
+            >
                 {choices}
-            </ul>
+            </ButtonGroup>
         </div>
     );
 }

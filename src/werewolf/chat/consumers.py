@@ -58,32 +58,28 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.send_to_worker({
                 'type': 'name_select',
                 'name': content['message'],
-                'room_group_name': self.room_group_name,
             })
         elif msg_type == "action":
             await self.send_to_worker({
                 'type': msg_type,
                 'action_type': content['action_type'],
                 'choice': content['choice'],
-                'name': self.player_name,
-                'room_group_name': self.room_group_name,
-                'channel_name': self.channel_name,
             })
         elif msg_type == "start":
             await self.send_to_worker({
                 'type': msg_type,
-                'name': self.player_name,
-                'room_group_name': self.room_group_name,
             })
         elif msg_type == "role_special":
             await self.send_to_worker({
                 'type': msg_type,
-                'name': self.player_name,
-                'channel_name': self.channel_name,
                 'role_special': content['role_special'],
                 'player1': content['player1'],
-                'room_group_name': self.room_group_name,
             })
+        elif msg_type == "reset":
+            await self.send_to_worker({
+                'type': msg_type,
+            })
+
     # Receive message from room group
     async def chat_message(self, event):
         await self.send_json({
@@ -107,6 +103,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             'player_role': self.player_role,
             'known_roles': {self.player_name: self.player_role},
         }
+        # known_roles = {"ken": "werewolf"}
 
         if self.player_name in werewolves:
             msg['known_roles'] = {name: role for name, role in roles.items() if name in werewolves}
@@ -116,6 +113,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     # Receive message from room group
     async def worker_players_not_voted_list_change(self, data):
+        await self.send_json(data)
+
+    async def worker_reset(self, data):
         await self.send_json(data)
 
     async def worker_action(self, content):
@@ -160,6 +160,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def send_to_worker(self, msg):
         print("To worker name:%s :%s" % (self.player_name, msg))
+        msg['_name'] = self.player_name
+        msg['_channel_name'] = self.channel_name
+        msg['_room_group_name'] = self.room_group_name
+
         await self.channel_layer.send(
             WEREWOLF_CHANNEL,
             msg

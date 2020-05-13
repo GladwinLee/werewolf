@@ -9,10 +9,12 @@ WEREWOLF = 'werewolf'
 VILLAGER = 'villager'
 ROBBER = 'robber'
 
+
 class RoleManager:
+    action_order = [SEER]
+
     def __init__(self):
         self.players_to_roles = {}  # name to role
-        self.action_order = [SEER]
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG
@@ -85,11 +87,5 @@ class RoleManager:
         else:
             return WEREWOLF
 
-# test = RoleManager()
-# test.generate_roles(['a', 'b', 'c', 'd', 'e', 'f'])
-# print(test.get_roles())
-# test.troublemaker('a','b')
-# test.robber('a')
-# print(test.get_roles())
-
-
+    def is_role_action(self, action_type):
+        return action_type in self.action_order

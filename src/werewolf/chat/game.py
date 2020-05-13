@@ -3,6 +3,9 @@ from .role_manager import RoleManager
 # Server side
 class Game:
     def __init__(self):
+        self.reset()
+
+    def reset(self):
         self.player_names = []
         self.role_manager = RoleManager()
         self.vote_results = {}
@@ -33,6 +36,12 @@ class Game:
     def get_next_action(self):
         return self.action_order[0]
 
+    def get_winner(self):
+        return self.role_manager.get_winner(self.vote_results), self.vote_results
+
+    def is_role_action(self, action_type):
+        return self.role_manager.is_role_action(action_type)
+
     # vote to kill
     def vote(self, voter, votee):
         self.vote_actions[voter] = votee
@@ -56,6 +65,3 @@ class Game:
 
         self.action_order.pop(0)
         return True
-
-    def get_winner(self):
-        return self.role_manager.get_winner(self.vote_results), self.vote_results

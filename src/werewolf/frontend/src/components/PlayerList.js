@@ -1,4 +1,8 @@
 import React from 'react';
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from '@material-ui/core/ListItemText';
+import Typography from "@material-ui/core/Typography";
 
 function PlayerList(props) {
     const playerList = props.players.slice()
@@ -8,28 +12,33 @@ function PlayerList(props) {
 
     const players = playerList.map((p) => {
         let text = p;
-
+        let role;
         if (props.known_roles) {
-            const role = props.known_roles[p]
-            if (role) {
-                text += " (" + role + ")";
-            }
+            role = props.known_roles[p];
         }
         if (props.vote_results) {
             const votes = props.vote_results[p];
             if (votes) {
-                text +=  " " + votes;
+                text += " " + votes + " votes";
             }
         }
-        return <li key={p}>{text}</li>;
+        return <ListItem>
+            <ListItemText
+                primary={text}
+                secondary={role}
+            />
+        </ListItem>;
     });
+
     return (
         <div>
-            <ul>
+            <Typography variant="h5">Connected Players</Typography>
+            <List dense={true}>
                 {players}
-            </ul>
+            </List>
         </div>
     );
+
 }
 
 export default PlayerList;

@@ -14,16 +14,13 @@ WEREWOLF_CHANNEL = 'werewolf-channel'
 
 # This probably doesn't work with multiple rooms atm
 class BackgroundConsumer(AsyncConsumer):
-    num_players = 0
     game = Game()
 
     async def player_join(self, data):
-        channel = data['channel_name']
-        room = data['room_name']
         player_list = self.game.get_player_names()
 
         await self.channel_send(
-            channel,
+            data['_channel_name'],
             {
                 'type': 'worker.player_list_change',
                 'player_list': player_list,
@@ -31,12 +28,11 @@ class BackgroundConsumer(AsyncConsumer):
         )
 
     async def player_leave(self, data):
-        name = data['name']
-        room = data['room_group_name']
+        name = data['_name']
         player_list = self.game.remove_player(name)
 
         await self.group_send(
-            data['room_group_name'],
+            data['_room_group_name'],
             {
                 'type': 'worker.player_list_change',
                 'player_list': player_list,
@@ -44,35 +40,33 @@ class BackgroundConsumer(AsyncConsumer):
         )
 
     async def name_select(self, data):
-        room = data['room_group_name']
         name = data['name']
-        self.num_players += 1
         player_list = self.game.add_player(name)
 
         # Send message to room group
         await self.group_send(
-            room,
+            data['_room_group_name'],
             {
                 'type': 'worker.player_list_change',
                 'player_list': player_list
             })
 
     async def action(self, content):
-        name = content['name']
+        name = content['_name']
         action_type = content['action_type']
         choice = content['choice']
 
         print("%s %s: %s" % (name, action_type, choice))
         if action_type == 'vote':
             await self.vote(content)
-        elif self.is_role_action(action_type):
+        elif self.game.is_role_action(action_type):
             await self.role_action(content)
         else:
             print(action_type, " not supported")
 
     async def vote(self, content):
-        name = content['name']
-        room = content['room_group_name']
+        name = content['_name']
+        room = content['_room_group_name']
         vote = content['choice']
 
         players_not_voted = self.game.vote(name, vote)
@@ -96,8 +90,8 @@ class BackgroundConsumer(AsyncConsumer):
                 })
 
     async def start(self, data):
-        name = data['name']
-        room_group_name = data['room_group_name']
+        name = data['_name']
+        room_group_name = data['_room_group_name']
         print("%s started the game" % name)
 
         self.game.start_game()
@@ -117,12 +111,9 @@ class BackgroundConsumer(AsyncConsumer):
         sleep(start_wait_time)
         await self.send_next_action(room_group_name)
 
-    def is_role_action(self, action_type):
-        return action_type in {'seer'}
-
     async def role_action(self, content):
-        room_group_name = content['room_group_name']
-        channel_name = content['channel_name']
+        room_group_name = content['_room_group_name']
+        channel_name = content['_channel_name']
         action_type = content['action_type']
         choice = content['choice']
 
@@ -143,18 +134,30 @@ class BackgroundConsumer(AsyncConsumer):
 
     async def send_next_action(self, room_group_name):
         next_action = self.game.get_next_action()
-        await self.group_send(room_group_name, {
+        msg = {
             'type': 'worker.action',
             'action': next_action,
-            'role_wait_time': role_wait_time
-        })
+        }
 
         if next_action != 'vote':
+            msg['role_wait_time'] = role_wait_time
+
             def current_action_timeout():
                 run(self.action_timeout(next_action, room_group_name))
 
-            action_timer = Timer(role_wait_time, current_action_timeout)
+            action_timer = Timer(role_wait_time + 1, current_action_timeout)
             action_timer.start()
+
+        await self.group_send(room_group_name, msg)
+
+    async def reset(self, data):
+        print("%s reset the game" % data['_name'])
+        await self.group_send(
+            data['_room_group_name'],
+            {
+                'type': 'worker.reset',
+            })
+        self.game.reset()
 
     # Private helpers
     async def group_send(self, room, msg):
