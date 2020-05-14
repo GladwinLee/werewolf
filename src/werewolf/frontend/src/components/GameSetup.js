@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import {NameInput} from "./NameInput";
 
 class GameSetup extends Component {
     constructor(props) {
@@ -12,16 +12,8 @@ class GameSetup extends Component {
         }
     }
 
-    handleChange(e) {
-        this.setState({name: e.target.value});
-    }
-
-    nameSubmit() {
-        if (this.state.name === "") {
-            alert("Name can't be empty")
-            return;
-        }
-        this.props.nameSubmit(this.state.name);
+    nameSubmit(name) {
+        this.props.nameSubmit(name);
         this.setState({show_name_input: false, show_start_button: true});
     }
 
@@ -31,9 +23,7 @@ class GameSetup extends Component {
         let name_display;
         if (this.state.show_name_input) {
             name_display = <NameInput
-                value={this.state.name}
-                handleChange={(e) => this.handleChange(e)}
-                onSubmit={() => this.nameSubmit()}
+                onSubmit={(name) => this.nameSubmit(name)}
             />
         }
 
@@ -49,23 +39,6 @@ class GameSetup extends Component {
             </div>
         )
     }
-}
-
-function NameInput(props) {
-    return (
-        <div>
-            <TextField
-                id="chat-message-input" type="text"
-                onKeyPress={(e) => e.key === "Enter" ? props.onSubmit() : null}
-                onChange={props.handleChange}
-                value={props.value}
-                label="Name"
-                variant="outlined"
-            />
-            <br/>
-            <Button variant="contained" onClick={props.onSubmit}>Choose name</Button>
-        </div>
-    );
 }
 
 export default GameSetup;
