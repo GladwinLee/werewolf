@@ -7,10 +7,15 @@ from .worker import WEREWOLF_CHANNEL
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
-    player_name = ""
-    player_list = []
-    player_role = ""
-    role_manager = ConsumerRoleManager()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.reset()
+
+    def reset(self):
+        self.player_name = ""
+        self.player_list = []
+        self.player_role = ""
+        self.role_manager = ConsumerRoleManager()
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -54,33 +59,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             if self.player_name != "":
                 # send error to client
                 return
-
-            self.player_name = content['message']
-
-            await self.send_to_worker({
-                'type': 'name_select',
-                'name': content['message'],
-            })
-        elif msg_type == "action":
-            await self.send_to_worker({
-                'type': msg_type,
-                'action_type': content['action_type'],
-                'choice': content['choice'],
-            })
-        elif msg_type == "start":
-            await self.send_to_worker({
-                'type': msg_type,
-            })
-        elif msg_type == "role_special":
-            await self.send_to_worker({
-                'type': msg_type,
-                'role_special': content['role_special'],
-                'player1': content['player1'],
-            })
-        elif msg_type == "reset":
-            await self.send_to_worker({
-                'type': msg_type,
-            })
+            self.player_name = content['name']
+            await self.send_to_worker(content)
+        elif (msg_type == "action"
+              or msg_type == "start"
+              or msg_type == "role_special"
+              or msg_type == "reset"):
+            await self.send_to_worker(content)
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -101,6 +86,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def worker_reset(self, data):
+        self.reset()
+        await self.send_json(data)
+
+    async def worker_game_master(self, data):
         await self.send_json(data)
 
     async def worker_action(self, content):
@@ -121,6 +110,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "waiting_on": action
             }
             await self.send_json(msg)
+
+    async def worker_role_special(self, data):
+        result_type = data['result_type']
+        if result_type == "role":
+            await self.send_json(data)
 
     async def worker_winner(self, data):
         msg = {

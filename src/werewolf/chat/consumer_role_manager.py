@@ -1,10 +1,12 @@
 from .role_manager import SEER, WEREWOLF
 
+
 class ConsumerRoleManager:
     def __init__(self):
         self.player_role = ""
 
     def is_player_role(self, role):
+        print("ROLE", self.player_role, role)
         return self.player_role == role
 
     def handle_start(self, data, player_name):
@@ -15,6 +17,7 @@ class ConsumerRoleManager:
             'type': data['type'],
             'player_role': self.player_role,
             'known_roles': self.get_known_roles(roles, player_name),
+            'role_count': data['role_count']
         }
 
     def get_known_roles(self, roles, player_name):

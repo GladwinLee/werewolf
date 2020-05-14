@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ActionChoice from "./ActionChoice";
 import Timer from "./Timer";
+import Typography from "@material-ui/core/Typography";
 
 class GameAction extends Component {
     constructor(props) {
@@ -26,7 +27,7 @@ class GameAction extends Component {
 
         const actionData = this.props.actionData;
         if (actionData['action'] === 'wait') {
-            display = <h1>{"Waiting on " + this.props.actionData['waiting_on']}</h1>
+            display = <Typography variant="h4">{"Waiting on " + this.props.actionData['waiting_on']}</Typography>
         } else {
             display =
                 <div>

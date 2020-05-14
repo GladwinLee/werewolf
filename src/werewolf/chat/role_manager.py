@@ -16,6 +16,10 @@ class RoleManager:
 
     def __init__(self):
         self.players_to_roles = {}  # name to role
+        self.selected_roles = []
+
+    def configure_roles(self, roles):
+        self.selected_roles = [role for role, selected in roles.items() if selected]
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG
@@ -25,23 +29,33 @@ class RoleManager:
 
         ROLES GUIDE: http://onenightultimate.com/?p=27
         """
-        player_count = len(players)
+        num_players = len(players)
+        total_roles = num_players + 3
+        num_werewolves = (num_players - 1) // 2
 
-        roles_matrix = {5: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            SEER,
-                            WEREWOLF, WEREWOLF],
-                        6: [ROBBER, VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-                            SEER,
-                            WEREWOLF, WEREWOLF],
-                        }
+        roles = self.selected_roles.copy()
+        if len(roles) + num_werewolves > total_roles:
+            random.shuffle(roles)
+            roles = roles[:(total_roles - num_werewolves)]
 
-        roles = roles_matrix[player_count]
+        roles.extend([WEREWOLF] * num_werewolves)
+        if len(roles) < total_roles:
+            roles.extend([VILLAGER] * (total_roles - len(roles)))
+
+        #
+        # roles_matrix = {5: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
+        #                     SEER,
+        #                     WEREWOLF, WEREWOLF],
+        #                 6: [ROBBER, VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
+        #                     SEER,
+        #                     WEREWOLF, WEREWOLF],
+        #                 }
+
         random.shuffle(roles)
-
         self.players_to_roles = dict(zip(players + ['Middle 1', 'Middle 2', 'Middle 3'], roles))
 
     def get_action_order(self):
-        current_roles = {role for _, role in self.players_to_roles.items()}
+        current_roles = set(self.players_to_roles.values())
         return [role for role in self.action_order if role in current_roles] + ["vote"]
 
     def get_roles(self):

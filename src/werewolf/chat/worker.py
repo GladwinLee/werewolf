@@ -6,6 +6,10 @@ from time import sleep
 
 from .game import Game
 
+NAME_FIELD = '_name'
+ROOM_GROUP_NAME_FIELD = '_room_group_name'
+CHANNEL_NAME_FIELD = '_channel_name'
+
 start_wait_time = 2
 role_wait_time = 4.0
 
@@ -20,7 +24,7 @@ class BackgroundConsumer(AsyncConsumer):
         player_list = self.game.get_player_names()
 
         await self.channel_send(
-            data['_channel_name'],
+            data[CHANNEL_NAME_FIELD],
             {
                 'type': 'worker.player_list_change',
                 'player_list': player_list,
@@ -28,10 +32,10 @@ class BackgroundConsumer(AsyncConsumer):
         )
 
     async def player_leave(self, data):
-        player_list = self.game.remove_player(data['_name'])
+        player_list = self.game.remove_player(data[NAME_FIELD])
 
         await self.group_send(
-            data['_room_group_name'],
+            data[ROOM_GROUP_NAME_FIELD],
             {
                 'type': 'worker.player_list_change',
                 'player_list': player_list,
@@ -40,17 +44,24 @@ class BackgroundConsumer(AsyncConsumer):
 
     async def name_select(self, data):
         player_list = self.game.add_player(data['name'])
+        if len(player_list) == 1:
+            await self.channel_send(
+                data[CHANNEL_NAME_FIELD],
+                {
+                    'type': 'worker.game_master',
+                }
+            )
 
         # Send message to room group
         await self.group_send(
-            data['_room_group_name'],
+            data[ROOM_GROUP_NAME_FIELD],
             {
                 'type': 'worker.player_list_change',
                 'player_list': player_list
             })
 
     async def action(self, content):
-        name = content['_name']
+        name = content[NAME_FIELD]
         action_type = content['action_type']
         choice = content['choice']
 
@@ -63,8 +74,8 @@ class BackgroundConsumer(AsyncConsumer):
             print(action_type, " not supported")
 
     async def vote(self, content):
-        name = content['_name']
-        room = content['_room_group_name']
+        name = content[NAME_FIELD]
+        room = content[ROOM_GROUP_NAME_FIELD]
         vote = content['choice']
 
         players_not_voted = self.game.vote(name, vote)
@@ -88,21 +99,26 @@ class BackgroundConsumer(AsyncConsumer):
                 })
 
     async def start(self, data):
-        name = data['_name']
-        room_group_name = data['_room_group_name']
+        name = data[NAME_FIELD]
+        room_group_name = data[ROOM_GROUP_NAME_FIELD]
         print("%s started the game" % name)
 
+        self.game.configure_roles(data['roles'])
         self.game.start_game()
-        roles = self.game.get_roles().copy()
-        roles.pop("Middle 1")
-        roles.pop("Middle 2")
-        roles.pop("Middle 3")
-        werewolves = self.game.get_werewolves()
+
+        player_roles = self.game.get_roles().copy()
+        role_count = {}
+        for role in player_roles.values():
+            role_count[role] = role_count.setdefault(role, 0) + 1
+
+        player_roles.pop("Middle 1")
+        player_roles.pop("Middle 2")
+        player_roles.pop("Middle 3")
 
         msg = {
             'type': 'worker.start',
-            'roles': roles,
-            'werewolves': werewolves,
+            'roles': player_roles,
+            'role_count': role_count,
         }
         await self.group_send(room_group_name, msg)
 
@@ -110,8 +126,8 @@ class BackgroundConsumer(AsyncConsumer):
         await self.send_next_action(room_group_name)
 
     async def role_action(self, content):
-        room_group_name = content['_room_group_name']
-        channel_name = content['_channel_name']
+        room_group_name = content[ROOM_GROUP_NAME_FIELD]
+        channel_name = content[CHANNEL_NAME_FIELD]
         action_type = content['action_type']
         choice = content['choice']
 
@@ -149,9 +165,9 @@ class BackgroundConsumer(AsyncConsumer):
         await self.group_send(room_group_name, msg)
 
     async def reset(self, data):
-        print("%s reset the game" % data['_name'])
+        print("%s reset the game" % data[NAME_FIELD])
         await self.group_send(
-            data['_room_group_name'],
+            data[ROOM_GROUP_NAME_FIELD],
             {
                 'type': 'worker.reset',
             })

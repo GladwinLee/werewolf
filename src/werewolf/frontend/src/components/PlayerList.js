@@ -22,7 +22,7 @@ function PlayerList(props) {
                 text += " " + votes + " votes";
             }
         }
-        return <ListItem>
+        return <ListItem key={p}>
             <ListItemText
                 primary={text}
                 secondary={role}

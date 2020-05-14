@@ -23,6 +23,9 @@ class Game:
     def get_player_names(self):
         return self.player_names
 
+    def configure_roles(self, roles):
+        self.role_manager.configure_roles(roles)
+
     def start_game(self):
         self.role_manager.generate_roles(self.player_names)
         self.action_order = self.role_manager.get_action_order()

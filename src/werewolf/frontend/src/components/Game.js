@@ -8,7 +8,6 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 
-
 class Game extends Component {
     constructor(props) {
         super(props);
@@ -22,8 +21,10 @@ class Game extends Component {
             player_role: "",
             known_roles: {},
             show_game_setup: true,
+            is_game_master: false,
             winner: "",
             vote_results: {},
+            role_count: null,
         }
     }
 
@@ -55,6 +56,7 @@ class Game extends Component {
                 this.setState({
                     player_role: data['player_role'],
                     known_roles: data['known_roles'],
+                    role_count: data['role_count']
                 })
                 break;
             case 'worker.action':
@@ -80,6 +82,9 @@ class Game extends Component {
             case 'worker.reset':
                 this.setState(this.getInitialState());
                 break;
+            case 'worker.game_master':
+                this.setState({is_game_master: true});
+                break;
             default:
                 console.log(data);
         }
@@ -89,7 +94,7 @@ class Game extends Component {
         this.setState({"name": name});
         this.socket.send(JSON.stringify({
             'type': "name_select",
-            'message': name,
+            'name': name,
         }));
     }
 
@@ -99,10 +104,10 @@ class Game extends Component {
         }));
     }
 
-    startSubmit() {
+    startSubmit(roles) {
         this.socket.send(JSON.stringify({
             'type': "start",
-            'name': this.state.name,
+            'roles': roles,
         }));
     }
 
@@ -114,27 +119,39 @@ class Game extends Component {
                         <Typography variant="h3">One-night Werewolf</Typography>
                     </Paper>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} md={12}>
                     <Paper>
                         <GameSetup
                             nameSubmit={(n) => this.nameSubmit(n)}
-                            onStart={() => this.startSubmit()}
+                            onStart={(r) => this.startSubmit(r)}
                             visible={this.state.show_game_setup}
-                        />
-                        <GameInfo
-                            name={this.state.name}
-                            role={this.state.player_role}
-                            winner={this.state.winner}
-                        />
-                        <GameAction
-                            socket={this.socket}
-                            actionData={this.state.actionData}
-                            name={this.state.name}
-                            players={this.state.players}
+                            isGameMaster={this.state.is_game_master}
                         />
                     </Paper>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} md={6}>
+                    <Paper>
+                        <Grid container spacing={3}>
+                            <Grid item xs={6}>
+                                <GameAction
+                                    socket={this.socket}
+                                    actionData={this.state.actionData}
+                                    name={this.state.name}
+                                    players={this.state.players}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <GameInfo
+                                    name={this.state.name}
+                                    role={this.state.player_role}
+                                    winner={this.state.winner}
+                                    roleCount={this.state.role_count}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} md={6}>
                     <Paper>
                         <PlayerList
                             players={this.state.players}

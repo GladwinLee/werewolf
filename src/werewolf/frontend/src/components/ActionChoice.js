@@ -7,6 +7,7 @@ function ActionChoice (props) {
     const choices = props.choices.map((p) => {
         return (
             <Button
+                key={p}
                 onClick={() => props.onChoice(p)}
             >
                 {p}
