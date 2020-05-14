@@ -8,10 +8,11 @@ SEER = 'seer'
 WEREWOLF = 'werewolf'
 VILLAGER = 'villager'
 ROBBER = 'robber'
+TROUBLEMAKER = 'troublemaker'
 
 
 class RoleManager:
-    action_order = [SEER]
+    action_order = [SEER, ROBBER, TROUBLEMAKER]
 
     def __init__(self):
         self.players_to_roles = {}  # name to role

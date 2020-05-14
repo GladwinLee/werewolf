@@ -1,6 +1,7 @@
 # chat/consumers.py
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from .consumer_role_manager import ConsumerRoleManager
 
 from .worker import WEREWOLF_CHANNEL
 
@@ -9,6 +10,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     player_name = ""
     player_list = []
     player_role = ""
+    role_manager = ConsumerRoleManager()
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -86,32 +88,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             'message': event['message']
         })
 
-    # Receive message from room group
     async def worker_player_list_change(self, data):
         self.player_list = data['player_list']
         await self.send_json(data)
 
-    # Receive message from room group
     async def worker_start(self, data):
-        roles = data['roles']
-        werewolves = data['werewolves']
         print("Starting for %s" % self.player_name)
-        self.player_role = roles[self.player_name]
-
-        msg = {
-            'type': data['type'],
-            'player_role': self.player_role,
-            'known_roles': {self.player_name: self.player_role},
-        }
-        # known_roles = {"ken": "werewolf"}
-
-        if self.player_name in werewolves:
-            msg['known_roles'] = {name: role for name, role in roles.items() if name in werewolves}
-
-        # Send message to WebSocket
+        msg = self.role_manager.handle_start(data, self.player_name)
         await self.send_json(msg)
 
-    # Receive message from room group
     async def worker_players_not_voted_list_change(self, data):
         await self.send_json(data)
 
@@ -125,14 +110,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             choices.remove(self.player_name)
             content['choices'] = choices
             await self.send_json(content)
-        elif self.player_role == action:
-            # move to role_manager_actions.py
-            if action == 'seer':
-                choices = self.player_list.copy()
-                choices.remove(self.player_name)
-                choices += ["Middle 1,2", "Middle 1,3", "Middle 2,3"]
-                content['choices'] = choices
-                await self.send_json(content)
+        elif self.role_manager.is_player_role(action):
+            msg = self.role_manager.handle_action(content, self.player_name, self.player_list)
+            if msg:
+                await self.send_json(msg)
         else:
             msg = {
                 "type": content['type'],
@@ -140,11 +121,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "waiting_on": action
             }
             await self.send_json(msg)
-
-    async def worker_role_special(self, data):
-        result_type = data['result_type']
-        if result_type == "role":
-            await self.send_json(data)
 
     async def worker_winner(self, data):
         msg = {
@@ -157,7 +133,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(msg)
 
     # Private helpers
-
     async def send_to_worker(self, msg):
         print("To worker name:%s :%s" % (self.player_name, msg))
         msg['_name'] = self.player_name

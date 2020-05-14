@@ -28,8 +28,7 @@ class BackgroundConsumer(AsyncConsumer):
         )
 
     async def player_leave(self, data):
-        name = data['_name']
-        player_list = self.game.remove_player(name)
+        player_list = self.game.remove_player(data['_name'])
 
         await self.group_send(
             data['_room_group_name'],
@@ -40,8 +39,7 @@ class BackgroundConsumer(AsyncConsumer):
         )
 
     async def name_select(self, data):
-        name = data['name']
-        player_list = self.game.add_player(name)
+        player_list = self.game.add_player(data['name'])
 
         # Send message to room group
         await self.group_send(
