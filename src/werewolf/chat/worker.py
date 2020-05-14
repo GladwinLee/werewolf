@@ -11,7 +11,7 @@ ROOM_GROUP_NAME_FIELD = '_room_group_name'
 CHANNEL_NAME_FIELD = '_channel_name'
 
 start_wait_time = 2
-role_wait_time = 4.0
+ROLE_WAIT_TIME = 4.0
 
 WEREWOLF_CHANNEL = 'werewolf-channel'
 
@@ -138,13 +138,12 @@ class BackgroundConsumer(AsyncConsumer):
             'result_type': result_type,
             'result': result,
         })
-        await self.send_next_action(room_group_name)
 
     async def action_timeout(self, action, room_group_name):
         timed_out = self.game.handle_special_timeout(action)
         if timed_out:
             print("%s timed out" % action)
-            await self.send_next_action(room_group_name)
+        await self.send_next_action(room_group_name)
 
     async def send_next_action(self, room_group_name):
         next_action = self.game.get_next_action()
@@ -154,15 +153,17 @@ class BackgroundConsumer(AsyncConsumer):
         }
 
         if next_action != 'vote':
-            msg['role_wait_time'] = role_wait_time
-
-            def current_action_timeout():
-                run(self.action_timeout(next_action, room_group_name))
-
-            action_timer = Timer(role_wait_time + 1, current_action_timeout)
-            action_timer.start()
+            msg['role_wait_time'] = ROLE_WAIT_TIME
+            await self.start_next_action_timer(next_action, room_group_name)
 
         await self.group_send(room_group_name, msg)
+
+    async def start_next_action_timer(self, next_action, room_group_name):
+        def current_action_timeout():
+            run(self.action_timeout(next_action, room_group_name))
+
+        action_timer = Timer(ROLE_WAIT_TIME + 1, current_action_timeout)
+        action_timer.start()
 
     async def reset(self, data):
         print("%s reset the game" % data[NAME_FIELD])
