@@ -1,7 +1,6 @@
 import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import WinnerAlert from "./WinnerAlert";
-import RoleCount from "./RoleCount";
 import Paper from "@material-ui/core/Paper";
 import capitalize from "@material-ui/core/utils/capitalize";
 
@@ -14,11 +13,10 @@ function GameInfo(props) {
     if (props.winner) winner_display = <WinnerAlert winner={props.winner} />
 
     return (
-        <Paper>
+        <Paper style={{height:"100%"}}>
             {name_display}
             {role_display}
             {winner_display}
-            <RoleCount roleCount={props.roleCount}/>
         </Paper>
     );
 }

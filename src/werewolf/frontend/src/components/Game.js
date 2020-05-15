@@ -7,6 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import RoleCount from "./RoleCount";
 
 class Game extends Component {
     constructor(props) {
@@ -112,38 +113,40 @@ class Game extends Component {
         return (
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <Paper>
-                        <Typography variant="h3">One-Night Werewolf</Typography>
+                    <Typography variant="h3">One-Night Werewolf</Typography>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                    <Paper style={{height: "100%"}}>
+                        <GameSetup
+                            nameSubmit={(n) => this.nameSubmit(n)}
+                            onStart={(r) => this.startSubmit(r)}
+                            visible={this.state.show_game_setup}
+                            isGameMaster={this.state.is_game_master}
+                        />
+                        <GameAction
+                            socket={this.socket}
+                            actionData={this.state.actionData}
+                            name={this.state.player_name}
+                            players={this.state.players}
+                        />
                     </Paper>
                 </Grid>
-                <Grid item xs={12} lg={4}>
-                    <GameSetup
-                        nameSubmit={(n) => this.nameSubmit(n)}
-                        onStart={(r) => this.startSubmit(r)}
-                        visible={this.state.show_game_setup}
-                        isGameMaster={this.state.is_game_master}
-                    />
-                    <GameAction
-                        socket={this.socket}
-                        actionData={this.state.actionData}
-                        name={this.state.player_name}
-                        players={this.state.players}
-                    />
-                </Grid>
-                <Grid item xs={12} lg={2}>
+                <Grid item xs={12} md={2}>
                     <GameInfo
                         name={this.state.player_name}
                         role={this.state.known_roles[this.state.player_name]}
                         winner={this.state.winner}
-                        roleCount={this.state.role_count}
                     />
                 </Grid>
-                <Grid item xs={12} lg={6}>
+                <Grid item xs={12} md={6}>
                     <PlayerList
                         players={this.state.players}
                         vote_results={this.state.vote_results}
                         known_roles={this.state.known_roles}
                     />
+                </Grid>
+                <Grid item>
+                    <RoleCount roleCount={this.state.role_count}/>
                 </Grid>
                 <Button onClick={() => this.resetSubmit()}>Reset</Button>
             </Grid>

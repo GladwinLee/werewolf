@@ -1,7 +1,3 @@
-# Server side
-
-# import pandas as pd
-# import numpy as np
 import random
 
 SEER = 'seer'
@@ -10,6 +6,12 @@ VILLAGER = 'villager'
 ROBBER = 'robber'
 TROUBLEMAKER = 'troublemaker'
 
+MIDDLE_1 = 'Middle 1'
+MIDDLE_2 = 'Middle 2'
+MIDDLE_3 = 'Middle 3'
+MIDDLE_1_2 = "Middle 1,2"
+MIDDLE_1_3 = "Middle 1,3"
+MIDDLE_2_3 = "Middle 2,3"
 
 class RoleManager:
     action_order = [SEER, ROBBER, TROUBLEMAKER]
@@ -52,7 +54,7 @@ class RoleManager:
         #                 }
 
         random.shuffle(roles)
-        self.players_to_roles = dict(zip(players + ['Middle 1', 'Middle 2', 'Middle 3'], roles))
+        self.players_to_roles = dict(zip(players + [MIDDLE_1, MIDDLE_2, MIDDLE_3], roles))
 
     def get_action_order(self):
         current_roles = set(self.players_to_roles.values())
@@ -76,7 +78,14 @@ class RoleManager:
             print("Not a special type:", role)
 
     def seer(self, target):
-        return "role", {target: self.players_to_roles[target]}
+        keys = [target]
+        if target == MIDDLE_1_2:
+            keys = [MIDDLE_1, MIDDLE_2]
+        elif target == MIDDLE_1_3:
+            keys = [MIDDLE_1, MIDDLE_3]
+        elif target == MIDDLE_2_3:
+            keys = [MIDDLE_2, MIDDLE_3]
+        return "role", {key: self.players_to_roles[key] for key in keys}
 
     def troublemaker(self, player_1, player_2):
         player_2_new = self.players_to_roles[player_1]

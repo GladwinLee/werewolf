@@ -41,7 +41,7 @@ class GameAction extends Component {
                     />
                 </div>
         }
-        return <Paper>{display}</Paper>;
+        return <div>{display}</div>;
     }
 }
 

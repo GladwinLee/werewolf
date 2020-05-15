@@ -19,6 +19,7 @@ function ActionChoice (props) {
         <div>
             <Typography variant="h4">{capitalize(props.choiceType)}</Typography>
             <ButtonGroup
+                fullWidth
                 orientation="vertical"
                 color="primary"
             >

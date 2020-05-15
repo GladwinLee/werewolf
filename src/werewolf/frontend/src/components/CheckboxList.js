@@ -14,6 +14,7 @@ export default function CheckboxList(props) {
     const checkboxes = Object.entries(props.choices).map(([choice, checked]) => {
         return (
             <FormControlLabel
+                key={choice}
                 control={<Checkbox checked={checked} onChange={handleChange} name={choice}/>}
                 label={capitalize(choice)}
             />

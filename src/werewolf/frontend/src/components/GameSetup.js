@@ -34,10 +34,10 @@ class GameSetup extends Component {
         }
 
         return (
-            <Paper>
+            <div>
                 {name_display}
                 {game_master_display}
-            </Paper>
+            </div>
         )
     }
 }
