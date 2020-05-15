@@ -1,4 +1,4 @@
-from .role_manager import SEER, WEREWOLF, ROBBER, MIDDLE_1_2, MIDDLE_1_3, MIDDLE_2_3
+from .role_manager import SEER, WEREWOLF, TROUBLEMAKER, ROBBER, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
 
 class ConsumerRoleManager:
     def __init__(self):
@@ -30,7 +30,11 @@ class ConsumerRoleManager:
         if action == SEER:
             choices = player_list.copy()
             choices.remove(player_name)
-            choices += [MIDDLE_1_2, MIDDLE_1_3, MIDDLE_2_3]
+            choices += [
+                MIDDLE_1+SEPARATOR+MIDDLE_2,
+                MIDDLE_1+SEPARATOR+MIDDLE_3,
+                MIDDLE_2+SEPARATOR+MIDDLE_3
+            ]
             data['choices'] = choices
             return data
         elif action == ROBBER:

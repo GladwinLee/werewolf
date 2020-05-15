@@ -119,7 +119,7 @@ class Game extends Component {
                     <Paper style={{height: "100%"}}>
                         <GameSetup
                             nameSubmit={(n) => this.nameSubmit(n)}
-                            onStart={(r) => this.startSubmit(r)}
+                            handleStart={(r) => this.startSubmit(r)}
                             visible={this.state.show_game_setup}
                             isGameMaster={this.state.is_game_master}
                         />

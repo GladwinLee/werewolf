@@ -9,9 +9,8 @@ TROUBLEMAKER = 'troublemaker'
 MIDDLE_1 = 'Middle 1'
 MIDDLE_2 = 'Middle 2'
 MIDDLE_3 = 'Middle 3'
-MIDDLE_1_2 = "Middle 1,2"
-MIDDLE_1_3 = "Middle 1,3"
-MIDDLE_2_3 = "Middle 2,3"
+
+SEPARATOR = ";"
 
 class RoleManager:
     action_order = [SEER, ROBBER, TROUBLEMAKER]
@@ -78,16 +77,12 @@ class RoleManager:
             print("Not a special type:", role)
 
     def seer(self, target):
-        keys = [target]
-        if target == MIDDLE_1_2:
-            keys = [MIDDLE_1, MIDDLE_2]
-        elif target == MIDDLE_1_3:
-            keys = [MIDDLE_1, MIDDLE_3]
-        elif target == MIDDLE_2_3:
-            keys = [MIDDLE_2, MIDDLE_3]
+        # TODO add validation so cheaters can't enter multiple names that aren't middle
+        keys = target.split(SEPARATOR)
         return "role", {key: self.players_to_roles[key] for key in keys}
 
-    def troublemaker(self, player_1, player_2):
+    def troublemaker(self, choice):
+        player_1, player_2 = choice.split(SEPARATOR)
         player_2_new = self.players_to_roles[player_1]
         player_1_new = self.players_to_roles[player_2]
         self.players_to_roles[player_1] = player_1_new
