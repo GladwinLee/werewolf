@@ -2,6 +2,7 @@ import React from 'react';
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Typography from "@material-ui/core/Typography";
+import capitalize from "@material-ui/core/utils/capitalize";
 
 function ActionChoice (props) {
     const choices = props.choices.map((p) => {
@@ -16,7 +17,7 @@ function ActionChoice (props) {
     });
     return (
         <div>
-            <Typography variant="h4">{props.children}</Typography>
+            <Typography variant="h4">{capitalize(props.choiceType)}</Typography>
             <ButtonGroup
                 orientation="vertical"
                 color="primary"

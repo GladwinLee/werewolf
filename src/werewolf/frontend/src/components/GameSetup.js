@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {NameInput} from "./NameInput";
 import GameSetupMaster from "./GameSetupMaster";
+import Paper from "@material-ui/core/Paper";
 
 class GameSetup extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: "",
             show_name_input: true,
         }
     }
@@ -34,10 +34,10 @@ class GameSetup extends Component {
         }
 
         return (
-            <div>
+            <Paper>
                 {name_display}
                 {game_master_display}
-            </div>
+            </Paper>
         )
     }
 }

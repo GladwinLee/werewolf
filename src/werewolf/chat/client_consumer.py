@@ -61,7 +61,6 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             await self.send_to_worker(data)
         elif (msg_type == "action"
               or msg_type == "start"
-              or msg_type == "role_special"
               or msg_type == "reset"):
             await self.send_to_worker(data)
 

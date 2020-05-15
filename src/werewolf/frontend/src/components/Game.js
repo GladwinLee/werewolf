@@ -16,7 +16,7 @@ class Game extends Component {
 
     getInitialState() {
         return {
-            name: "",
+            player_name: "",
             players: [],
             player_role: "",
             known_roles: {},
@@ -51,10 +51,8 @@ class Game extends Component {
                 break;
             case 'worker.start':
                 this.setState({show_game_setup: false});
-                if (!this.state.name) return;
-
+                if (!this.state.player_name) return;
                 this.setState({
-                    player_role: data['player_role'],
                     known_roles: data['known_roles'],
                     role_count: data['role_count']
                 })
@@ -72,7 +70,6 @@ class Game extends Component {
                 this.setState({
                     winner: data['winner'],
                     vote_results: data['vote_results'],
-                    player_role: data['player_role'],
                     known_roles: data['known_roles'],
                 });
                 break;
@@ -91,7 +88,7 @@ class Game extends Component {
     }
 
     nameSubmit(name) {
-        this.setState({"name": name});
+        this.setState({"player_name": name});
         this.socket.send(JSON.stringify({
             'type': "name_select",
             'name': name,
@@ -116,49 +113,37 @@ class Game extends Component {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Paper>
-                        <Typography variant="h3">One-night Werewolf</Typography>
+                        <Typography variant="h3">One-Night Werewolf</Typography>
                     </Paper>
                 </Grid>
-                <Grid item xs={12} md={12}>
-                    <Paper>
-                        <GameSetup
-                            nameSubmit={(n) => this.nameSubmit(n)}
-                            onStart={(r) => this.startSubmit(r)}
-                            visible={this.state.show_game_setup}
-                            isGameMaster={this.state.is_game_master}
-                        />
-                    </Paper>
+                <Grid item xs={12} lg={4}>
+                    <GameSetup
+                        nameSubmit={(n) => this.nameSubmit(n)}
+                        onStart={(r) => this.startSubmit(r)}
+                        visible={this.state.show_game_setup}
+                        isGameMaster={this.state.is_game_master}
+                    />
+                    <GameAction
+                        socket={this.socket}
+                        actionData={this.state.actionData}
+                        name={this.state.player_name}
+                        players={this.state.players}
+                    />
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper>
-                        <Grid container>
-                            <Grid item xs={6}>
-                                <GameAction
-                                    socket={this.socket}
-                                    actionData={this.state.actionData}
-                                    name={this.state.name}
-                                    players={this.state.players}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <GameInfo
-                                    name={this.state.name}
-                                    role={this.state.player_role}
-                                    winner={this.state.winner}
-                                    roleCount={this.state.role_count}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Paper>
+                <Grid item xs={12} lg={2}>
+                    <GameInfo
+                        name={this.state.player_name}
+                        role={this.state.known_roles[this.state.player_name]}
+                        winner={this.state.winner}
+                        roleCount={this.state.role_count}
+                    />
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Paper>
-                        <PlayerList
-                            players={this.state.players}
-                            vote_results={this.state.vote_results}
-                            known_roles={this.state.known_roles}
-                        />
-                    </Paper>
+                <Grid item xs={12} lg={6}>
+                    <PlayerList
+                        players={this.state.players}
+                        vote_results={this.state.vote_results}
+                        known_roles={this.state.known_roles}
+                    />
                 </Grid>
                 <Button onClick={() => this.resetSubmit()}>Reset</Button>
             </Grid>

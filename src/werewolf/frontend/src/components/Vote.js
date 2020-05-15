@@ -19,11 +19,9 @@ class Vote extends Component {
         return (
             <ActionChoice
                 choices={this.props.players}
-                choiceType={"vote"}
+                choiceType={"Vote"}
                 onChoice={(p) => this.onVote(p)}
-            >
-                Vote
-            </ActionChoice>
+            />
         );
     }
 }

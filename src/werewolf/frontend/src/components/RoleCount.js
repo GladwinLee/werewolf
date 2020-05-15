@@ -9,6 +9,7 @@ import Card from "@material-ui/core/Card";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Grid from "@material-ui/core/Grid";
+import capitalize from "@material-ui/core/utils/capitalize";
 
 export default function RoleCount(props) {
     const [open, setOpen] = React.useState(false);
@@ -18,7 +19,7 @@ export default function RoleCount(props) {
     const display = Object.entries(props.roleCount).map(([role, count]) => {
         return (
             <TableRow key={role}>
-                <TableCell>{role}</TableCell>
+                <TableCell>{capitalize(role)}</TableCell>
                 <TableCell>{count}</TableCell>
             </TableRow>
         )

@@ -17,7 +17,9 @@ WEREWOLF_CHANNEL = 'werewolf-channel'
 
 # This doesn't work with multiple rooms atm
 class GameWorker(AsyncConsumer):
-    game = Game()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.game = Game()
 
     async def player_join(self, data):
         player_list = self.game.get_player_names()
@@ -129,13 +131,14 @@ class GameWorker(AsyncConsumer):
         action_type = data['action_type']
         choice = data['choice']
 
-        result_type, result = self.game.handle_special(action_type, choice)
-
-        await self.channel_send(channel_name, {
-            'type': 'worker.role_special',
-            'result_type': result_type,
-            'result': result,
-        })
+        response = self.game.handle_special(action_type, choice)
+        if response:
+            result_type, result = response
+            await self.channel_send(channel_name, {
+                'type': 'worker.role_special',
+                'result_type': result_type,
+                'result': result,
+            })
 
     async def action_timeout(self, action, room_group_name):
         timed_out = self.game.handle_special_timeout(action)

@@ -3,6 +3,8 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import capitalize from "@material-ui/core/utils/capitalize";
 
 function PlayerList(props) {
     const playerList = props.players.slice()
@@ -25,18 +27,18 @@ function PlayerList(props) {
         return <ListItem key={p}>
             <ListItemText
                 primary={text}
-                secondary={role}
+                secondary={role ? capitalize(role) : null}
             />
         </ListItem>;
     });
 
     return (
-        <div>
+        <Paper>
             <Typography variant="h5">Connected Players</Typography>
             <List dense={true}>
                 {players}
             </List>
-        </div>
+        </Paper>
     );
 
 }

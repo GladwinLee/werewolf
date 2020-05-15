@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import ActionChoice from "./ActionChoice";
 import Timer from "./Timer";
 import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
+import capitalize from "@material-ui/core/utils/capitalize";
 
 class GameAction extends Component {
     constructor(props) {
@@ -27,21 +29,19 @@ class GameAction extends Component {
 
         const actionData = this.props.actionData;
         if (actionData['action'] === 'wait') {
-            display = <Typography variant="h4">{"Waiting on " + this.props.actionData['waiting_on']}</Typography>
+            display = <Typography variant="h4">{"Waiting on " + capitalize(this.props.actionData['waiting_on'])}</Typography>
         } else {
             display =
                 <div>
                     <Timer start={actionData['role_wait_time']}/>
                     <ActionChoice
                         choices={actionData['choices']}
-                        choiceType={actionData['action']}
+                        choiceType={capitalize(actionData['action'])}
                         onChoice={(c) => this.onChoice(c, actionData['action'])}
-                    >
-                        {actionData['action']}
-                    </ActionChoice>
+                    />
                 </div>
         }
-        return display;
+        return <Paper>{display}</Paper>;
     }
 }
 
