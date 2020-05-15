@@ -131,7 +131,7 @@ class Game extends Component {
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <Paper>
-                        <Grid container spacing={3}>
+                        <Grid container>
                             <Grid item xs={6}>
                                 <GameAction
                                     socket={this.socket}

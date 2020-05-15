@@ -1,11 +1,11 @@
 from django.urls import re_path
 
-from . import worker, consumers
+from . import game_worker, client_consumer
 
 websocket_urlpatterns = [
-    re_path(r'ws/werewolf/(?P<room_name>\w+)/$', consumers.ChatConsumer),
+    re_path(r'ws/werewolf/(?P<room_name>\w+)/$', client_consumer.ClientConsumer),
 ]
 
 worker_channels = {
-    worker.WEREWOLF_CHANNEL: worker.BackgroundConsumer,
+    game_worker.WEREWOLF_CHANNEL: game_worker.GameWorker,
 }

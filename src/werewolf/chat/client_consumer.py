@@ -1,12 +1,10 @@
-# chat/consumers.py
-
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from .consumer_role_manager import ConsumerRoleManager
 
-from .worker import WEREWOLF_CHANNEL
+from .game_worker import WEREWOLF_CHANNEL
 
 
-class ChatConsumer(AsyncJsonWebsocketConsumer):
+class ClientConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.reset()
@@ -51,21 +49,21 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
     # Receive message from WebSocket
-    async def receive_json(self, content, **kwargs):
-        print("client sent: %s" % content)
+    async def receive_json(self, data, **kwargs):
+        print("client sent: %s" % data)
 
-        msg_type = content['type']
+        msg_type = data['type']
         if msg_type == "name_select":
             if self.player_name != "":
                 # send error to client
                 return
-            self.player_name = content['name']
-            await self.send_to_worker(content)
+            self.player_name = data['name']
+            await self.send_to_worker(data)
         elif (msg_type == "action"
               or msg_type == "start"
               or msg_type == "role_special"
               or msg_type == "reset"):
-            await self.send_to_worker(content)
+            await self.send_to_worker(data)
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -92,20 +90,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def worker_game_master(self, data):
         await self.send_json(data)
 
-    async def worker_action(self, content):
-        action = content['action']
+    async def worker_action(self, data):
+        action = data['action']
         if action == 'vote':
             choices = self.player_list.copy()
             choices.remove(self.player_name)
-            content['choices'] = choices
-            await self.send_json(content)
+            data['choices'] = choices
+            await self.send_json(data)
         elif self.role_manager.is_player_role(action):
-            msg = self.role_manager.handle_action(content, self.player_name, self.player_list)
+            msg = self.role_manager.handle_action(data, self.player_name, self.player_list)
             if msg:
                 await self.send_json(msg)
         else:
             msg = {
-                "type": content['type'],
+                "type": data['type'],
                 "action": "wait",
                 "waiting_on": action
             }

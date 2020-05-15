@@ -1,4 +1,3 @@
-# chat/consumers.py
 from channels.consumer import AsyncConsumer
 from threading import Timer
 from asyncio import run
@@ -10,14 +9,14 @@ NAME_FIELD = '_name'
 ROOM_GROUP_NAME_FIELD = '_room_group_name'
 CHANNEL_NAME_FIELD = '_channel_name'
 
-start_wait_time = 2
+START_WAIT_TIME = 2
 ROLE_WAIT_TIME = 4.0
 
 WEREWOLF_CHANNEL = 'werewolf-channel'
 
 
-# This probably doesn't work with multiple rooms atm
-class BackgroundConsumer(AsyncConsumer):
+# This doesn't work with multiple rooms atm
+class GameWorker(AsyncConsumer):
     game = Game()
 
     async def player_join(self, data):
@@ -60,23 +59,23 @@ class BackgroundConsumer(AsyncConsumer):
                 'player_list': player_list
             })
 
-    async def action(self, content):
-        name = content[NAME_FIELD]
-        action_type = content['action_type']
-        choice = content['choice']
+    async def action(self, data):
+        name = data[NAME_FIELD]
+        action_type = data['action_type']
+        choice = data['choice']
 
         print("%s %s: %s" % (name, action_type, choice))
         if action_type == 'vote':
-            await self.vote(content)
+            await self.vote(data)
         elif self.game.is_role_action(action_type):
-            await self.role_action(content)
+            await self.role_action(data)
         else:
             print(action_type, " not supported")
 
-    async def vote(self, content):
-        name = content[NAME_FIELD]
-        room = content[ROOM_GROUP_NAME_FIELD]
-        vote = content['choice']
+    async def vote(self, data):
+        name = data[NAME_FIELD]
+        room = data[ROOM_GROUP_NAME_FIELD]
+        vote = data['choice']
 
         players_not_voted = self.game.vote(name, vote)
         await self.group_send(
@@ -122,14 +121,13 @@ class BackgroundConsumer(AsyncConsumer):
         }
         await self.group_send(room_group_name, msg)
 
-        sleep(start_wait_time)
+        sleep(START_WAIT_TIME)
         await self.send_next_action(room_group_name)
 
-    async def role_action(self, content):
-        room_group_name = content[ROOM_GROUP_NAME_FIELD]
-        channel_name = content[CHANNEL_NAME_FIELD]
-        action_type = content['action_type']
-        choice = content['choice']
+    async def role_action(self, data):
+        channel_name = data[CHANNEL_NAME_FIELD]
+        action_type = data['action_type']
+        choice = data['choice']
 
         result_type, result = self.game.handle_special(action_type, choice)
 
