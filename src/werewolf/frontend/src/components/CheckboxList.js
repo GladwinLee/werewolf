@@ -8,14 +8,27 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import PropTypes from 'prop-types';
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 export default function CheckboxList(props) {
     const [choices, setChoices] = React.useState(props.choices)
+
+    const numSelected = Object.values(choices).filter((v) => v).length;
+
+    const error = numSelected < props.minChoice || numSelected > props.maxChoice;
+    let errorMessage;
+    if (props.minChoice !== props.maxChoice) {
+        errorMessage = `Must choose between ${props.minChoice} and ${props.maxChoice}`
+    } else {
+        errorMessage = `Must choose ${props.minChoice}`
+    }
+
     const handleChange = (event) => {
-        setChoices({...props.choices, [event.target.name]: event.target.checked});
+        setChoices({...choices, [event.target.name]: event.target.checked});
     };
 
     const handleSubmit = () => {
+        if (error) return;
         props.onSubmit(choices);
     }
 
@@ -32,11 +45,14 @@ export default function CheckboxList(props) {
     return (
         <Grid container>
             <Grid item xs={12}>
-                <FormControl component="fieldset">
+                <FormControl component="fieldset" error={error}>
                     <FormLabel component="legend">Roles</FormLabel>
                     <FormGroup>
                         {checkboxes}
                     </FormGroup>
+                    <FormHelperText>
+                        {error ? errorMessage : null}
+                    </FormHelperText>
                 </FormControl>
             </Grid>
             <Grid item xs={12}>
@@ -50,4 +66,12 @@ CheckboxList.propTypes = {
     choices: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
     buttonValue: PropTypes.string,
+    minChoice: PropTypes.number,
+    maxChoice: PropTypes.number,
+}
+
+CheckboxList.defaultProps = {
+    buttonValue: "Submit",
+    minChoice: 0,
+    maxChoice: Number.MAX_SAFE_INTEGER,
 }

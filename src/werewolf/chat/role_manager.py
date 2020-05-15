@@ -71,10 +71,7 @@ class RoleManager:
         return werewolves
 
     def handle_special(self, role, choice):
-        try:
-            return getattr(RoleManager, role)(self, choice)
-        except KeyError:
-            print("Not a special type:", role)
+        return getattr(RoleManager, role)(self, choice)
 
     def seer(self, target):
         # TODO add validation so cheaters can't enter multiple names that aren't middle

@@ -95,6 +95,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             choices = self.player_list.copy()
             choices.remove(self.player_name)
             data['choices'] = choices
+            data['choice_type'] = "pick1"
             await self.send_json(data)
         elif self.role_manager.is_player_role(action):
             msg = self.role_manager.handle_action(data, self.player_name, self.player_list)

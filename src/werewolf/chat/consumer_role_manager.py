@@ -27,18 +27,33 @@ class ConsumerRoleManager:
 
     def handle_action(self, data, player_name, player_list):
         action = data['action']
-        if action == SEER:
-            choices = player_list.copy()
-            choices.remove(player_name)
-            choices += [
-                MIDDLE_1+SEPARATOR+MIDDLE_2,
-                MIDDLE_1+SEPARATOR+MIDDLE_3,
-                MIDDLE_2+SEPARATOR+MIDDLE_3
-            ]
-            data['choices'] = choices
-            return data
-        elif action == ROBBER:
-            choices = player_list.copy()
-            choices.remove(player_name)
-            data['choices'] = choices
-            return data
+        try:
+            return getattr(ConsumerRoleManager, action)(self, data, player_name, player_list)
+        except KeyError:
+            print("Not a special type:", action)
+
+    def seer(self, data, player_name, player_list):
+        choices = player_list.copy()
+        choices.remove(player_name)
+        choices += [
+            MIDDLE_1 + SEPARATOR + MIDDLE_2,
+            MIDDLE_1 + SEPARATOR + MIDDLE_3,
+            MIDDLE_2 + SEPARATOR + MIDDLE_3
+        ]
+        data['choices'] = choices
+        data['choice_type'] = "pick1"
+        return data
+
+    def robber(self, data, player_name, player_list):
+        choices = player_list.copy()
+        choices.remove(player_name)
+        data['choices'] = choices
+        data['choice_type'] = "pick1"
+        return data
+
+    def troublemaker(self, data, player_name, player_list):
+        choices = player_list.copy()
+        choices.remove(player_name)
+        data['choices'] = {choice: False for choice in choices}
+        data['choice_type'] = "pick2"
+        return data
