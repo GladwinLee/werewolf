@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 import FormGroup from "@material-ui/core/FormGroup";
@@ -11,25 +11,40 @@ import Button from "@material-ui/core/Button";
 import FormHelperText from "@material-ui/core/FormHelperText";
 
 export default function CheckboxList(props) {
-    const [choices, setChoices] = React.useState(props.choices)
+    const [choices, setChoices] = React.useState(props.choices);
+
+    const choicesRef = React.useRef()
 
     const numSelected = Object.values(choices).filter((v) => v).length;
-
     const error = numSelected < props.minChoice || numSelected > props.maxChoice;
-    let errorMessage;
-    if (props.minChoice !== props.maxChoice) {
-        errorMessage = `Must choose between ${props.minChoice} and ${props.maxChoice}`
-    } else {
-        errorMessage = `Must choose ${props.minChoice}`
-    }
+    const errorMessage = (props.minChoice !== props.maxChoice) ?
+        `Must choose between ${props.minChoice} and ${props.maxChoice}` :
+        `Must choose ${props.minChoice}`;
 
     const handleChange = (event) => {
-        setChoices({...choices, [event.target.name]: event.target.checked});
+        const newChoices = {...choices, [event.target.name]: event.target.checked};
+        setChoices(newChoices);
+        choicesRef.current = newChoices;
     };
 
     const handleSubmit = () => {
-        if (error) return;
-        props.onSubmit(choices);
+        console.log("submit");
+        console.log(choicesRef.current);
+        if (!choicesRef.current) choicesRef.current = choices;
+
+        const numSelected = Object.values(choicesRef.current).filter((v) => v).length;
+        const error = numSelected < props.minChoice || numSelected > props.maxChoice;
+        if (!error)
+            props.onSubmit(choicesRef.current);
+    }
+
+    if (props.autoSubmitAfter) {
+        useEffect(() => {
+            let timeout = setTimeout(handleSubmit, props.autoSubmitAfter * 1000);
+            return () => {
+                clearTimeout(timeout)
+            };
+        }, [])
     }
 
     const checkboxes = Object.entries(choices).map(([choice, checked]) => {
@@ -68,6 +83,7 @@ CheckboxList.propTypes = {
     buttonValue: PropTypes.string,
     minChoice: PropTypes.number,
     maxChoice: PropTypes.number,
+    autoSubmitAfter: PropTypes.number,
 }
 
 CheckboxList.defaultProps = {

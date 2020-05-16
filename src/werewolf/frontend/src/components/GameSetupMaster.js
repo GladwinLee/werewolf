@@ -2,9 +2,9 @@ import React from "react";
 import CheckboxList from "./CheckboxList";
 
 const selectedRoles = {
-    seer: true,
-    robber: true,
-    troublemaker: false,
+    seer: false,
+    robber: false,
+    troublemaker: true,
 }
 
 export default function GameSetupMaster(props) {

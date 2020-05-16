@@ -1,7 +1,8 @@
-from channels.consumer import AsyncConsumer
-from threading import Timer
 from asyncio import run
+from threading import Timer
 from time import sleep
+
+from channels.consumer import AsyncConsumer
 
 from .game import Game
 
@@ -10,7 +11,7 @@ ROOM_GROUP_NAME_FIELD = '_room_group_name'
 CHANNEL_NAME_FIELD = '_channel_name'
 
 START_WAIT_TIME = 2
-ROLE_WAIT_TIME = 4.0
+ROLE_WAIT_TIME = 5
 
 WEREWOLF_CHANNEL = 'werewolf-channel'
 

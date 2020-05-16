@@ -1,11 +1,10 @@
-from .role_manager import SEER, WEREWOLF, TROUBLEMAKER, ROBBER, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
+from .role_manager import WEREWOLF, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
 
 class ConsumerRoleManager:
     def __init__(self):
         self.player_role = ""
 
     def is_player_role(self, role):
-        print("ROLE", self.player_role, role)
         return self.player_role == role
 
     def handle_start(self, data, player_name):
