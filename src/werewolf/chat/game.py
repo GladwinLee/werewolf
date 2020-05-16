@@ -1,5 +1,6 @@
 from .role_manager import RoleManager
 
+
 # Server side
 class Game:
     def __init__(self):

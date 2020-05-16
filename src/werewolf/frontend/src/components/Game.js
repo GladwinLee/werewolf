@@ -41,7 +41,7 @@ class Game extends Component {
             this.receiveMessage(JSON.parse(e.data));
         };
 
-        this.socket.onclose = (e) => {
+        this.socket.onclose = () => {
             console.error('socket closed unexpectedly');
         };
     }

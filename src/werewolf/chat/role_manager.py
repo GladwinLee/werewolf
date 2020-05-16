@@ -25,16 +25,17 @@ class RoleManager:
         return self.action_order
 
     def configure_roles(self, roles):
-        self.selected_roles = [role for role, selected in roles.items() if selected]
+        self.selected_roles = [role for role, selected in roles.items() if
+                               selected]
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG
         """
-        :param players: list of names
-        Returns list of roles selected by the players, according to number of players
+            :param players: list of names
+            Returns list of roles selected by the players, according to number of players
 
-        ROLES GUIDE: http://onenightultimate.com/?p=27
-        """
+            ROLES GUIDE: http://onenightultimate.com/?p=27
+            """
         num_players = len(players)
         total_roles = num_players + 3
         num_werewolves = (num_players - 1) // 2
@@ -49,11 +50,13 @@ class RoleManager:
             roles.extend([VILLAGER] * (total_roles - len(roles)))
 
         random.shuffle(roles)
-        self.players_to_roles = dict(zip(players + [MIDDLE_1, MIDDLE_2, MIDDLE_3], roles))
+        self.players_to_roles = dict(
+            zip(players + [MIDDLE_1, MIDDLE_2, MIDDLE_3], roles))
 
     def get_action_order(self):
         current_roles = set(self.players_to_roles.values())
-        return [role for role in self.action_order if role in current_roles] + ["vote"]
+        return [role for role in self.action_order if role in current_roles] + \
+               ["vote"]
 
     def get_roles(self):
         return self.players_to_roles
@@ -74,7 +77,8 @@ class RoleManager:
         keys = target.split(SEPARATOR)
         result = {key: self.players_to_roles[key] for key in keys}
         log_msg = f"The Seer {player_name} sees:"
-        log_msg += ",".join([f" {key} as {role}" for key, role in result.items()])
+        log_msg += ",".join(
+            [f" {key} as {role}" for key, role in result.items()])
         self.action_log.append(log_msg)
 
         return "role", result
@@ -93,7 +97,9 @@ class RoleManager:
 
     def robber(self, player_name, target):
         switch_role = self.players_to_roles[target]
-        self.action_log.append(f"The Robber {player_name} robs {target}, and becomes a {switch_role}")
+        self.action_log.append(
+            f"The Robber {player_name} robs {target}, and becomes a {switch_role}")
+
         self.players_to_roles[player_name] = switch_role
         self.players_to_roles[target] = ROBBER
         return "role", {player_name: self.players_to_roles[player_name]}

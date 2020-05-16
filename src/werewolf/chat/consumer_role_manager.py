@@ -1,5 +1,6 @@
 from .role_manager import WEREWOLF, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
 
+
 class ConsumerRoleManager:
     def __init__(self):
         self.player_role = ""
@@ -27,7 +28,9 @@ class ConsumerRoleManager:
     def handle_action(self, data, player_name, player_list):
         action = data['action']
         try:
-            return getattr(ConsumerRoleManager, action)(self, data, player_name, player_list)
+            return getattr(ConsumerRoleManager, action)(
+                self, data, player_name, player_list
+            )
         except KeyError:
             print("Not a special type:", action)
 
