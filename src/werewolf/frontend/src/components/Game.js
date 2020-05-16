@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import RoleCount from "./RoleCount";
+import ActionLog from "./ActionLog";
 
 class Game extends Component {
     constructor(props) {
@@ -26,6 +27,7 @@ class Game extends Component {
             winner: "",
             vote_results: {},
             role_count: null,
+            action_log: [],
         }
     }
 
@@ -58,6 +60,9 @@ class Game extends Component {
                     role_count: data['role_count']
                 })
                 break;
+            case 'worker.game_master':
+                this.setState({is_game_master: true});
+                break;
             case 'worker.action':
                 this.setState({
                     actionData: data
@@ -72,6 +77,7 @@ class Game extends Component {
                     winner: data['winner'],
                     vote_results: data['vote_results'],
                     known_roles: data['known_roles'],
+                    action_log: data['action_log']
                 });
                 break;
             case 'worker.players_not_voted_list_change':
@@ -79,9 +85,6 @@ class Game extends Component {
                 break;
             case 'worker.reset':
                 this.setState(this.getInitialState());
-                break;
-            case 'worker.game_master':
-                this.setState({is_game_master: true});
                 break;
             default:
                 console.log(data);
@@ -131,22 +134,37 @@ class Game extends Component {
                         />
                     </Paper>
                 </Grid>
-                <Grid item xs={12} md={2}>
-                    <GameInfo
-                        name={this.state.player_name}
-                        role={this.state.known_roles[this.state.player_name]}
-                        winner={this.state.winner}
-                    />
+                <Grid container item xs={12} md={5} spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <Paper style={{height: "100%"}}>
+                            <GameInfo
+                                name={this.state.player_name}
+                                role={this.state.known_roles[this.state.player_name]}
+                                winner={this.state.winner}
+                            />
+                        </Paper>
+                    </Grid>
+                    <Grid container item xs={12} md={6} spacing={3} direction={'column'}>
+                        <Grid item>
+                            <Paper style={{width:"100%"}}>
+                                <RoleCount roleCount={this.state.role_count}/>
+                            </Paper>
+                        </Grid>
+                        <Grid item>
+                            <Paper style={{width:"100%"}}>
+                                <ActionLog actionLog={this.state.action_log}/>
+                            </Paper>
+                        </Grid>
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <PlayerList
-                        players={this.state.players}
-                        vote_results={this.state.vote_results}
-                        known_roles={this.state.known_roles}
-                    />
-                </Grid>
-                <Grid item>
-                    <RoleCount roleCount={this.state.role_count}/>
+                <Grid item xs={12} md={3}>
+                    <Paper style={{height: "100%"}}>
+                        <PlayerList
+                            players={this.state.players}
+                            vote_results={this.state.vote_results}
+                            known_roles={this.state.known_roles}
+                        />
+                    </Paper>
                 </Grid>
                 <Button onClick={() => this.resetSubmit()}>Reset</Button>
             </Grid>

@@ -20,6 +20,7 @@ class GameWorker(AsyncConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.game = Game()
+        self.action_log = []
 
     async def player_join(self, data):
         player_list = self.game.get_player_names()
@@ -88,16 +89,21 @@ class GameWorker(AsyncConsumer):
             })
 
         if len(players_not_voted) == 0:
-            winner, vote_results = self.game.get_winner()
-            roles = self.game.get_roles()
-            await self.group_send(
-                room,
-                {
-                    'type': 'worker.winner',
-                    'winner': winner,
-                    'vote_results': vote_results,
-                    'roles': roles,
-                })
+            await self.send_winner(room)
+
+    async def send_winner(self, room):
+        winner, vote_results = self.game.get_winner()
+        roles = self.game.get_roles()
+        action_log = self.game.get_action_log()
+        await self.group_send(
+            room,
+            {
+                'type': 'worker.winner',
+                'winner': winner,
+                'vote_results': vote_results,
+                'known_roles': roles,
+                'action_log': action_log,
+            })
 
     async def start(self, data):
         name = data[NAME_FIELD]
@@ -130,8 +136,9 @@ class GameWorker(AsyncConsumer):
         channel_name = data[CHANNEL_NAME_FIELD]
         action_type = data['action_type']
         choice = data['choice']
+        player_name = data[NAME_FIELD]
 
-        response = self.game.handle_special(action_type, choice)
+        response = self.game.handle_special(action_type, player_name, choice)
         if response:
             result_type, result = response
             await self.channel_send(channel_name, {

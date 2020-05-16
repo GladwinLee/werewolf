@@ -45,7 +45,6 @@ class Game:
     def is_role_action(self, action_type):
         return self.role_manager.is_role_action(action_type)
 
-    # vote to kill
     def vote(self, voter, votee):
         self.vote_actions[voter] = votee
         if votee in self.vote_results.keys():
@@ -56,11 +55,11 @@ class Game:
         non_voters = [player for player in self.player_names if player not in voted_players]
         return non_voters
 
-    def handle_special(self, role, choice):
+    def handle_special(self, role, player_name, choice):
         if role != self.get_next_action():
             return "ERROR", "Not expecting action %s" % role
         self.action_order.pop(0)
-        return self.role_manager.handle_special(role, choice)
+        return self.role_manager.handle_special(role, player_name, choice)
 
     def handle_special_timeout(self, action):
         if action != self.get_next_action():
@@ -68,3 +67,9 @@ class Game:
 
         self.action_order.pop(0)
         return True
+
+    def get_action_log(self):
+        action_log = self.role_manager.get_action_log().copy()
+        for name, vote in self.vote_actions.items():
+            action_log.append(f"{name} votes {vote}")
+        return action_log

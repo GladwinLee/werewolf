@@ -33,14 +33,13 @@ function PlayerList(props) {
     });
 
     return (
-        <Paper style={{height:"100%"}}>
+        <div>
             <Typography variant="h5">Connected Players</Typography>
             <List dense={true}>
                 {players}
             </List>
-        </Paper>
+        </div>
     );
-
 }
 
 export default PlayerList;

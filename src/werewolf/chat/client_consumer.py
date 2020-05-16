@@ -115,14 +115,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             await self.send_json(data)
 
     async def worker_winner(self, data):
-        msg = {
-            'type': data['type'],
-            'winner': data['winner'],
-            'vote_results': data['vote_results'],
-            'known_roles': data['roles'],
-            'player_role': data['roles'][self.player_name],
-        }
-        await self.send_json(msg)
+        await self.send_json(data)
 
     # Private helpers
     async def send_to_worker(self, msg):

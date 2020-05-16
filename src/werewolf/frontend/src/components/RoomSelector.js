@@ -22,7 +22,7 @@ class RoomSelector extends Component {
                         onChange={(e) => this.handleChange(e)}
                     />
                 </label>
-                <input type="submit" value="Choose Name"/>
+                <input type="submit" value="Enter Name"/>
             </form>
         )
     }

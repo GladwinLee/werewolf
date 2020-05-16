@@ -1,7 +1,6 @@
 import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import WinnerAlert from "./WinnerAlert";
-import Paper from "@material-ui/core/Paper";
 import capitalize from "@material-ui/core/utils/capitalize";
 
 function GameInfo(props) {
@@ -13,11 +12,11 @@ function GameInfo(props) {
     if (props.winner) winner_display = <WinnerAlert winner={props.winner} />
 
     return (
-        <Paper style={{height:"100%"}}>
+        <div>
             {name_display}
             {role_display}
             {winner_display}
-        </Paper>
+        </div>
     );
 }
 

@@ -10,10 +10,9 @@ import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Grid from "@material-ui/core/Grid";
 import capitalize from "@material-ui/core/utils/capitalize";
+import Collapsible from "./Collapsible";
 
 export default function RoleCount(props) {
-    const [open, setOpen] = React.useState(false);
-
     if (!props.roleCount) return null;
 
     const display = Object.entries(props.roleCount).map(([role, count]) => {
@@ -26,22 +25,10 @@ export default function RoleCount(props) {
     })
 
     return (
-        <Card>
-            <Grid container direction="row" alignItems="center">
-                <Grid item>
-                    <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-                        {open ? <KeyboardArrowUpIcon/> : <KeyboardArrowDownIcon/>}
-                    </IconButton>
-                </Grid>
-                <Grid item>
-                    <Typography>Roles in play: </Typography>
-                </Grid>
-            </Grid>
-            <Collapse in={open}>
-                <Table size={"small"}>
-                    {display}
-                </Table>
-            </Collapse>
-        </Card>
+        <Collapsible value={"Roles in play:"}>
+            <Table size={"small"}>
+                {display}
+            </Table>
+        </Collapsible>
     )
 }

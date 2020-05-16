@@ -12,12 +12,14 @@ MIDDLE_3 = 'Middle 3'
 
 SEPARATOR = ";"
 
+
 class RoleManager:
     action_order = [SEER, ROBBER, TROUBLEMAKER]
 
     def __init__(self):
         self.players_to_roles = {}  # name to role
         self.selected_roles = []
+        self.action_log = []
 
     def configure_roles(self, roles):
         self.selected_roles = [role for role, selected in roles.items() if selected]
@@ -43,15 +45,6 @@ class RoleManager:
         if len(roles) < total_roles:
             roles.extend([VILLAGER] * (total_roles - len(roles)))
 
-        #
-        # roles_matrix = {5: [VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-        #                     SEER,
-        #                     WEREWOLF, WEREWOLF],
-        #                 6: [ROBBER, VILLAGER, VILLAGER, VILLAGER, VILLAGER, VILLAGER,
-        #                     SEER,
-        #                     WEREWOLF, WEREWOLF],
-        #                 }
-
         random.shuffle(roles)
         self.players_to_roles = dict(zip(players + [MIDDLE_1, MIDDLE_2, MIDDLE_3], roles))
 
@@ -70,29 +63,38 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, role, choice):
-        return getattr(RoleManager, role)(self, choice)
+    def handle_special(self, role, player_name, choice):
+        return getattr(RoleManager, role)(self, player_name, choice)
 
-    def seer(self, target):
+    def seer(self, player_name, target):
         # TODO add validation so cheaters can't enter multiple names that aren't middle
         keys = target.split(SEPARATOR)
-        return "role", {key: self.players_to_roles[key] for key in keys}
+        result = {key: self.players_to_roles[key] for key in keys}
+        log_msg = f"The Seer {player_name} sees:"
+        log_msg += ",".join([f" {key} as {role}" for key, role in result.items()])
+        self.action_log.append(log_msg)
 
-    def troublemaker(self, choice):
+        return "role", result
+
+    def troublemaker(self, player_name, choice):
         player_1, player_2 = choice.split(SEPARATOR)
         player_2_new = self.players_to_roles[player_1]
         player_1_new = self.players_to_roles[player_2]
+        self.action_log.append(
+            f"The Troublemaker {player_name} switches role for {player_1}'s to {player_1_new} "
+            f"and {player_2} to {player_2_new}"
+        )
+
         self.players_to_roles[player_1] = player_1_new
         self.players_to_roles[player_2] = player_2_new
 
-    def robber(self, target):
-        players = list(self.players_to_roles.keys())
-        roles = list(self.players_to_roles.values())
-        old_robber = players[roles.index(ROBBER)]
+    def robber(self, player_name, target):
         switch_role = self.players_to_roles[target]
+        self.action_log.append(f"The Robber {player_name} robs {target}, and becomes a {switch_role}")
+
+        self.players_to_roles[player_name] = switch_role
         self.players_to_roles[target] = ROBBER
-        self.players_to_roles[old_robber] = switch_role
-        return "role", {old_robber: self.players_to_roles[old_robber]}
+        return "role", {player_name: self.players_to_roles[player_name]}
 
     def get_winner(self, vote_matrix):
         highest_voted = max(vote_matrix, key=vote_matrix.get)
@@ -103,3 +105,6 @@ class RoleManager:
 
     def is_role_action(self, action_type):
         return action_type in self.action_order
+
+    def get_action_log(self):
+        return self.action_log

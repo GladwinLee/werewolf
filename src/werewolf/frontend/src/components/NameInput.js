@@ -37,7 +37,7 @@ export function NameInput(props) {
                 />
             </Grid>
             <Grid item>
-                <Button variant="contained" onClick={handleSubmit}>Choose name</Button>
+                <Button variant="contained" onClick={handleSubmit}>Enter name</Button>
             </Grid>
         </Grid>
     );
