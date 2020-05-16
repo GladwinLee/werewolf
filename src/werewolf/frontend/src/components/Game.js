@@ -28,6 +28,7 @@ class Game extends Component {
             vote_results: {},
             role_count: null,
             action_log: [],
+            configurable_roles: [],
         }
     }
 
@@ -61,7 +62,10 @@ class Game extends Component {
                 })
                 break;
             case 'worker.game_master':
-                this.setState({is_game_master: true});
+                this.setState({
+                    is_game_master: true,
+                    configurable_roles: data['configurable_roles'],
+                });
                 break;
             case 'worker.action':
                 this.setState({
@@ -131,6 +135,7 @@ class Game extends Component {
                             handleStart={(r) => this.startSubmit(r)}
                             visible={this.state.show_game_setup}
                             isGameMaster={this.state.is_game_master}
+                            configurableRoles={this.state.configurable_roles}
                         />
                         <GameAction
                             socket={this.socket}

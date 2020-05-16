@@ -23,6 +23,9 @@ class Game:
     def get_player_names(self):
         return self.player_names
 
+    def get_configurable_roles(self):
+        return self.role_manager.get_configurable_roles()
+
     def configure_roles(self, roles):
         self.role_manager.configure_roles(roles)
 

@@ -21,6 +21,9 @@ class RoleManager:
         self.selected_roles = []
         self.action_log = []
 
+    def get_configurable_roles(self):
+        return self.action_order
+
     def configure_roles(self, roles):
         self.selected_roles = [role for role, selected in roles.items() if selected]
 

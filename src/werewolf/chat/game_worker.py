@@ -47,11 +47,13 @@ class GameWorker(AsyncConsumer):
 
     async def name_select(self, data):
         player_list = self.game.add_player(data['name'])
+        configurable_roles = self.game.get_configurable_roles()
         if len(player_list) == 1:
             await self.channel_send(
                 data[CHANNEL_NAME_FIELD],
                 {
                     'type': 'worker.game_master',
+                    'configurable_roles': configurable_roles,
                 }
             )
 
