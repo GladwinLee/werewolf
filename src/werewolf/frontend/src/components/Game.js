@@ -65,7 +65,7 @@ class Game extends Component {
                 break;
             case 'worker.action':
                 this.setState({
-                    actionData: data
+                    action_data: data
                 });
                 break;
             case 'worker.role_special':
@@ -112,6 +112,12 @@ class Game extends Component {
         }));
     }
 
+    setActionLog(log) {
+        const newActionLog = this.state.action_log.slice();
+        newActionLog.push(log);
+        this.setState({action_log: newActionLog})
+    }
+
     render() {
         return (
             <Grid container spacing={3}>
@@ -128,9 +134,10 @@ class Game extends Component {
                         />
                         <GameAction
                             socket={this.socket}
-                            actionData={this.state.actionData}
+                            actionData={this.state.action_data}
                             name={this.state.player_name}
                             players={this.state.players}
+                            logAction={(l) => this.setActionLog(l)}
                         />
                     </Paper>
                 </Grid>

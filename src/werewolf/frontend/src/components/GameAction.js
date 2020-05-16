@@ -10,7 +10,6 @@ class GameAction extends Component {
         super(props)
         this.state = {
             lastActionSent: "",
-            timeLeft: 0
         }
     }
 
@@ -20,7 +19,10 @@ class GameAction extends Component {
             'action_type': action_type,
             'choice': choice,
         }));
-        this.setState({lastActionSent: action_type});
+        this.setState({
+            lastActionSent: action_type,
+        });
+        this.props.logAction(`${capitalize(action_type)}: ${choice}`);
     }
 
     onCheckBoxSubmit(choices, action_type) {
@@ -63,7 +65,9 @@ class GameAction extends Component {
                     </div>
             }
         }
-        return {display};
+        return <div>
+            {display}
+        </div>
     }
 }
 
