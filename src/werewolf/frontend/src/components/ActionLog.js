@@ -4,6 +4,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import Collapsible from "./Collapsible";
 import PropTypes from "prop-types";
+import TableBody from "@material-ui/core/TableBody";
 
 export default function ActionLog(props) {
     if (!props.actionLog || props.actionLog.length === 0) return null;
@@ -19,7 +20,9 @@ export default function ActionLog(props) {
     return (
         <Collapsible value={"Action Log"}>
             <Table size={"small"}>
-                {display}
+                <TableBody>
+                    {display}
+                </TableBody>
             </Table>
         </Collapsible>
     )

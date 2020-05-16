@@ -11,6 +11,7 @@ import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 import Grid from "@material-ui/core/Grid";
 import capitalize from "@material-ui/core/utils/capitalize";
 import Collapsible from "./Collapsible";
+import TableBody from "@material-ui/core/TableBody";
 
 export default function RoleCount(props) {
     if (!props.roleCount) return null;
@@ -27,7 +28,9 @@ export default function RoleCount(props) {
     return (
         <Collapsible value={"Roles in play:"}>
             <Table size={"small"}>
-                {display}
+                <TableBody>
+                    {display}
+                </TableBody>
             </Table>
         </Collapsible>
     )

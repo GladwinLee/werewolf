@@ -5,6 +5,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import capitalize from "@material-ui/core/utils/capitalize";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableHead from "@material-ui/core/TableHead";
+import TableCell from "@material-ui/core/TableCell";
+import TableRow from "@material-ui/core/TableRow";
 
 function PlayerList(props) {
     const playerList = props.players.slice()
@@ -13,31 +18,34 @@ function PlayerList(props) {
     }
 
     const players = playerList.map((p) => {
-        let text = p;
         let role;
-        if (props.known_roles) {
-            role = props.known_roles[p];
-        }
-        if (props.vote_results) {
-            const votes = props.vote_results[p];
-            if (votes) {
-                text += " " + votes + " votes";
-            }
-        }
-        return <ListItem key={p}>
-            <ListItemText
-                primary={text}
-                secondary={role ? capitalize(role) : null}
-            />
-        </ListItem>;
+        if (props.known_roles) role = props.known_roles[p];
+        let votes;
+        if (props.vote_results) votes = props.vote_results[p];
+        return (
+            <TableRow key={p}>
+                <TableCell>{p}</TableCell>
+                <TableCell>{role ? capitalize(role) : null}</TableCell>
+                <TableCell>{votes}</TableCell>
+            </TableRow>
+        );
     });
 
     return (
         <div>
             <Typography variant="h5">Connected Players</Typography>
-            <List dense={true}>
-                {players}
-            </List>
+            <Table size={"small"}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Role</TableCell>
+                        <TableCell>Votes</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {players}
+                </TableBody>
+            </Table>
         </div>
     );
 }

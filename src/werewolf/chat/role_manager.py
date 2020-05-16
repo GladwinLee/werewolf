@@ -81,7 +81,7 @@ class RoleManager:
         player_2_new = self.players_to_roles[player_1]
         player_1_new = self.players_to_roles[player_2]
         self.action_log.append(
-            f"The Troublemaker {player_name} switches role for {player_1}'s to {player_1_new} "
+            f"The Troublemaker {player_name} changes {player_1} to {player_1_new} "
             f"and {player_2} to {player_2_new}"
         )
 
