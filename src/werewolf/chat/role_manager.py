@@ -1,20 +1,11 @@
 import random
 
-SEER = 'seer'
-WEREWOLF = 'werewolf'
-VILLAGER = 'villager'
-ROBBER = 'robber'
-TROUBLEMAKER = 'troublemaker'
-TANNER = 'tanner'
-MIDDLE_1 = 'Middle 1'
-MIDDLE_2 = 'Middle 2'
-MIDDLE_3 = 'Middle 3'
-
-SEPARATOR = ";"
+from .role_constants import *
 
 
 class RoleManager:
     action_order = [SEER, ROBBER, TROUBLEMAKER]
+    all_role_order = action_order + [VILLAGER, WEREWOLF]
 
     def __init__(self):
         self.players_to_roles = {}  # name to role
@@ -108,8 +99,6 @@ class RoleManager:
         highest_voted = max(vote_matrix, key=vote_matrix.get)
         if self.get_roles()[highest_voted] == WEREWOLF:
             return VILLAGER
-        elif self.get_roles()[highest_voted] == TANNER:
-            return TANNER
         else:
             return WEREWOLF
 

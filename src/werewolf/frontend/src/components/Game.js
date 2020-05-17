@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-import RoleCount from "./RoleCount";
+import RoleInfo from "./RoleInfo";
 import ActionLog from "./ActionLog";
 
 class Game extends Component {
@@ -26,7 +26,7 @@ class Game extends Component {
             is_game_master: false,
             winner: "",
             vote_results: {},
-            role_count: null,
+            role_info: null,
             action_log: [],
             configurable_roles: [],
         }
@@ -58,7 +58,7 @@ class Game extends Component {
                 if (!this.state.player_name) return;
                 this.setState({
                     known_roles: data['known_roles'],
-                    role_count: data['role_count']
+                    role_info: data['role_info']
                 })
                 break;
             case 'worker.game_master':
@@ -159,7 +159,7 @@ class Game extends Component {
                     <Grid container item xs={12} md={6} spacing={3} direction={'column'}>
                         <Grid item>
                             <Paper style={{width:"100%"}}>
-                                <RoleCount roleCount={this.state.role_count}/>
+                                <RoleInfo roleInfo={this.state.role_info}/>
                             </Paper>
                         </Grid>
                         <Grid item>

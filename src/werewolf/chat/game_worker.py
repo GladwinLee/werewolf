@@ -117,18 +117,16 @@ class GameWorker(AsyncConsumer):
         self.game.start_game()
 
         player_roles = self.game.get_roles().copy()
-        role_count = {}
-        for role in player_roles.values():
-            role_count[role] = role_count.setdefault(role, 0) + 1
-
         player_roles.pop("Middle 1")
         player_roles.pop("Middle 2")
         player_roles.pop("Middle 3")
 
+        role_info = self.game.get_role_info()
+
         msg = {
             'type': 'worker.start',
             'roles': player_roles,
-            'role_count': role_count,
+            'role_info': role_info,
         }
         await self.group_send(room_group_name, msg)
 

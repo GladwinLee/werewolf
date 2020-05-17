@@ -1,4 +1,4 @@
-from .role_manager import WEREWOLF, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
+from .role_constants import WEREWOLF, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
 
 
 class ConsumerRoleManager:
@@ -16,7 +16,7 @@ class ConsumerRoleManager:
             'type': data['type'],
             'player_role': self.player_role,
             'known_roles': self.get_known_roles(roles, player_name),
-            'role_count': data['role_count']
+            'role_info': data['role_info']
         }
 
     def get_known_roles(self, roles, player_name):

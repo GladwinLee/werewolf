@@ -77,3 +77,6 @@ class Game:
         for name, vote in self.vote_actions.items():
             action_log.append(f"{name} votes {vote}")
         return action_log
+
+    def get_role_info(self):
+        return self.role_manager.get_role_info()
