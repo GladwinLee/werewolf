@@ -27,5 +27,5 @@ role_info = {
     WEREWOLF: "Knows the identity of the other werewolves",
     TANNER: "Wins if they are voted out",
     MASON: "Knows the identity of the other masons",
-    MINION: "Knows identity of other Werewolves, but werewolves do not know Minion"
+    MINION: "Knows identity of other Werewolves, but werewolves do not know Minion",
 }
