@@ -27,3 +27,5 @@ role_info = {
     TANNER: "Wins if they are voted out",
     MASON: "Knows the identity of the other masons"
 }
+
+#hello
