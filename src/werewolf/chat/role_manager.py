@@ -5,7 +5,7 @@ WEREWOLF = 'werewolf'
 VILLAGER = 'villager'
 ROBBER = 'robber'
 TROUBLEMAKER = 'troublemaker'
-
+TANNER = 'tanner'
 MIDDLE_1 = 'Middle 1'
 MIDDLE_2 = 'Middle 2'
 MIDDLE_3 = 'Middle 3'
@@ -94,7 +94,6 @@ class RoleManager:
     def robber(self, player_name, target):
         switch_role = self.players_to_roles[target]
         self.action_log.append(f"The Robber {player_name} robs {target}, and becomes a {switch_role}")
-
         self.players_to_roles[player_name] = switch_role
         self.players_to_roles[target] = ROBBER
         return "role", {player_name: self.players_to_roles[player_name]}
@@ -103,6 +102,8 @@ class RoleManager:
         highest_voted = max(vote_matrix, key=vote_matrix.get)
         if self.get_roles()[highest_voted] == WEREWOLF:
             return VILLAGER
+        elif self.get_roles()[highest_voted] == TANNER:
+            return TANNER
         else:
             return WEREWOLF
 
