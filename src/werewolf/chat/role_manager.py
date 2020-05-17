@@ -29,6 +29,10 @@ class RoleManager:
         num_werewolves = (num_players - 1) // 2
 
         roles = self.selected_roles.copy()
+
+        if MASON in roles:
+            roles.extend([MASON] * 1)
+
         if len(roles) + num_werewolves > total_roles:
             random.shuffle(roles)
             roles = roles[:(total_roles - num_werewolves)]

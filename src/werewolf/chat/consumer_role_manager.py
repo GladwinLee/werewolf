@@ -1,5 +1,4 @@
-from .role_constants import WEREWOLF, MIDDLE_1, MIDDLE_2, MIDDLE_3, SEPARATOR
-
+from .role_constants import *
 
 class ConsumerRoleManager:
     def __init__(self):
@@ -22,6 +21,8 @@ class ConsumerRoleManager:
     def get_known_roles(self, roles, player_name):
         if self.player_role == WEREWOLF:
             return {name: role for name, role in roles.items() if role == WEREWOLF}
+        elif self.player_role == MASON:
+            return {name: role for name, role in roles.items() if role == MASON}
         else:
             return {player_name: self.player_role}
 
