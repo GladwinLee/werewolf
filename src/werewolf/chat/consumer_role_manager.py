@@ -19,7 +19,7 @@ class ConsumerRoleManager:
         }
 
     def get_known_roles(self, roles, player_name):
-        if self.player_role == WEREWOLF:
+        if self.player_role in [WEREWOLF, MINION]:
             return {name: role for name, role in roles.items() if role == WEREWOLF}
         elif self.player_role == MASON:
             return {name: role for name, role in roles.items() if role == MASON}
