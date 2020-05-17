@@ -70,7 +70,7 @@ class RoleManager:
         result = {key: self.players_to_roles[key] for key in keys}
         log_msg = f"The Seer {player_name} sees:"
         log_msg += ",".join(
-            [f" {key} as {role}" for key, role in result.items()])
+            [f" {key} as {role.capitalize()}" for key, role in result.items()])
         self.action_log.append(log_msg)
 
         return "role", result

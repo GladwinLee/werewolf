@@ -30,7 +30,7 @@ export default function Collapsible(props) {
 }
 
 Collapsible.propTypes = {
-    value: PropTypes.string,
+    value: PropTypes.object,
     open: PropTypes.bool,
 }
 
