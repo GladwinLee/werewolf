@@ -5,7 +5,9 @@ from .role_constants import *
 
 class RoleManager:
     action_order = [SEER, ROBBER, TROUBLEMAKER]
-    all_role_order = action_order + [VILLAGER, WEREWOLF]
+    special_roles_no_action = [TANNER]
+    all_role_order = action_order \
+                     + special_roles_no_action + [VILLAGER, WEREWOLF]
 
     def __init__(self):
         self.players_to_roles = {}  # name to role
@@ -99,6 +101,8 @@ class RoleManager:
         highest_voted = max(vote_matrix, key=vote_matrix.get)
         if self.get_roles()[highest_voted] == WEREWOLF:
             return VILLAGER
+        elif self.get_roles()[highest_voted] == TANNER:
+            return TANNER
         else:
             return WEREWOLF
 
@@ -107,3 +111,15 @@ class RoleManager:
 
     def get_action_log(self):
         return self.action_log
+
+    def get_role_info(self):
+        role_count = {role: 0 for role in self.all_role_order}
+        for role in self.players_to_roles.values():
+            role_count[role] += 1
+        return {
+            role: {
+                "count": count,
+                "info": role_info[role]
+            }
+            for role, count in role_count.items() if count > 0
+        }
