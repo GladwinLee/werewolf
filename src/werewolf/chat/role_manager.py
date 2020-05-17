@@ -4,18 +4,13 @@ from .role_constants import *
 
 
 class RoleManager:
-    action_order = [SEER, ROBBER, TROUBLEMAKER]
-    special_roles_no_action = [TANNER]
-    all_role_order = action_order \
-                     + special_roles_no_action + [VILLAGER, WEREWOLF]
-
     def __init__(self):
         self.players_to_roles = {}  # name to role
         self.selected_roles = []
         self.action_log = []
 
     def get_configurable_roles(self):
-        return self.action_order
+        return all_special_roles
 
     def configure_roles(self, roles):
         self.selected_roles = [role for role, selected in roles.items() if
@@ -48,7 +43,7 @@ class RoleManager:
 
     def get_action_order(self):
         current_roles = set(self.players_to_roles.values())
-        return [role for role in self.action_order if role in current_roles] + \
+        return [role for role in action_order if role in current_roles] + \
                ["vote"]
 
     def get_roles(self):
@@ -107,13 +102,13 @@ class RoleManager:
             return WEREWOLF
 
     def is_role_action(self, action_type):
-        return action_type in self.action_order
+        return action_type in action_order
 
     def get_action_log(self):
         return self.action_log
 
     def get_role_info(self):
-        role_count = {role: 0 for role in self.all_role_order}
+        role_count = {role: 0 for role in role_info_order}
         for role in self.players_to_roles.values():
             role_count[role] += 1
         return {
