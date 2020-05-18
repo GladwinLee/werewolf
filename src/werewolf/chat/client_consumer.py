@@ -1,6 +1,6 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from .consumer_role_manager import ConsumerRoleManager
 
+from .consumer_role_manager import ConsumerRoleManager
 from .game_worker import WEREWOLF_CHANNEL
 
 
@@ -98,16 +98,17 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             data['choice_type'] = "pick1"
             await self.send_json(data)
         elif self.role_manager.is_player_role(action):
-            msg = self.role_manager.handle_action(data, self.player_name, self.player_list)
+            msg = self.role_manager.handle_action(data, self.player_name,
+                                                  self.player_list)
             if msg:
                 await self.send_json(msg)
         else:
-            msg = {
+            await self.send_json({
                 "type": data['type'],
                 "action": "wait",
-                "waiting_on": action
-            }
-            await self.send_json(msg)
+                "waiting_on": action,
+                'role_wait_time': data['role_wait_time'],
+            })
 
     async def worker_role_special(self, data):
         result_type = data['result_type']

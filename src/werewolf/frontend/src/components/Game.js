@@ -109,10 +109,10 @@ class Game extends Component {
         }));
     }
 
-    startSubmit(roles) {
+    startSubmit(settings) {
         this.socket.send(JSON.stringify({
             'type': "start",
-            'roles': roles,
+            'settings': settings,
         }));
     }
 
@@ -132,7 +132,7 @@ class Game extends Component {
                     <Paper style={{height: "100%"}}>
                         <GameSetup
                             nameSubmit={(n) => this.nameSubmit(n)}
-                            handleStart={(r) => this.startSubmit(r)}
+                            handleStart={(s) => this.startSubmit(s)}
                             visible={this.state.show_game_setup}
                             isGameMaster={this.state.is_game_master}
                             configurableRoles={this.state.configurable_roles}

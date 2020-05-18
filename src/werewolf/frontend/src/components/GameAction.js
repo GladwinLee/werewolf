@@ -3,7 +3,7 @@ import ActionChoice from "./ActionChoice";
 import Timer from "./Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
-import CheckboxList from "./CheckboxList";
+import CheckboxListSubmit from "./CheckboxListSubmit";
 
 class GameAction extends Component {
     constructor(props) {
@@ -26,46 +26,50 @@ class GameAction extends Component {
     }
 
     onCheckBoxSubmit(choices, action_type) {
-        const selectedChoices = Object.keys(choices).filter((choice) => choices[choice]);
+        const selectedChoices = Object.keys(choices).filter(
+            (choice) => choices[choice]);
         const choice = selectedChoices.join(";");
         this.onChoice(choice, action_type);
     }
 
     render() {
-        if (!this.props.actionData || this.state.lastActionSent === this.props.actionData['action']) return null;
-        let display;
-
+        if (!this.props.actionData || this.state.lastActionSent
+            === this.props.actionData['action']) {
+            return null;
+        }
         const actionData = this.props.actionData;
+        const role_wait_time = actionData['role_wait_time'];
+
+        let display;
         if (actionData['action'] === 'wait') {
             display =
-                <Typography variant="h4">{"Waiting on " + capitalize(this.props.actionData['waiting_on'])}</Typography>
+                <Typography variant="h4">
+                    {"Waiting on " + capitalize(
+                        this.props.actionData['waiting_on'])}
+                </Typography>
         } else {
-            let role_wait_time = actionData['role_wait_time'];
             if (actionData['choice_type'] === "pick2") {
                 display =
-                    <div>
-                        <Timer start={role_wait_time}/>
-                        <CheckboxList
-                            choices={actionData['choices']}
-                            onSubmit={(c) => this.onCheckBoxSubmit(c, actionData['action'])}
-                            minChoice={2}
-                            maxChoice={2}
-                            autoSubmitAfter={role_wait_time}
-                        />
-                    </div>
+                    <CheckboxListSubmit
+                        choices={actionData['choices']}
+                        onSubmit={(c) => this.onCheckBoxSubmit(c,
+                            actionData['action'])}
+                        minChoice={2}
+                        maxChoice={2}
+                        autoSubmitAfter={role_wait_time}
+                    />
             } else if (actionData['choice_type'] === "pick1") {
                 display =
-                    <div>
-                        <Timer start={role_wait_time}/>
-                        <ActionChoice
-                            choices={actionData['choices']}
-                            choiceType={capitalize(actionData['action'])}
-                            onChoice={(c) => this.onChoice(c, actionData['action'])}
-                        />
-                    </div>
+                    <ActionChoice
+                        choices={actionData['choices']}
+                        choiceType={capitalize(actionData['action'])}
+                        onChoice={(c) => this.onChoice(c,
+                            actionData['action'])}
+                    />
             }
         }
         return <div>
+            <Timer start={role_wait_time}/>
             {display}
         </div>
     }

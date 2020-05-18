@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 
 function Timer(props) {
@@ -17,9 +16,7 @@ function Timer(props) {
         return null;
     }
     return (
-        <Paper>
-            <Typography>Time remaining: {time}</Typography>
-        </Paper>
+        <Typography>Time remaining: {time}</Typography>
     )
 }
 
