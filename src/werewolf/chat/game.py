@@ -32,7 +32,7 @@ class Game:
 
     def start_game(self):
         self.role_manager.generate_roles(self.player_names)
-        self.action_order = self.role_manager.get_action_order()
+        self.action_order = self.role_manager.get_role_order() + ['vote', 'end']
 
     def get_roles(self):
         return self.role_manager.get_roles()
@@ -44,10 +44,17 @@ class Game:
         return self.action_order[0]
 
     def get_winner(self):
-        return self.role_manager.get_winner(self.vote_results), self.vote_results
+        return self.role_manager.get_winner(
+            self.vote_results), self.vote_results
 
     def is_role_action(self, action_type):
         return self.role_manager.is_role_action(action_type)
+
+    def handle_role_action(self, action, player_name, choice):
+        if action != self.get_next_action():
+            return "ERROR", "Not expecting action %s" % action
+        self.action_order.pop(0)
+        return self.role_manager.handle_role_action(action, player_name, choice)
 
     def vote(self, voter, votee):
         self.vote_actions[voter] = votee
@@ -56,21 +63,14 @@ class Game:
         else:
             self.vote_results[votee] = 1
         voted_players = self.vote_actions.keys()
-        non_voters = [player for player in self.player_names if player not in voted_players]
+        non_voters = [player for player in self.player_names if
+                      player not in voted_players]
         return non_voters
 
-    def handle_special(self, role, player_name, choice):
-        if role != self.get_next_action():
-            return "ERROR", "Not expecting action %s" % role
-        self.action_order.pop(0)
-        return self.role_manager.handle_special(role, player_name, choice)
-
-    def handle_special_timeout(self, action):
+    def handle_action_timeout(self, action):
         if action != self.get_next_action():
-            return False
-
+            return
         self.action_order.pop(0)
-        return True
 
     def get_action_log(self):
         action_log = self.role_manager.get_action_log().copy()

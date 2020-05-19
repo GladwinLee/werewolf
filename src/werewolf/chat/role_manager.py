@@ -45,10 +45,9 @@ class RoleManager:
         self.players_to_roles = dict(
             zip(players + [MIDDLE_1, MIDDLE_2, MIDDLE_3], roles))
 
-    def get_action_order(self):
+    def get_role_order(self):
         current_roles = set(self.players_to_roles.values())
-        return [role for role in action_order if role in current_roles] + \
-               ["vote"]
+        return [role for role in action_order if role in current_roles]
 
     def get_roles(self):
         return self.players_to_roles
@@ -61,7 +60,7 @@ class RoleManager:
                 werewolves.append(name)
         return werewolves
 
-    def handle_special(self, role, player_name, choice):
+    def handle_role_action(self, role, player_name, choice):
         return getattr(RoleManager, role)(self, player_name, choice)
 
     def seer(self, player_name, target):

@@ -27,8 +27,9 @@ export function NameInput(props) {
             <Grid item>
                 <TextField
                     error={error}
-                    id="chat-message-input" type="text"
-                    onKeyPress={(e) => e.key === "Enter" ? handleSubmit() : null}
+                    id="name-input" type="text"
+                    onKeyPress={(e) => e.key === "Enter" ? handleSubmit()
+                        : null}
                     onChange={handleChange}
                     value={value}
                     helperText={error ? "Cannot be empty" : ""}

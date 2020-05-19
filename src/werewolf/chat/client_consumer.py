@@ -107,7 +107,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 "type": data['type'],
                 "action": "wait",
                 "waiting_on": action,
-                'role_wait_time': data['role_wait_time'],
+                'wait_time': data['wait_time'],
             })
 
     async def worker_role_special(self, data):

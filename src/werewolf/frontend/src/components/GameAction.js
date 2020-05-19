@@ -32,45 +32,47 @@ class GameAction extends Component {
         this.onChoice(choice, action_type);
     }
 
-    render() {
-        if (!this.props.actionData || this.state.lastActionSent
-            === this.props.actionData['action']) {
+    getDisplay(actionData) {
+        if (!actionData || this.state.lastActionSent
+            === actionData['action']) {
             return null;
         }
-        const actionData = this.props.actionData;
-        const role_wait_time = actionData['role_wait_time'];
 
         let display;
         if (actionData['action'] === 'wait') {
             display =
                 <Typography variant="h4">
-                    {"Waiting on " + capitalize(
-                        this.props.actionData['waiting_on'])}
+                    {"Waiting on " + capitalize(actionData['waiting_on'])}
                 </Typography>
-        } else {
-            if (actionData['choice_type'] === "pick2") {
-                display =
-                    <CheckboxListSubmit
-                        choices={actionData['choices']}
-                        onSubmit={(c) => this.onCheckBoxSubmit(c,
-                            actionData['action'])}
-                        minChoice={2}
-                        maxChoice={2}
-                        autoSubmitAfter={role_wait_time}
-                    />
-            } else if (actionData['choice_type'] === "pick1") {
-                display =
-                    <ActionChoice
-                        choices={actionData['choices']}
-                        choiceType={capitalize(actionData['action'])}
-                        onChoice={(c) => this.onChoice(c,
-                            actionData['action'])}
-                    />
-            }
+        } else if (actionData['choice_type'] === "pick2") {
+            display =
+                <CheckboxListSubmit
+                    choices={actionData['choices']}
+                    onSubmit={(c) => this.onCheckBoxSubmit(c,
+                        actionData['action'])}
+                    minChoice={2}
+                    maxChoice={2}
+                    autoSubmitAfter={actionData['wait_time']}
+                />
+        } else if (actionData['choice_type'] === "pick1") {
+            display =
+                <ActionChoice
+                    choices={actionData['choices']}
+                    choiceType={capitalize(actionData['action'])}
+                    onChoice={(c) => this.onChoice(c, actionData['action'])}
+                />
         }
+
+        return display;
+    }
+
+    render() {
+        const actionData = this.props.actionData;
+        const waitTime = (actionData) ? actionData['wait_time'] : 0;
+
         return <div>
-            <Timer start={role_wait_time}/>
-            {display}
+            <Timer start={waitTime} timerKey={actionData}/>
+            {this.getDisplay(actionData)}
         </div>
     }
 }

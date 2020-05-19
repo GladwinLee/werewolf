@@ -10,18 +10,22 @@ NAME_FIELD = '_name'
 ROOM_GROUP_NAME_FIELD = '_room_group_name'
 CHANNEL_NAME_FIELD = '_channel_name'
 
-START_WAIT_TIME = 2
-
 WEREWOLF_CHANNEL = 'werewolf-channel'
 
 
 # This doesn't work with multiple rooms atm
 class GameWorker(AsyncConsumer):
+    wait_times = {
+        "start": 2,
+        "role": 5,
+        "vote": 300,
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.game = Game()
         self.action_log = []
-        self.role_wait_time = 5
+        self.action_timer = None  # Timer object
 
     async def player_join(self, data):
         player_list = self.game.get_player_names()
@@ -95,12 +99,13 @@ class GameWorker(AsyncConsumer):
         if len(players_not_voted) == 0:
             await self.send_winner(room)
 
-    async def send_winner(self, room):
+    async def send_winner(self, room_group_name):
+        self.action_timer.cancel()
         winner, vote_results = self.game.get_winner()
         roles = self.game.get_roles()
         action_log = self.game.get_action_log()
         await self.group_send(
-            room,
+            room_group_name,
             {
                 'type': 'worker.winner',
                 'winner': winner,
@@ -114,8 +119,7 @@ class GameWorker(AsyncConsumer):
         room_group_name = data[ROOM_GROUP_NAME_FIELD]
         print("%s started the game" % name)
 
-        self.game.configure_roles(data['settings']['selected_roles'])
-        self.role_wait_time = data['settings']['role_wait_time']
+        self.configure_settings(data)
         self.game.start_game()
 
         player_roles = self.game.get_roles().copy()
@@ -131,8 +135,13 @@ class GameWorker(AsyncConsumer):
                 'role_info': self.game.get_role_info(),
             })
 
-        sleep(START_WAIT_TIME)
+        sleep(self.get_wait_time("start"))
         await self.send_next_action(room_group_name)
+
+    def configure_settings(self, data):
+        self.game.configure_roles(data['settings']['selected_roles'])
+        self.wait_times['role'] = data['settings']['role_wait_time']
+        self.wait_times['vote'] = data['settings']['vote_wait_time'] * 60
 
     async def role_action(self, data):
         channel_name = data[CHANNEL_NAME_FIELD]
@@ -140,7 +149,8 @@ class GameWorker(AsyncConsumer):
         choice = data['choice']
         player_name = data[NAME_FIELD]
 
-        response = self.game.handle_special(action_type, player_name, choice)
+        response = self.game.handle_role_action(action_type, player_name,
+                                                choice)
         if response:
             result_type, result = response
             await self.channel_send(channel_name, {
@@ -149,31 +159,37 @@ class GameWorker(AsyncConsumer):
                 'result': result,
             })
 
-    async def action_timeout(self, action, room_group_name):
-        timed_out = self.game.handle_special_timeout(action)
-        if timed_out:
-            print("%s timed out" % action)
+    async def handle_action_timeout(self, action, room_group_name):
+        self.game.handle_action_timeout(action)
         await self.send_next_action(room_group_name)
 
     async def send_next_action(self, room_group_name):
         next_action = self.game.get_next_action()
-        msg = {
+        if next_action == 'end':
+            return
+
+        await self.start_next_action_timer(next_action, room_group_name)
+        await self.group_send(room_group_name, {
             'type': 'worker.action',
             'action': next_action,
-        }
+            'wait_time': self.get_wait_time(next_action),
+        })
 
-        if next_action != 'vote':
-            msg['role_wait_time'] = self.role_wait_time
-            await self.start_next_action_timer(next_action, room_group_name)
-
-        await self.group_send(room_group_name, msg)
+    def get_wait_time(self, action):
+        if action in self.wait_times:
+            return self.wait_times[action]
+        return self.wait_times["role"]
 
     async def start_next_action_timer(self, next_action, room_group_name):
         def current_action_timeout():
-            run(self.action_timeout(next_action, room_group_name))
+            run(self.handle_action_timeout(next_action, room_group_name))
 
-        action_timer = Timer(self.role_wait_time + 1, current_action_timeout)
-        action_timer.start()
+        # Allow an extra second for better experience
+        self.action_timer = Timer(
+            self.get_wait_time(next_action) + 1,
+            current_action_timeout
+        )
+        self.action_timer.start()
 
     async def reset(self, data):
         print("%s reset the game" % data[NAME_FIELD])
@@ -183,6 +199,10 @@ class GameWorker(AsyncConsumer):
                 'type': 'worker.reset',
             })
         self.game.reset()
+        try:
+            self.action_timer.cancel()
+        except AttributeError:
+            pass
 
     # Private helpers
     async def group_send(self, room, msg):

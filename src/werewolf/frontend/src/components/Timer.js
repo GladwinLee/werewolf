@@ -1,22 +1,38 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Typography from "@material-ui/core/Typography";
 
+function fmtMSS(s) {
+    return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s
+}
+
 function Timer(props) {
-    const [time, setTime] = React.useState(props.start);
+    const [secondsLeft, setSecondsLeft] = useState(props.start);
+    const timeLeftRef = useRef();
+    const intervalTimerRef = useRef();
+
     useEffect(() => {
-        const to = setTimeout(() => {
-            if (time > 0) {
-                setTime(time - 1);
+        clearTimeout(intervalTimerRef.current);
+        timeLeftRef.current = props.start
+        console.log("starting timer")
+        intervalTimerRef.current = setInterval(() => {
+            if (timeLeftRef.current > 0) {
+                timeLeftRef.current -= 1;
+                setSecondsLeft(timeLeftRef.current)
             }
         }, 1000);
-        return () => clearTimeout(to);
-    }, [time])
 
-    if (!time || time === 0) {
+        return () => {
+            console.log("stopping timer cleanup")
+            clearTimeout(intervalTimerRef.current);
+        }
+    }, [props.start, props.timerKey])
+
+    if (!secondsLeft || secondsLeft === 0) {
         return null;
     }
+
     return (
-        <Typography>Time remaining: {time}</Typography>
+        <Typography>Time remaining: {fmtMSS(secondsLeft)}</Typography>
     )
 }
 

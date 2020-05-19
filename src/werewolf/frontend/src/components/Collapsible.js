@@ -19,7 +19,7 @@ export default function Collapsible(props) {
                     </IconButton>
                 </Grid>
                 <Grid item>
-                    <Typography>{props.value}</Typography>
+                    <Typography component={"div"}>{props.value}</Typography>
                 </Grid>
             </Grid>
             <Collapse in={open}>
@@ -30,7 +30,10 @@ export default function Collapsible(props) {
 }
 
 Collapsible.propTypes = {
-    value: PropTypes.object,
+    value: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.string,
+    ]),
     open: PropTypes.bool,
 }
 
