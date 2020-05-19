@@ -102,7 +102,7 @@ class GameWorker(AsyncConsumer):
     async def send_winner(self, room_group_name):
         self.action_timer.cancel()
         winner, vote_results = self.game.get_winner()
-        roles = self.game.get_roles()
+        roles = self.game.get_full_roles_map()
         action_log = self.game.get_action_log()
         await self.group_send(
             room_group_name,
@@ -122,10 +122,7 @@ class GameWorker(AsyncConsumer):
         self.configure_settings(data)
         self.game.start_game()
 
-        player_roles = self.game.get_roles().copy()
-        player_roles.pop("Middle 1")
-        player_roles.pop("Middle 2")
-        player_roles.pop("Middle 3")
+        player_roles = self.game.get_players_to_roles()
 
         await self.group_send(
             room_group_name,

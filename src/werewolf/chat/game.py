@@ -9,8 +9,7 @@ class Game:
     def reset(self):
         self.player_names = []
         self.role_manager = RoleManager()
-        self.vote_results = {}
-        self.vote_actions = {}
+        self.player_to_vote_choice = {}
         self.action_order = []
 
     def add_player(self, name):
@@ -34,18 +33,17 @@ class Game:
         self.role_manager.generate_roles(self.player_names)
         self.action_order = self.role_manager.get_role_order() + ['vote', 'end']
 
-    def get_roles(self):
-        return self.role_manager.get_roles()
+    def get_players_to_roles(self):
+        return self.role_manager.get_players_to_roles()
 
-    def get_werewolves(self):
-        return self.role_manager.get_werewolves()
+    def get_full_roles_map(self):
+        return self.role_manager.get_full_roles_map()
 
     def get_next_action(self):
         return self.action_order[0]
 
     def get_winner(self):
-        return self.role_manager.get_winner(
-            self.vote_results), self.vote_results
+        return self.role_manager.get_winners(self.player_to_vote_choice)
 
     def is_role_action(self, action_type):
         return self.role_manager.is_role_action(action_type)
@@ -57,12 +55,8 @@ class Game:
         return self.role_manager.handle_role_action(action, player_name, choice)
 
     def vote(self, voter, votee):
-        self.vote_actions[voter] = votee
-        if votee in self.vote_results.keys():
-            self.vote_results[votee] += 1
-        else:
-            self.vote_results[votee] = 1
-        voted_players = self.vote_actions.keys()
+        self.player_to_vote_choice[voter] = votee
+        voted_players = self.player_to_vote_choice.keys()
         non_voters = [player for player in self.player_names if
                       player not in voted_players]
         return non_voters
@@ -74,7 +68,7 @@ class Game:
 
     def get_action_log(self):
         action_log = self.role_manager.get_action_log().copy()
-        for name, vote in self.vote_actions.items():
+        for name, vote in self.player_to_vote_choice.items():
             action_log.append(f"{name} votes {vote}")
         return action_log
 

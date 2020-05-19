@@ -80,7 +80,7 @@ export default function GameSetupMaster(props) {
                             endAdornment: <InputAdornment
                                 position="end">seconds</InputAdornment>
                         }}
-                        label="Time per vote"
+                        label="Time for role action"
                         variant="outlined"
                     />
                 </Grid>
