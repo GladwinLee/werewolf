@@ -31,6 +31,9 @@ function Timer(props) {
         return null;
     }
 
+    if (props.timerKey == null) {
+        return null;
+    }
     return (
         <Typography>Time remaining: {fmtMSS(secondsLeft)}</Typography>
     )

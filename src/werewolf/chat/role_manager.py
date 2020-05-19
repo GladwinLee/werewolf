@@ -89,7 +89,7 @@ class RoleManager:
     def robber(self, player_name, target):
         switch_role = self.players_to_roles[target]
         self.action_log.append(
-            f"The Robber {player_name} robs {target}, and becomes a {switch_role}")
+            f"The Robber {player_name} robs {target}, and becomes a {switch_role.capitalize()}")
 
         self.players_to_roles[player_name] = switch_role
         self.players_to_roles[target] = ROBBER

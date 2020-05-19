@@ -10,6 +10,7 @@ import Button from "@material-ui/core/Button";
 import RoleInfo from "./RoleInfo";
 import ActionLog from "./ActionLog";
 import {CookiesProvider} from "react-cookie";
+import capitalize from "@material-ui/core/utils/capitalize";
 
 class Game extends Component {
     constructor(props) {
@@ -60,10 +61,25 @@ class Game extends Component {
                 if (!this.state.player_name) {
                     return;
                 }
+                this.addToActionLog(
+                    `Your role: ${capitalize(
+                        data['known_roles'][this.state.player_name])}`
+                );
                 this.setState({
                     known_roles: data['known_roles'],
                     role_info: data['role_info']
                 })
+                if (Object.entries(data['known_roles']).length > 1) {
+                    let logMsg = "Known allies:";
+                    Object.entries(data['known_roles']).forEach(
+                        ([player_name, role]) => {
+                            if (player_name === this.state.player_name) {
+                                return;
+                            }
+                            logMsg += `\n${player_name}: ${capitalize(role)}`
+                        });
+                    this.addToActionLog(logMsg);
+                }
                 break;
             case 'worker.game_master':
                 this.setState({
@@ -77,15 +93,22 @@ class Game extends Component {
                 });
                 break;
             case 'worker.role_special':
-                const new_known_roles = {...this.state.known_roles, ...data['result']}
-                this.setState({known_roles: new_known_roles});
+                const newKnownRoles = {...this.state.known_roles, ...data['result']}
+                let logMsg = "Revealed roles:";
+                Object.entries(data['result']).forEach(
+                    ([player_name, role]) => {
+                        logMsg += `\n${player_name}: ${role}`;
+                    });
+                this.addToActionLog(logMsg)
+                this.setState({known_roles: newKnownRoles});
                 break;
             case 'worker.winner':
                 this.setState({
                     winner: data['winner'],
                     vote_results: data['vote_results'],
                     known_roles: data['known_roles'],
-                    action_log: data['action_log']
+                    action_log: data['action_log'],
+                    action_data: null,
                 });
                 break;
             case 'worker.players_not_voted_list_change':

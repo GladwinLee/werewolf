@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import ActionChoice from "./ActionChoice";
+import Choice from "./ActionChoice";
 import Timer from "./Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
@@ -22,7 +22,7 @@ class GameAction extends Component {
         this.setState({
             lastActionSent: action_type,
         });
-        this.props.logAction(`${capitalize(action_type)}: ${choice}`);
+        this.props.logAction(`${capitalize(action_type)} on: ${choice}`);
     }
 
     onCheckBoxSubmit(choices, action_type) {
@@ -56,7 +56,7 @@ class GameAction extends Component {
                 />
         } else if (actionData['choice_type'] === "pick1") {
             display =
-                <ActionChoice
+                <Choice
                     choices={actionData['choices']}
                     choiceType={capitalize(actionData['action'])}
                     onChoice={(c) => this.onChoice(c, actionData['action'])}

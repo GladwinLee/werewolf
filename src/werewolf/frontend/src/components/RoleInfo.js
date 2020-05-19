@@ -12,7 +12,8 @@ import Grid from "@material-ui/core/Grid";
 const roleInfoText = <Grid container spacing={1}>
     <Grid item>Roles in play </Grid>
     <Grid item>
-        <Tooltip arrow title={"Hover over a role for more info"}>
+        <Tooltip arrow
+                 title={"Hover over a role for more info. Roles go in order of this list."}>
             <InfoIcon color={"disabled"} fontSize={"small"}/>
         </Tooltip>
     </Grid>

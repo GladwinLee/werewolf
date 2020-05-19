@@ -13,7 +13,6 @@ class ConsumerRoleManager:
 
         return {
             'type': data['type'],
-            'player_role': self.player_role,
             'known_roles': self.get_known_roles(roles, player_name),
             'role_info': data['role_info']
         }
