@@ -100,11 +100,15 @@ class Game extends Component {
     }
 
     nameSubmit(name) {
+        if (this.state.players.includes(name)) {
+            return false;
+        }
         this.setState({"player_name": name});
         this.socket.send(JSON.stringify({
             'type': "name_select",
             'name': name,
         }));
+        return true;
     }
 
     resetSubmit() {
@@ -120,7 +124,7 @@ class Game extends Component {
         }));
     }
 
-    setActionLog(log) {
+    addToActionLog(log) {
         const newActionLog = this.state.action_log.slice();
         newActionLog.push(log);
         this.setState({action_log: newActionLog})
@@ -147,7 +151,7 @@ class Game extends Component {
                                 actionData={this.state.action_data}
                                 name={this.state.player_name}
                                 players={this.state.players}
-                                logAction={(l) => this.setActionLog(l)}
+                                logAction={(l) => this.addToActionLog(l)}
                             />
                         </Paper>
                     </Grid>

@@ -140,8 +140,8 @@ class GameWorker(AsyncConsumer):
 
     def configure_settings(self, data):
         self.game.configure_roles(data['settings']['selected_roles'])
-        self.wait_times['role'] = data['settings']['role_wait_time']
-        self.wait_times['vote'] = data['settings']['vote_wait_time'] * 60
+        self.wait_times['role'] = int(data['settings']['role_wait_time'])
+        self.wait_times['vote'] = int(data['settings']['vote_wait_time']) * 60
 
     async def role_action(self, data):
         channel_name = data[CHANNEL_NAME_FIELD]

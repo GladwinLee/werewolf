@@ -11,20 +11,28 @@ class GameSetup extends Component {
     }
 
     nameSubmit(name) {
-        this.props.nameSubmit(name);
-        this.setState({show_name_input: false});
+        const success = this.props.nameSubmit(name);
+        if (success) {
+            this.setState({show_name_input: false});
+        }
+        return success;
     }
 
     render() {
-        if (!this.props.visible) return null;
+        if (!this.props.visible) {
+            return null;
+        }
 
-        let name_display;
-        if (this.state.show_name_input) name_display = <NameInput onSubmit={(name) => this.nameSubmit(name)}/>
-        let game_master_display;
-        if (this.props.isGameMaster) game_master_display = <GameSetupMaster
-            handleStart={this.props.handleStart}
-            configurableRoles={this.props.configurableRoles}
-        />
+        let name_display = (this.state.show_name_input) ?
+            <NameInput onSubmit={(name) => this.nameSubmit(name)}/> :
+            null
+
+        let game_master_display = (this.props.isGameMaster) ?
+            <GameSetupMaster
+                handleStart={this.props.handleStart}
+                configurableRoles={this.props.configurableRoles}
+            /> :
+            null
 
         return (
             <div>

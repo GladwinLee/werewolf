@@ -29,7 +29,7 @@ export default function GameSetupMaster(props) {
     };
 
     const [roleWaitTime, setRoleWaitTime] = React.useState(
-        (cookies.roleWaitTime) ? cookies.roleWaitTime : 7
+        (cookies.roleWaitTime == null) ? cookies.roleWaitTime : 7
     );
     const handleRoleWaitTimeChange = (event) => {
         setRoleWaitTime(
@@ -37,7 +37,7 @@ export default function GameSetupMaster(props) {
     };
 
     const [voteWaitTime, setVoteWaitTime] = React.useState(
-        (cookies.voteWaitTime) ? cookies.voteWaitTime : 5
+        (cookies.voteWaitTime == null) ? cookies.voteWaitTime : 5
     );
     const handleVoteWaitTimeChange = (event) => {
         setVoteWaitTime(
@@ -89,8 +89,8 @@ export default function GameSetupMaster(props) {
                         value={voteWaitTime}
                         onChange={handleVoteWaitTimeChange}
                         inputProps={{
-                            step: 1,
-                            min: 1,
+                            step: 0.5,
+                            min: 0,
                             max: 60,
                             type: 'number',
                             'aria-labelledby': 'input-slider',
