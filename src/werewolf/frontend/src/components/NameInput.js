@@ -2,24 +2,25 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import React from "react";
 import Grid from "@material-ui/core/Grid";
+import {useCookies} from "react-cookie";
 
 export function NameInput(props) {
-    const [value, setValue] = React.useState("");
+    const [cookies, setCookie] = useCookies(['player_name'])
     const [error, setError] = React.useState(false);
 
     const handleChange = (e) => {
-        setValue(e.target.value);
-        if (error && value !== "") {
+        setCookie('player_name', e.target.value);
+        if (error && cookies.player_name !== "") {
             setError(false);
         }
     }
 
     const handleSubmit = () => {
-        if (value === "") {
+        if (cookies.player_name === "") {
             setError(true);
             return;
         }
-        props.onSubmit(value);
+        props.onSubmit(cookies.player_name);
     }
 
     return (
@@ -31,7 +32,7 @@ export function NameInput(props) {
                     onKeyPress={(e) => e.key === "Enter" ? handleSubmit()
                         : null}
                     onChange={handleChange}
-                    value={value}
+                    value={cookies.player_name}
                     helperText={error ? "Cannot be empty" : ""}
                     label="Name"
                     variant="outlined"

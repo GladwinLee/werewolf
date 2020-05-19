@@ -9,6 +9,7 @@ import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import RoleInfo from "./RoleInfo";
 import ActionLog from "./ActionLog";
+import {CookiesProvider} from "react-cookie";
 
 class Game extends Component {
     constructor(props) {
@@ -34,7 +35,8 @@ class Game extends Component {
 
     componentDidMount() {
         this.socket = new WebSocket(
-            'ws://' + window.location.host + "/ws/werewolf/" + this.props.roomName + "/"
+            'ws://' + window.location.host + "/ws/werewolf/"
+            + this.props.roomName + "/"
         );
 
         this.socket.onmessage = (e) => {
@@ -55,7 +57,9 @@ class Game extends Component {
                 break;
             case 'worker.start':
                 this.setState({show_game_setup: false});
-                if (!this.state.player_name) return;
+                if (!this.state.player_name) {
+                    return;
+                }
                 this.setState({
                     known_roles: data['known_roles'],
                     role_info: data['role_info']
@@ -124,62 +128,66 @@ class Game extends Component {
 
     render() {
         return (
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <Typography variant="h3">One-Night Werewolf</Typography>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <Paper style={{height: "100%"}}>
-                        <GameSetup
-                            nameSubmit={(n) => this.nameSubmit(n)}
-                            handleStart={(s) => this.startSubmit(s)}
-                            visible={this.state.show_game_setup}
-                            isGameMaster={this.state.is_game_master}
-                            configurableRoles={this.state.configurable_roles}
-                        />
-                        <GameAction
-                            socket={this.socket}
-                            actionData={this.state.action_data}
-                            name={this.state.player_name}
-                            players={this.state.players}
-                            logAction={(l) => this.setActionLog(l)}
-                        />
-                    </Paper>
-                </Grid>
-                <Grid container item xs={12} md={5} spacing={3}>
-                    <Grid item xs={12} md={6}>
+            <CookiesProvider>
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <Typography variant="h3">One-Night Werewolf</Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
                         <Paper style={{height: "100%"}}>
-                            <GameInfo
+                            <GameSetup
+                                nameSubmit={(n) => this.nameSubmit(n)}
+                                handleStart={(s) => this.startSubmit(s)}
+                                visible={this.state.show_game_setup}
+                                isGameMaster={this.state.is_game_master}
+                                configurableRoles={this.state.configurable_roles}
+                            />
+                            <GameAction
+                                socket={this.socket}
+                                actionData={this.state.action_data}
                                 name={this.state.player_name}
-                                role={this.state.known_roles[this.state.player_name]}
-                                winner={this.state.winner}
+                                players={this.state.players}
+                                logAction={(l) => this.setActionLog(l)}
                             />
                         </Paper>
                     </Grid>
-                    <Grid container item xs={12} md={6} spacing={3} direction={'column'}>
-                        <Grid item>
-                            <Paper style={{width:"100%"}}>
-                                <RoleInfo roleInfo={this.state.role_info}/>
+                    <Grid container item xs={12} md={5} spacing={3}>
+                        <Grid item xs={12} md={6}>
+                            <Paper style={{height: "100%"}}>
+                                <GameInfo
+                                    name={this.state.player_name}
+                                    role={this.state.known_roles[this.state.player_name]}
+                                    winner={this.state.winner}
+                                />
                             </Paper>
                         </Grid>
-                        <Grid item>
-                            <Paper style={{width:"100%"}}>
-                                <ActionLog actionLog={this.state.action_log}/>
-                            </Paper>
+                        <Grid container item xs={12} md={6} spacing={3}
+                              direction={'column'}>
+                            <Grid item>
+                                <Paper style={{width: "100%"}}>
+                                    <RoleInfo roleInfo={this.state.role_info}/>
+                                </Paper>
+                            </Grid>
+                            <Grid item>
+                                <Paper style={{width: "100%"}}>
+                                    <ActionLog
+                                        actionLog={this.state.action_log}/>
+                                </Paper>
+                            </Grid>
                         </Grid>
                     </Grid>
+                    <Grid item xs={12} md={3}>
+                        <Paper style={{height: "100%"}}>
+                            <PlayerList
+                                players={this.state.players}
+                                vote_results={this.state.vote_results}
+                                known_roles={this.state.known_roles}
+                            />
+                        </Paper>
+                    </Grid>
+                    <Button onClick={() => this.resetSubmit()}>Reset</Button>
                 </Grid>
-                <Grid item xs={12} md={3}>
-                    <Paper style={{height: "100%"}}>
-                        <PlayerList
-                            players={this.state.players}
-                            vote_results={this.state.vote_results}
-                            known_roles={this.state.known_roles}
-                        />
-                    </Paper>
-                </Grid>
-                <Button onClick={() => this.resetSubmit()}>Reset</Button>
-            </Grid>
+            </CookiesProvider>
         )
     }
 }

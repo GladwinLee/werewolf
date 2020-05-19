@@ -4,12 +4,22 @@ import Button from "@material-ui/core/Button";
 import CheckboxList from "./CheckboxList";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
+import {useCookies} from "react-cookie";
 
 export default function GameSetupMaster(props) {
+    const [cookies, setCookies] = useCookies(
+        ["selectedRoles", "roleWaitTime", "voteWaitTime"]);
+
     const initialSelectedRoles = {};
     if (props.configurableRoles) {
         props.configurableRoles.forEach(
-            (role) => initialSelectedRoles[role] = false
+            (role) => {
+                if (cookies.selectedRoles) {
+                    initialSelectedRoles[role] = !!cookies.selectedRoles[role];
+                } else {
+                    initialSelectedRoles[role] = false;
+                }
+            }
         );
     }
 
@@ -18,13 +28,17 @@ export default function GameSetupMaster(props) {
         setSelectedRoles(choices);
     };
 
-    const [roleWaitTime, setRoleWaitTime] = React.useState(5);
+    const [roleWaitTime, setRoleWaitTime] = React.useState(
+        (cookies.roleWaitTime) ? cookies.roleWaitTime : 7
+    );
     const handleRoleWaitTimeChange = (event) => {
         setRoleWaitTime(
             event.target.value === '' ? '' : Number(event.target.value));
     };
 
-    const [voteWaitTime, setVoteWaitTime] = React.useState(5);
+    const [voteWaitTime, setVoteWaitTime] = React.useState(
+        (cookies.voteWaitTime) ? cookies.voteWaitTime : 5
+    );
     const handleVoteWaitTimeChange = (event) => {
         setVoteWaitTime(
             event.target.value === '' ? '' : Number(event.target.value));
@@ -37,6 +51,9 @@ export default function GameSetupMaster(props) {
             "vote_wait_time": voteWaitTime,
         }
         props.handleStart(settings);
+        setCookies("selectedRoles", selectedRoles);
+        setCookies("roleWaitTime", roleWaitTime);
+        setCookies("voteWaitTime", voteWaitTime);
     }
 
     return (
