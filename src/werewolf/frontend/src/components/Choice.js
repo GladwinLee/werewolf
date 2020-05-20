@@ -4,7 +4,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
 
-function ActionChoice (props) {
+function Choice(props) {
     const choices = props.choices.map((p) => {
         return (
             <Button
@@ -29,4 +29,4 @@ function ActionChoice (props) {
     );
 }
 
-export default ActionChoice;
+export default Choice;

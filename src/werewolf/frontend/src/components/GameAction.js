@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Choice from "./ActionChoice";
+import Choice from "./Choice";
 import Timer from "./Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
