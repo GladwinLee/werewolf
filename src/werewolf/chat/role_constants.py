@@ -21,13 +21,14 @@ all_special_roles = action_order + special_roles_no_action
 role_info_order = action_order + special_roles_no_action + [VILLAGER, WEREWOLF]
 
 role_info = {
-    SEER: "View another player's role, or 2 of the roles from the middle",
-    ROBBER: "Trade roles with another player, and look at your new role",
-    TROUBLEMAKER: "Swap the roles of 2 players",
-    VILLAGER: "No special ability",
-    WEREWOLF: "Knows the identity of the other werewolves",
-    TANNER: "Wins if they are voted out",
-    MASON: "Knows the identity of the other masons",
-    MINION: "Knows identity of other Werewolves, but werewolves do not know Minion",
-    HUNTER: "If voted out, will kill whoever they voted as well",
+    SEER: "(Village Team) View another player's role, or 2 of the roles from the middle",
+    ROBBER: "(Village Team) Trade roles with another player, and look at your new role",
+    TROUBLEMAKER: "(Village Team) Swap the roles of 2 players",
+    VILLAGER: "(Village Team) No special ability",
+    WEREWOLF: "(Werewolf Team) Knows the identity of the other werewolves",
+    TANNER: "(No Team) Wins if they are voted out",
+    MASON: "(Village Team) Knows the identity of the other masons",
+    MINION: "(Werewolf Team) Knows the identity of the Werewolves, but the Werewolves do not know the Minion."
+            " Being voted out will not lead to Village victory",
+    HUNTER: "(Village Team) If voted out, will kill whoever they voted as well",
 }

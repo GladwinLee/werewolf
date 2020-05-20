@@ -5,6 +5,7 @@ import TableCell from "@material-ui/core/TableCell";
 import Collapsible from "./Collapsible";
 import PropTypes from "prop-types";
 import TableBody from "@material-ui/core/TableBody";
+import Typography from "@material-ui/core/Typography";
 
 export default function ActionLog(props) {
     if (!props.actionLog || props.actionLog.length === 0) return null;
@@ -12,7 +13,11 @@ export default function ActionLog(props) {
     const display = props.actionLog.map((s, i) => {
         return (
             <TableRow key={`actionLog-${i}`}>
-                <TableCell>{s}</TableCell>
+                <TableCell>
+                    <Typography style={{whiteSpace: 'pre-line'}}>
+                        {s}
+                    </Typography>
+                </TableCell>
             </TableRow>
         )
     })
