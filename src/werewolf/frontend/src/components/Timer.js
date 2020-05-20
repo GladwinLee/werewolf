@@ -7,18 +7,16 @@ function fmtMSS(s) {
 
 function Timer(props) {
     const [secondsLeft, setSecondsLeft] = useState(props.start);
-    const timeLeftRef = useRef();
     const intervalTimerRef = useRef();
 
     useEffect(() => {
         clearTimeout(intervalTimerRef.current);
-        timeLeftRef.current = props.start
         console.log("starting timer")
+        setSecondsLeft(props.start);
         intervalTimerRef.current = setInterval(() => {
-            if (timeLeftRef.current > 0) {
-                timeLeftRef.current -= 1;
-                setSecondsLeft(timeLeftRef.current)
-            }
+            setSecondsLeft((secondsLeft => {
+                return (secondsLeft > 0) ? secondsLeft - 1 : secondsLeft
+            }))
         }, 1000);
 
         return () => {
