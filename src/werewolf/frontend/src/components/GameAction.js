@@ -1,80 +1,86 @@
-import React, {Component} from 'react';
-import Choice from "./Choice";
+import React, {useState} from 'react';
 import Timer from "./Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
 import CheckboxListSubmit from "./CheckboxListSubmit";
+import RadioChoice from "./RadioChoice";
 
-class GameAction extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            lastActionSent: "",
-        }
+export default function GameAction(props) {
+    const [lastActionSent, setLastActionSent] = useState("");
+    const [choices, setChoices] = useState();
+
+    const actionData = props.actionData;
+    if (!actionData || lastActionSent === actionData['action']) {
+        return null;
     }
 
-    onChoice(choice, action_type) {
-        this.props.socket.send(JSON.stringify({
+    const sendChoice = (choice, action_type) => {
+        console.log(`${choice} chosen`)
+        props.socket.send(JSON.stringify({
             'type': "action",
             'action_type': action_type,
             'choice': choice,
         }));
-        this.setState({
-            lastActionSent: action_type,
-        });
-        this.props.logAction(`${capitalize(action_type)} on: ${choice}`);
+        setLastActionSent(action_type);
+        props.logAction(`${capitalize(action_type)} on: ${choice}`);
     }
 
-    onCheckBoxSubmit(choices, action_type) {
-        const selectedChoices = Object.keys(choices).filter(
-            (choice) => choices[choice]);
-        const choice = selectedChoices.join(";");
-        this.onChoice(choice, action_type);
+    const onCheckBoxSubmit = (action_type) => {
+        const choicesString = Object.keys(choices).filter(
+            (choice) => choices[choice]
+        ).join(";");
+        sendChoice(choicesString, action_type);
     }
 
-    getDisplay(actionData) {
-        if (!actionData || this.state.lastActionSent
-            === actionData['action']) {
-            return null;
-        }
-
-        let display;
-        if (actionData['action'] === 'wait') {
-            display =
-                <Typography variant="h4">
-                    {"Waiting on " + capitalize(actionData['waiting_on'])}
-                </Typography>
-        } else if (actionData['choice_type'] === "pick2") {
-            display =
-                <CheckboxListSubmit
-                    choices={actionData['choices']}
-                    onSubmit={(c) => this.onCheckBoxSubmit(c,
-                        actionData['action'])}
-                    minChoice={2}
-                    maxChoice={2}
-                    autoSubmitAfter={actionData['wait_time']}
-                />
-        } else if (actionData['choice_type'] === "pick1") {
-            display =
-                <Choice
-                    choices={actionData['choices']}
-                    choiceType={capitalize(actionData['action'])}
-                    onChoice={(c) => this.onChoice(c, actionData['action'])}
-                />
-        }
-
-        return display;
+    const onChoiceSubmit = (action_type) => {
+        sendChoice(choices, action_type);
     }
 
-    render() {
-        const actionData = this.props.actionData;
-        const waitTime = (actionData) ? actionData['wait_time'] : 0;
+    let display;
+    let onSubmit = () => {
+    };
+    if (actionData['action'] === 'wait') {
+        display =
+            <Typography variant="h4">
+                {"Waiting on " + capitalize(actionData['waiting_on'])}
+            </Typography>
+    } else if (actionData['action'] === "witch") {
 
-        return <div>
-            <Timer start={waitTime} timerKey={actionData}/>
-            {this.getDisplay(actionData)}
-        </div>
+    } else if (actionData['choice_type'] === "pick2") {
+        onSubmit = () => onCheckBoxSubmit(actionData['action']);
+        display =
+            <CheckboxListSubmit
+                choices={actionData['choices']}
+                onSubmit={onSubmit}
+                onChange={(c) => setChoices(c)}
+                minChoice={2}
+                maxChoice={2}
+            />
+    } else if (actionData['choice_type'] === "pick1") {
+        onSubmit = () => onChoiceSubmit(actionData['action'])
+        display =
+            <RadioChoice
+                choices={actionData['choices']}
+                label={capitalize(actionData['action'])}
+                onSubmit={onSubmit}
+                onChange={(c) => setChoices(c)}
+                default={actionData['default']}
+            />
     }
+
+    const waitTime = (actionData['wait_time']) ? actionData['wait_time'] : 0;
+
+    let timerKey = actionData['action'];
+    if (actionData['action'] === "wait") {
+        timerKey += `-${actionData['waiting_on']}`;
+    }
+
+    return <div>
+        <Timer
+            start={waitTime}
+            timerKey={timerKey}
+            callback={() => onSubmit()}
+        />
+        {display}
+    </div>
 }
-
-export default GameAction;

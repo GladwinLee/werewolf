@@ -67,10 +67,7 @@ class Game:
         self.action_order.pop(0)
 
     def get_action_log(self):
-        action_log = self.role_manager.get_action_log().copy()
-        for name, vote in self.player_to_vote_choice.items():
-            action_log.append(f"{name} votes {vote}")
-        return action_log
+        return self.role_manager.get_action_log()
 
     def get_role_info(self):
         return self.role_manager.get_role_info()

@@ -1,17 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
 import Typography from "@material-ui/core/Typography";
+import PropTypes from 'prop-types';
 
 function fmtMSS(s) {
     return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s
 }
 
-function Timer(props) {
+export default function Timer(props) {
     const [secondsLeft, setSecondsLeft] = useState(props.start);
     const intervalTimerRef = useRef();
 
     useEffect(() => {
         clearTimeout(intervalTimerRef.current);
-        console.log("starting timer")
         setSecondsLeft(props.start);
         intervalTimerRef.current = setInterval(() => {
             setSecondsLeft((secondsLeft => {
@@ -20,16 +20,22 @@ function Timer(props) {
         }, 1000);
 
         return () => {
-            console.log("stopping timer cleanup")
             clearTimeout(intervalTimerRef.current);
         }
     }, [props.start, props.timerKey])
 
-    if (!secondsLeft || secondsLeft === 0) {
-        return null;
-    }
+    useEffect(() => {
+        if (secondsLeft === 0 && props.start !== 0) {
+            if (props.callback) {
+                props.callback();
+            }
+        }
+    }, [secondsLeft])
 
-    if (props.timerKey == null) {
+    if (!secondsLeft
+        || secondsLeft === 0
+        || props.timerKey == null
+    ) {
         return null;
     }
     return (
@@ -37,4 +43,12 @@ function Timer(props) {
     )
 }
 
-export default Timer;
+Timer.propTypes = {
+    start: PropTypes.number,
+    timerKey: PropTypes.any,
+    callback: PropTypes.func,
+}
+
+Timer.defaultProps = {
+    start: 0,
+}

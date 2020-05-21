@@ -29,7 +29,7 @@ export default function GameSetupMaster(props) {
     };
 
     const [roleWaitTime, setRoleWaitTime] = React.useState(
-        (cookies.roleWaitTime == null) ? cookies.roleWaitTime : 7
+        (cookies.roleWaitTime == null) ? 7 : cookies.roleWaitTime
     );
     const handleRoleWaitTimeChange = (event) => {
         setRoleWaitTime(
@@ -37,7 +37,7 @@ export default function GameSetupMaster(props) {
     };
 
     const [voteWaitTime, setVoteWaitTime] = React.useState(
-        (cookies.voteWaitTime == null) ? cookies.voteWaitTime : 5
+        (cookies.voteWaitTime == null) ? 5 : cookies.voteWaitTime
     );
     const handleVoteWaitTimeChange = (event) => {
         setVoteWaitTime(

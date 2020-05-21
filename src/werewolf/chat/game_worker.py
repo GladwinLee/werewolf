@@ -146,8 +146,9 @@ class GameWorker(AsyncConsumer):
         choice = data['choice']
         player_name = data[NAME_FIELD]
 
-        response = self.game.handle_role_action(action_type, player_name,
-                                                choice)
+        response = self.game.handle_role_action(
+            action_type, player_name, choice)
+
         if response:
             result_type, result = response
             await self.channel_send(channel_name, {

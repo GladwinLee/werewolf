@@ -91,29 +91,46 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
 
     async def worker_action(self, data):
         action = data['action']
+        wait_time = data['wait_time']
+
         if action == 'vote':
             choices = self.player_list.copy()
             choices.remove(self.player_name)
-            data['choices'] = choices
-            data['choice_type'] = "pick1"
-            await self.send_json(data)
+            await self.send_json({
+                "type": "action",
+                "action": "vote",
+                "choices": choices,
+                "choice_type": "pick1",
+                "wait_time": wait_time,
+            })
         elif self.role_manager.is_player_role(action):
-            msg = self.role_manager.handle_action(data, self.player_name,
-                                                  self.player_list)
-            if msg:
-                await self.send_json(msg)
+            await self.send_json(self.role_manager.get_role_action_data(
+                data,
+                self.player_name,
+                self.player_list
+            ))
         else:
             await self.send_json({
-                "type": data['type'],
+                "type": "action",
                 "action": "wait",
                 "waiting_on": action,
-                'wait_time': data['wait_time'],
+                'wait_time': wait_time,
             })
 
     async def worker_role_special(self, data):
         result_type = data['result_type']
+        await self.send_json(data)
         if result_type == "role":
-            await self.send_json(data)
+            pass
+        elif result_type == "witch":
+            await self.send_json(self.role_manager.get_role_action_data(
+                {
+                    "action": "witch_part_two",
+                    "wait_time": "continue"
+                },
+                self.player_name,
+                self.player_list
+            ))
 
     async def worker_winner(self, data):
         await self.send_json(data)

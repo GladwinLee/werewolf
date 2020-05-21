@@ -1,21 +1,22 @@
 import React, {useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 
-export default function AutoSubmit(props) {
-    // const [timer, setTimer] = useState(null);
+export default function AutoSubmit({onSubmit, submitAfter}) {
+    if (onSubmit == null || submitAfter == null) {
+        return null;
+    }
     const onSubmitRef = useRef()
 
     useEffect(() => {
-            console.log("Changed onSubmit")
-            onSubmitRef.current = props.onSubmit;
+            onSubmitRef.current = onSubmit;
         },
-        [props.onSubmit])
+        [onSubmit])
 
     useEffect(() => {
         // setTimer(setTimeout(props.onSubmit, props.submitAfter * 1000));
         const timer = setTimeout(() => {
             onSubmitRef.current()
-        }, props.submitAfter * 1000);
+        }, submitAfter * 1000);
         return () => clearTimeout(timer);
     }, [])
 
@@ -23,6 +24,6 @@ export default function AutoSubmit(props) {
 }
 
 AutoSubmit.propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    submitAfter: PropTypes.number.isRequired,
+    onSubmit: PropTypes.func,
+    submitAfter: PropTypes.number,
 }

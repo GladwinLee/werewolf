@@ -57,6 +57,16 @@ class Game extends Component {
     receiveMessage(data) {
         console.log("Received message " + data.type)
         console.log(data);
+
+        const logRevealedRoles = (revealedRoles) => {
+            let logMsg = "Revealed roles:";
+            Object.entries(revealedRoles).forEach(
+                ([player_name, role]) => {
+                    logMsg += `\n${player_name}: ${role}`;
+                });
+            this.addToActionLog(logMsg);
+        }
+
         switch (data.type) {
             case 'worker.player_list_change':
                 this.setState({players: data['player_list']});
@@ -92,20 +102,25 @@ class Game extends Component {
                     configurable_roles: data['configurable_roles'],
                 });
                 break;
-            case 'worker.action':
+            case 'action':
                 this.setState({
                     action_data: data
                 });
                 break;
             case 'worker.role_special':
-                const newKnownRoles = {...this.state.known_roles, ...data['result']}
-                let logMsg = "Revealed roles:";
-                Object.entries(data['result']).forEach(
-                    ([player_name, role]) => {
-                        logMsg += `\n${player_name}: ${role}`;
-                    });
-                this.addToActionLog(logMsg)
-                this.setState({known_roles: newKnownRoles});
+                switch (data["result_type"]) {
+                    case "role": {
+                        const newKnownRoles = {...this.state.known_roles, ...data['result']}
+                        logRevealedRoles(data['result']);
+                        this.setState({known_roles: newKnownRoles});
+                        break;
+                    }
+                    case "witch": {
+                        logRevealedRoles(data['result']);
+
+                        break;
+                    }
+                }
                 break;
             case 'worker.winner':
                 this.setState({
@@ -218,7 +233,6 @@ class Game extends Component {
                         </Paper>
                     </Grid>
                     <Grid item xs={6}>
-
                         <ExpansionPanel>
                             <ExpansionPanelSummary
                                 expandIcon={<ExpandMoreIcon/>}

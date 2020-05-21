@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import AutoSubmit from "./AutoSubmit";
 
 export default function CheckboxListSubmit(props) {
     const [choices, setChoices] = React.useState(props.choices);
@@ -27,6 +26,7 @@ export default function CheckboxListSubmit(props) {
             [event.target.name]: event.target.checked
         };
         setChoices(newChoices);
+        props.onChange(newChoices);
     };
 
     const handleSubmit = () => {
@@ -69,10 +69,6 @@ export default function CheckboxListSubmit(props) {
                     {props.buttonValue}
                 </Button>
             </Grid>
-            <AutoSubmit
-                onSubmit={handleSubmit}
-                submitAfter={props.autoSubmitAfter}
-            />
         </Grid>
     )
 }
@@ -80,14 +76,16 @@ export default function CheckboxListSubmit(props) {
 CheckboxListSubmit.propTypes = {
     choices: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
     buttonValue: PropTypes.string,
     minChoice: PropTypes.number,
     maxChoice: PropTypes.number,
-    autoSubmitAfter: PropTypes.number,
 }
 
 CheckboxListSubmit.defaultProps = {
     buttonValue: "Submit",
     minChoice: 0,
     maxChoice: Number.MAX_SAFE_INTEGER,
+    onChange: () => {
+    },
 }
