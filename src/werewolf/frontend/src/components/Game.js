@@ -59,10 +59,10 @@ class Game extends Component {
         console.log(data);
 
         const logRevealedRoles = (revealedRoles) => {
-            let logMsg = "Revealed roles:";
+            let logMsg = "Changed Roles:";
             Object.entries(revealedRoles).forEach(
                 ([player_name, role]) => {
-                    logMsg += `\n${player_name}: ${role}`;
+                    logMsg += `\n${player_name}: ${capitalize(role)}`;
                 });
             this.addToActionLog(logMsg);
         }
@@ -109,15 +109,11 @@ class Game extends Component {
                 break;
             case 'worker.role_special':
                 switch (data["result_type"]) {
+                    case "witch":
                     case "role": {
                         const newKnownRoles = {...this.state.known_roles, ...data['result']}
                         logRevealedRoles(data['result']);
                         this.setState({known_roles: newKnownRoles});
-                        break;
-                    }
-                    case "witch": {
-                        logRevealedRoles(data['result']);
-
                         break;
                     }
                 }
@@ -128,7 +124,7 @@ class Game extends Component {
                     vote_results: data['vote_results'],
                     known_roles: data['known_roles'],
                     action_log: data['action_log'],
-                    action_data: null,
+                    action_data: {},
                 });
                 break;
             case 'worker.players_not_voted_list_change':

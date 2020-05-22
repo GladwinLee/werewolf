@@ -8,6 +8,7 @@ class RoleManager:
         self.full_roles_map = {}  # name to role, including middle
         self.selected_roles = []
         self.action_log = []
+        self.witch_middle_target = ""  # store the target of the witch in its 1st part
 
     def get_configurable_roles(self):
         return all_special_roles
@@ -47,7 +48,10 @@ class RoleManager:
 
     def get_role_order(self):
         current_roles = set(self.full_roles_map.values())
-        return [role for role in action_order if role in current_roles]
+        role_order = [role for role in action_order if role in current_roles]
+        if WITCH in role_order:
+            role_order.insert(role_order.index(WITCH) + 1, WITCH_PART_TWO)
+        return role_order
 
     def get_players_to_roles(self):
         players_to_roles = self.full_roles_map.copy()
@@ -63,6 +67,10 @@ class RoleManager:
         return getattr(RoleManager, role)(self, player_name, choice)
 
     def seer(self, player_name, target):
+        if target == NONE:
+            self.action_log.append(
+                f"The Seer {player_name} chooses not to see a role")
+            return
         keys = target.split(SEPARATOR)
         result = {key: self.full_roles_map[key] for key in keys}
         log_msg = f"The Seer {player_name} sees:"
@@ -72,23 +80,49 @@ class RoleManager:
         return "role", result
 
     def robber(self, player_name, target):
+        if target == NONE:
+            self.action_log.append(
+                f"The Robber {player_name} chooses not to rob anybody")
+            return
         switch_role = self.full_roles_map[target]
         self.action_log.append(
             f"The Robber {player_name} robs {target}, and becomes a {switch_role.capitalize()}")
         self.full_roles_map[player_name] = switch_role
         self.full_roles_map[target] = ROBBER
-        return "role", {player_name: self.full_roles_map[player_name]}
+        return "role", {player_name: self.full_roles_map[player_name],
+                        target: ROBBER}
 
     def witch(self, player_name, target):
+        if target == "None":
+            self.action_log.append(
+                f"The Witch {player_name} chooses not to act")
+            return
+        self.witch_middle_target = target
         target_role = self.full_roles_map[target]
         self.action_log.append(
             f"The Witch {player_name} looks at {target} and sees {target_role.capitalize()}.")
-
         return "witch", {target: target_role}
+
+    def witch_part_two(self, player_name, target):
+        middle_target = self.witch_middle_target
+        middle_new = self.full_roles_map[target]
+        target_new = self.full_roles_map[middle_target]
+        self.action_log.append(
+            f"The Witch {player_name} changes {target} to {target_new.capitalize()} "
+            f"and {self.witch_middle_target} to {middle_new.capitalize()}"
+        )
+
+        self.full_roles_map[target] = target_new
+        self.full_roles_map[self.witch_middle_target] = middle_new
+        if target != player_name:
+            middle_new = ""
+        return "role", {middle_target: middle_new, target: target_new}
 
     def troublemaker(self, player_name, choice):
         choices = choice.split(SEPARATOR)
         if len(choices) != 2:
+            self.action_log.append(
+                f"The Troublemaker {player_name} chooses not to swap anybody")
             return
         player_1, player_2 = choices
         player_2_new = self.full_roles_map[player_1]
@@ -124,25 +158,29 @@ class RoleManager:
             self.action_log.append(msg)
         else:
             dead_roles = {}
-            self.action_log.append(f"The village votes to kill no one.")
+            self.action_log.append(f"The village votes to kill no one")
 
         if HUNTER in dead_roles:
             hunter_name = dead_roles[HUNTER]
             hunter_choice = player_to_vote_choice[hunter_name]
             dead_roles[self.full_roles_map[hunter_choice]] = hunter_name
             self.action_log.append(
-                f"The Hunter {hunter_name} is voted off. They shoot {hunter_choice} before they die.")
+                f"The Hunter {hunter_name} is voted off. They shoot {hunter_choice} before they die")
 
         for role, name in dead_roles.items():
-            self.action_log.append(f"{name} the {role.capitalize()} dies.")
+            self.action_log.append(f"{name} the {role.capitalize()} dies")
         return dead_roles, vote_counts
 
     def calculate_winners(self, dead_roles):
         if len(dead_roles) == 0:
-            if WEREWOLF not in self.get_players_to_roles():
-                return [VILLAGER]
-            else:
+            if WEREWOLF in self.get_players_to_roles().values():
+                self.action_log.append(
+                    f"The Werewolves infiltrated the village")
                 return [WEREWOLF]
+            else:
+                self.action_log.append(
+                    f"There were no Werewolves in the village. The village is safe")
+                return [VILLAGER]
 
         winners = []
         if WEREWOLF in dead_roles:

@@ -24,7 +24,6 @@ export default function RadioChoice(props) {
         props.onChange(e.target.value);
     }
     const handleSubmit = () => {
-        console.log(`rc ${value}`)
         props.onSubmit(value);
     }
 

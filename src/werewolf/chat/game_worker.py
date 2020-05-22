@@ -78,10 +78,8 @@ class GameWorker(AsyncConsumer):
         print("%s %s: %s" % (name, action_type, choice))
         if action_type == 'vote':
             await self.vote(data)
-        elif self.game.is_role_action(action_type):
-            await self.role_action(data)
         else:
-            print(action_type, " not supported")
+            await self.role_action(data)
 
     async def vote(self, data):
         name = data[NAME_FIELD]
@@ -100,7 +98,11 @@ class GameWorker(AsyncConsumer):
             await self.send_winner(room)
 
     async def send_winner(self, room_group_name):
-        self.action_timer.cancel()
+        try:
+            self.action_timer.cancel()
+        except AttributeError:
+            pass
+
         winner, vote_results = self.game.get_winner()
         roles = self.game.get_full_roles_map()
         action_log = self.game.get_action_log()
@@ -142,9 +144,9 @@ class GameWorker(AsyncConsumer):
 
     async def role_action(self, data):
         channel_name = data[CHANNEL_NAME_FIELD]
+        player_name = data[NAME_FIELD]
         action_type = data['action_type']
         choice = data['choice']
-        player_name = data[NAME_FIELD]
 
         response = self.game.handle_role_action(
             action_type, player_name, choice)

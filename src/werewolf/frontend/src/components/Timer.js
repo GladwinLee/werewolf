@@ -7,11 +7,12 @@ function fmtMSS(s) {
 }
 
 export default function Timer(props) {
-    const [secondsLeft, setSecondsLeft] = useState(props.start);
+    const [secondsLeft, setSecondsLeft] = useState(0);
     const intervalTimerRef = useRef();
 
     useEffect(() => {
-        clearTimeout(intervalTimerRef.current);
+        console.log(`New timer ${props.start}, ${props.timerKey}`)
+        clearInterval(intervalTimerRef.current);
         setSecondsLeft(props.start);
         intervalTimerRef.current = setInterval(() => {
             setSecondsLeft((secondsLeft => {
@@ -20,7 +21,8 @@ export default function Timer(props) {
         }, 1000);
 
         return () => {
-            clearTimeout(intervalTimerRef.current);
+            console.log("Cleaned up timer")
+            clearInterval(intervalTimerRef.current);
         }
     }, [props.start, props.timerKey])
 

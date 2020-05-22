@@ -2,6 +2,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .consumer_role_manager import ConsumerRoleManager
 from .game_worker import WEREWOLF_CHANNEL
+from .role_constants import WITCH_PART_TWO
 
 
 class ClientConsumer(AsyncJsonWebsocketConsumer):
@@ -94,20 +95,21 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         wait_time = data['wait_time']
 
         if action == 'vote':
-            choices = self.player_list.copy()
-            choices.remove(self.player_name)
+            i = self.player_list.index(self.player_name)
+            choices = self.player_list[i + 1:] + self.player_list[:i]
             await self.send_json({
                 "type": "action",
                 "action": "vote",
                 "choices": choices,
+                "default": choices[0],
                 "choice_type": "pick1",
                 "wait_time": wait_time,
             })
         elif self.role_manager.is_player_role(action):
             await self.send_json(self.role_manager.get_role_action_data(
                 data,
-                self.player_name,
-                self.player_list
+                player_name=self.player_name,
+                player_list=self.player_list
             ))
         else:
             await self.send_json({
@@ -123,13 +125,15 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         if result_type == "role":
             pass
         elif result_type == "witch":
+            result_role = list(data['result'].values())[0]
             await self.send_json(self.role_manager.get_role_action_data(
                 {
-                    "action": "witch_part_two",
-                    "wait_time": "continue"
+                    "action": WITCH_PART_TWO,
+                    "wait_time": "continue",
                 },
-                self.player_name,
-                self.player_list
+                player_name=self.player_name,
+                player_list=self.player_list,
+                role_to_swap=result_role
             ))
 
     async def worker_winner(self, data):

@@ -8,16 +8,18 @@ import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 
 function PlayerList(props) {
-    const playerList = props.players.slice()
-    if (props.known_roles && props.known_roles["Middle 1"]) {
-        playerList.push("Middle 1", "Middle 2", "Middle 3");
-    }
+    const playerList = [...new Set(
+        [...props.players, ...Object.keys(props.known_roles)])];
 
     const players = playerList.map((p) => {
         let role;
-        if (props.known_roles) role = props.known_roles[p];
+        if (props.known_roles) {
+            role = props.known_roles[p];
+        }
         let votes;
-        if (props.vote_results) votes = props.vote_results[p];
+        if (props.vote_results) {
+            votes = props.vote_results[p];
+        }
         return (
             <TableRow key={p}>
                 <TableCell>{p}</TableCell>

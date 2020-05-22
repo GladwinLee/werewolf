@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import Typography from "@material-ui/core/Typography";
 
 export default function CheckboxListSubmit(props) {
     const [choices, setChoices] = React.useState(props.choices);
@@ -54,28 +55,32 @@ export default function CheckboxListSubmit(props) {
     })
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
-                <FormControl component="fieldset" error={error}>
-                    <FormLabel component="legend">Roles</FormLabel>
-                    <FormGroup>{checkboxes}</FormGroup>
-                    <FormHelperText>
-                        {error ? errorMessage : null}
-                    </FormHelperText>
-                </FormControl>
+        <div>
+            <Typography variant="h4">{props.label}</Typography>
+            <Grid container>
+                <Grid item xs={12}>
+                    <FormControl component="fieldset" error={error}>
+                        <FormLabel component="legend">Roles</FormLabel>
+                        <FormGroup>{checkboxes}</FormGroup>
+                        <FormHelperText>
+                            {error ? errorMessage : null}
+                        </FormHelperText>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                    <Button variant="contained" onClick={handleSubmit}>
+                        {props.buttonValue}
+                    </Button>
+                </Grid>
             </Grid>
-            <Grid item xs={12}>
-                <Button variant="contained" onClick={handleSubmit}>
-                    {props.buttonValue}
-                </Button>
-            </Grid>
-        </Grid>
+        </div>
     )
 }
 
 CheckboxListSubmit.propTypes = {
     choices: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    label: PropTypes.string.isRequired,
     onChange: PropTypes.func,
     buttonValue: PropTypes.string,
     minChoice: PropTypes.number,

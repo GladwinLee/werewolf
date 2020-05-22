@@ -8,6 +8,8 @@ MASON = 'mason'
 MINION = 'minion'
 HUNTER = 'hunter'
 WITCH = 'witch'
+WITCH_PART_TWO = 'witch_part_two'
+NONE = "None"
 
 MIDDLE_1 = 'Middle 1'
 MIDDLE_2 = 'Middle 2'

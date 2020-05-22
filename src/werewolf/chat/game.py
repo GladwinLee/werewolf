@@ -1,3 +1,4 @@
+from .role_constants import WITCH, NONE
 from .role_manager import RoleManager
 
 
@@ -42,6 +43,9 @@ class Game:
     def get_next_action(self):
         return self.action_order[0]
 
+    def remove_next_action(self):
+        return self.action_order.pop(0)
+
     def get_winner(self):
         return self.role_manager.get_winners(self.player_to_vote_choice)
 
@@ -51,7 +55,9 @@ class Game:
     def handle_role_action(self, action, player_name, choice):
         if action != self.get_next_action():
             return "ERROR", "Not expecting action %s" % action
-        self.action_order.pop(0)
+        self.remove_next_action()
+        if action == WITCH and choice == NONE:
+            self.remove_next_action()
         return self.role_manager.handle_role_action(action, player_name, choice)
 
     def vote(self, voter, votee):
@@ -64,7 +70,7 @@ class Game:
     def handle_action_timeout(self, action):
         if action != self.get_next_action():
             return
-        self.action_order.pop(0)
+        self.remove_next_action()
 
     def get_action_log(self):
         return self.role_manager.get_action_log()
