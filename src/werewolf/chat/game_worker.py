@@ -1,4 +1,6 @@
+import logging
 from asyncio import run
+from logging.handlers import RotatingFileHandler
 from threading import Timer
 from time import sleep
 
@@ -11,6 +13,26 @@ ROOM_GROUP_NAME_FIELD = '_room_group_name'
 CHANNEL_NAME_FIELD = '_channel_name'
 
 WEREWOLF_CHANNEL = 'werewolf-channel'
+
+logger = logging.getLogger("worker")
+logger.setLevel(logging.DEBUG)
+MAX_MB = 10 * 1000000
+
+fh = RotatingFileHandler("worker.log", maxBytes=MAX_MB, backupCount=5)
+fh.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+formatter = logging.Formatter(
+    fmt='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt="%m-%d %H:%M:%S"
+)
+
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 
 # This doesn't work with multiple rooms atm
@@ -75,7 +97,7 @@ class GameWorker(AsyncConsumer):
         action_type = data['action_type']
         choice = data['choice']
 
-        print("%s %s: %s" % (name, action_type, choice))
+        logger.info("%s %s: %s" % (name, action_type, choice))
         if action_type == 'vote':
             await self.vote(data)
         else:
@@ -119,7 +141,7 @@ class GameWorker(AsyncConsumer):
     async def start(self, data):
         name = data[NAME_FIELD]
         room_group_name = data[ROOM_GROUP_NAME_FIELD]
-        print("%s started the game" % name)
+        logger.info("%s started the game" % name)
 
         self.configure_settings(data)
         self.game.start_game()
@@ -192,7 +214,7 @@ class GameWorker(AsyncConsumer):
         self.action_timer.start()
 
     async def reset(self, data):
-        print("%s reset the game" % data[NAME_FIELD])
+        logger.info("%s reset the game" % data[NAME_FIELD])
         await self.group_send(
             data[ROOM_GROUP_NAME_FIELD],
             {
@@ -206,20 +228,20 @@ class GameWorker(AsyncConsumer):
 
     # Private helpers
     async def group_send(self, room, msg):
-        print("send room:%s" % room)
-        print(msg)
+        logger.debug("send room:%s" % room)
+        logger.debug(msg)
         await self.channel_layer.group_send(
             room,
             msg
         )
 
     async def channel_send(self, channel, msg):
-        print("Send channel:%s, %s" % (channel, msg))
+        logger.debug("Send channel:%s, %s" % (channel, msg))
         await self.channel_layer.send(
             channel,
             msg
         )
 
     async def dispatch(self, message):
-        print("Received ", message)
+        logger.debug("Received ", message)
         await super().dispatch(message)

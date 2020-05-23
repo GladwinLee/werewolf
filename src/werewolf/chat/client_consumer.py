@@ -1,8 +1,31 @@
+import logging
+from logging.handlers import RotatingFileHandler
+
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .consumer_role_manager import ConsumerRoleManager
 from .game_worker import WEREWOLF_CHANNEL
 from .role_constants import WITCH_PART_TWO
+
+logger = logging.getLogger("consumer")
+logger.setLevel(logging.DEBUG)
+MAX_MB = 10 * 1000000
+
+fh = RotatingFileHandler("worker.log", maxBytes=MAX_MB, backupCount=5)
+fh.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+
+formatter = logging.Formatter(
+    fmt='%(asctime)s - %(levelname)s - %(thread)d - %(message)s',
+    datefmt="%m-%d %H:%M:%S"
+)
+
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+
+logger.addHandler(fh)
+logger.addHandler(ch)
 
 
 class ClientConsumer(AsyncJsonWebsocketConsumer):
@@ -51,7 +74,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive_json(self, data, **kwargs):
-        print("client sent: %s" % data)
+        logger.debug(f"{self.player_name} client sent: {data}")
 
         msg_type = data['type']
         if msg_type == "name_select":
@@ -76,7 +99,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def worker_start(self, data):
-        print("Starting for %s" % self.player_name)
+        logger.debug(f"{self.player_name} Starting for %s" % self.player_name)
         msg = self.role_manager.handle_start(data, self.player_name)
         await self.send_json(msg)
 
@@ -141,7 +164,8 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
 
     # Private helpers
     async def send_to_worker(self, msg):
-        print("To worker name:%s :%s" % (self.player_name, msg))
+        logger.debug(f"{self.player_name} To worker name:%s :%s" % (
+        self.player_name, msg))
         msg['_name'] = self.player_name
         msg['_channel_name'] = self.channel_name
         msg['_room_group_name'] = self.room_group_name
@@ -153,5 +177,6 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
 
     # Send message to WebSocket
     async def send_json(self, msg, close=False):
-        print("To client name:%s :%s" % (self.player_name, msg))
+        logger.debug(f"{self.player_name} To client name:%s :%s" % (
+        self.player_name, msg))
         await super().send_json(msg, close)

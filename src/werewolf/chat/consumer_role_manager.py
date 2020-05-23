@@ -1,4 +1,8 @@
+import logging
+
 from .role_constants import *
+
+logger = logging.getLogger("consumer.consumer_role_manager")
 
 
 class ConsumerRoleManager:
@@ -43,7 +47,7 @@ class ConsumerRoleManager:
             )
             return msg
         except KeyError:
-            print("Not a role action:", action_data["action"])
+            logger.error(f"Not a role action:", action_data["action"])
 
     def seer(self, msg, player_name, player_list, **kwargs):
         choices = player_list.copy()

@@ -1,0 +1,6 @@
+.idea/
+django/
+venv/
+node_modules/
+__pycache__/
+*.log
