@@ -1,5 +1,6 @@
 from .role_constants import *
 
+
 class ConsumerRoleManager:
     def __init__(self):
         self.player_role = ""
@@ -56,7 +57,7 @@ class ConsumerRoleManager:
         msg['choices'] = choices
         msg['choice_type'] = "pick1"
         msg['default'] = NONE
-        msg['help_text'] = "Reveal role(s) of selection"
+        msg['help_text'] = "Reveal role(s) of selected"
         return msg
 
     def robber(self, msg, player_name, player_list, **kwargs):
@@ -66,8 +67,7 @@ class ConsumerRoleManager:
         msg['choices'] = choices
         msg['choice_type'] = "pick1"
         msg['default'] = NONE
-        msg[
-            'help_text'] = "Swap your role with selected player, and see your new role"
+        msg['help_text'] = "Swap your role with selected"
         return msg
 
     def troublemaker(self, msg, player_name, player_list, **kwargs):
@@ -75,15 +75,14 @@ class ConsumerRoleManager:
         choices.remove(player_name)
         msg['choices'] = {choice: False for choice in choices}
         msg['choice_type'] = "pick2"
-        msg['help_text'] = "Swap the roles of two players"
+        msg['help_text'] = "Swap the roles of the selected"
         return msg
 
     def witch(self, msg, **kwargs):
         msg['choices'] = [MIDDLE_1, MIDDLE_2, MIDDLE_3, NONE]
         msg['default'] = NONE
         msg['choice_type'] = "pick1"
-        msg[
-            'help_text'] = "Reveal the role of a middle card. You must swap it with a player role"
+        msg['help_text'] = "Reveal the role of selected"
         return msg
 
     def witch_part_two(self, msg, player_name, player_list, role_to_swap,
@@ -92,5 +91,5 @@ class ConsumerRoleManager:
         msg['default'] = player_name
         msg['choice_type'] = "pick1"
         msg[
-            'help_text'] = f"Swap the middle role ${role_to_swap} with the selected player's role"
+            'help_text'] = f"Swap the role of selected with the revealed {role_to_swap.capitalize()}"
         return msg

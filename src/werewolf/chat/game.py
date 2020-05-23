@@ -70,6 +70,9 @@ class Game:
     def handle_action_timeout(self, action):
         if action != self.get_next_action():
             return
+        if action == WITCH:
+            # remove WITCH_PART_TWO from next action
+            self.remove_next_action()
         self.remove_next_action()
 
     def get_action_log(self):

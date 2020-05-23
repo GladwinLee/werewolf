@@ -60,7 +60,7 @@ export default function GameAction(props) {
             display =
                 <CheckboxListSubmit
                     choices={actionData['choices']}
-                    label={capitalize(actionData['action'])}
+                    label={getLabel(actionData)}
                     onSubmit={onSubmit}
                     onChange={(c) => setChoices(c)}
                     minChoice={2}
@@ -71,7 +71,7 @@ export default function GameAction(props) {
             display =
                 <RadioChoice
                     choices={actionData['choices']}
-                    label={capitalize(actionData['action'])}
+                    label={getLabel(actionData)}
                     onSubmit={onSubmit}
                     onChange={(c) => setChoices(c)}
                     default={actionData['default']}
@@ -126,4 +126,18 @@ GameAction.propTypes = {
 
 GameAction.defaultProps = {
     actionData: {},
+}
+
+function getLabel(actionData) {
+    let title = actionData['action'];
+    if (title === "witch_part_two") {
+        title = "witch";
+    }
+    let subtitle = actionData['help_text'];
+
+    return <div>
+        <Typography variant="h4">{capitalize(title)}</Typography>
+        <Typography variant="subtitle1">{subtitle}</Typography>
+    </div>
+
 }
