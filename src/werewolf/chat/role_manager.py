@@ -139,6 +139,20 @@ class RoleManager:
         self.full_roles_map[player_1] = player_1_new
         self.full_roles_map[player_2] = player_2_new
 
+    def revealer(self, player_name, target):
+        if target == NONE:
+            self.log_append(
+                f"The Revealer {player_name} chooses not to see a role")
+            return
+        target_role = self.full_roles_map[target]
+        result = {target: target_role}
+        self.log_append(
+            f"The Revealer {player_name} sees {target} as {target_role.capitalize()}")
+        if target_role in [TANNER, WEREWOLF]:
+            return "role", result
+        else:
+            return "role_for_all", result
+
     def get_winners(self, player_to_vote_choice):
         self.vote_counts = self.get_vote_counts(player_to_vote_choice)
         dead_roles = self.get_dead_roles(player_to_vote_choice,

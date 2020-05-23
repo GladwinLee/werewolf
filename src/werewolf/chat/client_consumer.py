@@ -145,9 +145,8 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
     async def worker_role_special(self, data):
         result_type = data['result_type']
         await self.send_json(data)
-        if result_type == "role":
-            pass
-        elif result_type == "witch":
+
+        if result_type == "witch":
             result_role = list(data['result'].values())[0]
             await self.send_json(self.role_manager.get_role_action_data(
                 {

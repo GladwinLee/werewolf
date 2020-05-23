@@ -110,6 +110,7 @@ class Game extends Component {
             case 'worker.role_special':
                 switch (data["result_type"]) {
                     case "witch":
+                    case "role_for_all":
                     case "role": {
                         const newKnownRoles = {...this.state.known_roles, ...data['result']}
                         logRevealedRoles(data['result']);

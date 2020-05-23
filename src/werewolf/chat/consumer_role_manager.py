@@ -97,3 +97,14 @@ class ConsumerRoleManager:
         msg[
             'help_text'] = f"Swap the role of selected with the revealed {role_to_swap.capitalize()}"
         return msg
+
+    def revealer(self, msg, player_name, player_list, **kwargs):
+        choices = player_list.copy()
+        choices.remove(player_name)
+        choices.append(NONE)
+        msg['choices'] = choices
+        msg['choice_type'] = "pick1"
+        msg['default'] = NONE
+        msg[
+            'help_text'] = "Reveal role of selected. If not Werewolf or Tanner, everyone sees it too"
+        return msg

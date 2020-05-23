@@ -167,7 +167,6 @@ class GameWorker(AsyncConsumer):
         self.wait_times['vote'] = int(data['settings']['vote_wait_time']) * 60
 
     async def role_action(self, data):
-        channel_name = data[CHANNEL_NAME_FIELD]
         player_name = data[NAME_FIELD]
         action_type = data['action_type']
         choice = data['choice']
@@ -175,13 +174,20 @@ class GameWorker(AsyncConsumer):
         response = self.game.handle_role_action(
             action_type, player_name, choice)
 
-        if response:
-            result_type, result = response
-            await self.channel_send(channel_name, {
-                'type': 'worker.role_special',
-                'result_type': result_type,
-                'result': result,
-            })
+        if not response:
+            return
+
+        result_type, result = response
+        msg = {
+            'type': 'worker.role_special',
+            'result_type': result_type,
+            'result': result,
+        }
+
+        if result_type == "role_for_all":
+            await self.group_send(data[ROOM_GROUP_NAME_FIELD], msg)
+        else:
+            await self.channel_send(data[CHANNEL_NAME_FIELD], msg)
 
     async def handle_action_timeout(self, action, room_group_name):
         self.game.handle_action_timeout(action)

@@ -10,6 +10,8 @@ HUNTER = 'hunter'
 WITCH = 'witch'
 WITCH_PART_TWO = 'witch_part_two'
 BODYGUARD = "bodyguard"
+REVEALER = "revealer"
+
 NONE = "None"
 
 MIDDLE_1 = 'Middle 1'
@@ -18,7 +20,7 @@ MIDDLE_3 = 'Middle 3'
 
 SEPARATOR = ";"
 
-action_order = [SEER, ROBBER, WITCH, TROUBLEMAKER]
+action_order = [SEER, ROBBER, WITCH, TROUBLEMAKER, REVEALER]
 special_roles_no_action = [TANNER, MASON, MINION, HUNTER, BODYGUARD]
 all_special_roles = action_order + special_roles_no_action
 
@@ -36,5 +38,6 @@ role_info = {
     MINION: "(Werewolf Team) Knows the identity of the Werewolves, but the Werewolves do not know the Minion"
             " Being voted out will not lead to Village victory",
     HUNTER: "(Village Team) If voted out, will kill whoever they voted as well",
-    BODYGUARD: "(Village Team) The person they vote will not be killed. Next most votes dies instead"
+    BODYGUARD: "(Village Team) The person they vote will not be killed. Next most votes dies instead",
+    REVEALER: "(Village Team) View another player's role. If it is not a Werewolf or Tanner, it is revealed to everyone",
 }
