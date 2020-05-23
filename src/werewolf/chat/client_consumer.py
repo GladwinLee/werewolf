@@ -118,13 +118,17 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         wait_time = data['wait_time']
 
         if action == 'vote':
-            i = self.player_list.index(self.player_name)
-            choices = self.player_list[i + 1:] + self.player_list[:i]
+            player_after_self = self.player_list[
+                (self.player_list.index(self.player_name) + 1) % len(
+                    self.player_list)
+                ]
+            choices = self.player_list.copy()
+            choices.remove(self.player_name)
             await self.send_json({
                 "type": "action",
                 "action": "vote",
                 "choices": choices,
-                "default": choices[0],
+                "default": player_after_self,
                 "choice_type": "pick1",
                 "wait_time": wait_time,
             })
@@ -157,6 +161,8 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 player_list=self.player_list,
                 role_to_swap=result_role
             ))
+        elif result_type == "sentinel":
+            self.role_manager.set_sentinel_target(data['result'])
 
     async def worker_winner(self, data):
         await self.send_json(data)

@@ -8,6 +8,7 @@ logger = logging.getLogger("consumer.consumer_role_manager")
 class ConsumerRoleManager:
     def __init__(self):
         self.player_role = ""
+        self.sentinel_target = None
 
     def is_player_role(self, role):
         return self.player_role == role
@@ -40,11 +41,14 @@ class ConsumerRoleManager:
             msg = {
                 "type": "action",
                 "action": action_data["action"],
-                "wait_time": action_data['wait_time']
+                "wait_time": action_data['wait_time'],
+                "choices": []
             }
             msg = getattr(ConsumerRoleManager, action_data["action"])(
                 self, msg, **kwargs
             )
+            if self.sentinel_target in msg['choices']:
+                msg['disabledChoices'] = {self.sentinel_target: True}
             return msg
         except KeyError:
             logger.error(f"Not a role action:", action_data["action"])
@@ -65,6 +69,10 @@ class ConsumerRoleManager:
         return msg
 
     def robber(self, msg, player_name, player_list, **kwargs):
+        if self.sentinel_target == player_name:
+            msg[
+                'help_text'] = "The Sentinel shielded you. You cannot swap yourself with another player"
+            return msg
         choices = player_list.copy()
         choices.remove(player_name)
         choices.append(NONE)
@@ -93,6 +101,10 @@ class ConsumerRoleManager:
         **kwargs):
         msg['choices'] = player_list
         msg['default'] = player_name
+        if self.sentinel_target == msg['default']:
+            # Default as next in choices if sentinel blocked the default
+            msg['default'] = player_list[
+                (player_list.index(player_name) + 1) % len(player_list)]
         msg['choice_type'] = "pick1"
         msg[
             'help_text'] = f"Swap the role of selected with the revealed {role_to_swap.capitalize()}"
@@ -108,3 +120,16 @@ class ConsumerRoleManager:
         msg[
             'help_text'] = "Reveal role of selected. If not Werewolf or Tanner, everyone sees it too"
         return msg
+
+    def sentinel(self, msg, player_name, player_list, **kwargs):
+        choices = player_list.copy()
+        choices.remove(player_name)
+        choices.append(NONE)
+        msg['choices'] = choices
+        msg['choice_type'] = "pick1"
+        msg['default'] = NONE
+        msg['help_text'] = "Block abilities affecting selected"
+        return msg
+
+    def set_sentinel_target(self, target):
+        self.sentinel_target = target

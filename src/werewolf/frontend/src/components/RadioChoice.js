@@ -15,6 +15,7 @@ export default function RadioChoice(props) {
                 label={p}
                 key={p}
                 control={<Radio/>}
+                disabled={props.disabledChoices[p]}
             />
         )
     });
@@ -31,7 +32,6 @@ export default function RadioChoice(props) {
         <div>
             <Typography variant="h4">{props.label}</Typography>
             <RadioGroup
-                fullWidth
                 orientation="vertical"
                 color="primary"
                 onChange={handleChange}
@@ -51,11 +51,13 @@ RadioChoice.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     onChange: PropTypes.func,
     default: PropTypes.string,
-    label: PropTypes.string,
+    label: PropTypes.node,
+    disabledChoices: PropTypes.object,
 }
 
 RadioChoice.defaultProps = {
     default: "",
     onChange: () => {
     },
+    disabledChoices: {},
 }

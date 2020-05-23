@@ -176,15 +176,13 @@ class GameWorker(AsyncConsumer):
 
         if not response:
             return
-
         result_type, result = response
         msg = {
             'type': 'worker.role_special',
             'result_type': result_type,
             'result': result,
         }
-
-        if result_type == "role_for_all":
+        if result_type in ["role_for_all", "sentinel"]:
             await self.group_send(data[ROOM_GROUP_NAME_FIELD], msg)
         else:
             await self.channel_send(data[CHANNEL_NAME_FIELD], msg)

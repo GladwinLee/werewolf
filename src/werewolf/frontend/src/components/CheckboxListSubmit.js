@@ -46,8 +46,8 @@ export default function CheckboxListSubmit(props) {
                     checked={checked}
                     onChange={handleChange}
                     name={choice}
-                />
-                }
+                />}
+                disabled={props.disabledChoices[choice]}
                 label={capitalize(choice)}
             />
         )
@@ -84,6 +84,7 @@ CheckboxListSubmit.propTypes = {
     buttonValue: PropTypes.string,
     minChoice: PropTypes.number,
     maxChoice: PropTypes.number,
+    disabledChoices: PropTypes.object,
 }
 
 CheckboxListSubmit.defaultProps = {
@@ -92,4 +93,5 @@ CheckboxListSubmit.defaultProps = {
     maxChoice: Number.MAX_SAFE_INTEGER,
     onChange: () => {
     },
+    disabledChoices: {},
 }

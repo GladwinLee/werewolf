@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import GameSetup from './GameSetup'
-import PlayerList from './PlayerList';
+import PlayersInfo from './PlayersInfo';
 import GameInfo from "./GameInfo";
 import GameAction from "./GameAction";
 import Typography from "@material-ui/core/Typography";
@@ -28,6 +28,7 @@ class Game extends Component {
             player_name: "",
             players: [],
             player_role: "",
+            players_status: {},
             known_roles: {},
             show_game_setup: true,
             is_game_master: false,
@@ -115,6 +116,15 @@ class Game extends Component {
                         const newKnownRoles = {...this.state.known_roles, ...data['result']}
                         logRevealedRoles(data['result']);
                         this.setState({known_roles: newKnownRoles});
+                        break;
+                    }
+                    case "sentinel": {
+                        const protectedPlayer = data['result'];
+                        const newStatus = {...this.state.players_status};
+                        newStatus[protectedPlayer] = "sentinel"
+                        this.setState({players_status: newStatus});
+                        this.addToActionLog(
+                            `The Sentinel protects ${protectedPlayer}`);
                         break;
                     }
                 }
@@ -222,10 +232,11 @@ class Game extends Component {
                     </Grid>
                     <Grid item xs={12} md={3}>
                         <Paper style={{height: "100%"}}>
-                            <PlayerList
+                            <PlayersInfo
                                 players={this.state.players}
                                 vote_results={this.state.vote_results}
                                 known_roles={this.state.known_roles}
+                                status={this.state.players_status}
                             />
                         </Paper>
                     </Grid>

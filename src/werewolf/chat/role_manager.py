@@ -153,6 +153,14 @@ class RoleManager:
         else:
             return "role_for_all", result
 
+    def sentinel(self, player_name, target):
+        if target == NONE:
+            self.log_append(
+                f"The Sentinel {player_name} chooses not to shield anyone")
+            return
+        self.log_append(f"The Sentinel {player_name} shields {target}")
+        return "sentinel", target
+
     def get_winners(self, player_to_vote_choice):
         self.vote_counts = self.get_vote_counts(player_to_vote_choice)
         dead_roles = self.get_dead_roles(player_to_vote_choice,

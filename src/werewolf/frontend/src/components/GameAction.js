@@ -27,6 +27,9 @@ export default function GameAction(props) {
             'action_type': action_type,
             'choice': choice,
         }));
+        if (action_type === "witch_part_two") {
+            action_type = "Witch";
+        }
         setLastActionSent(action_type);
         props.logAction(`${capitalize(action_type)} on: ${choice}`);
     }
@@ -50,6 +53,8 @@ export default function GameAction(props) {
     };
 
     const getDisplayAndOnSubmit = () => {
+        let disabledChoices = (actionData['disabledChoices'])
+            ? actionData['disabledChoices'] : {};
         if (actionData['action'] === 'wait') {
             display =
                 <Typography variant="h4">
@@ -65,6 +70,7 @@ export default function GameAction(props) {
                     onChange={(c) => setChoices(c)}
                     minChoice={2}
                     maxChoice={2}
+                    disabledChoices={disabledChoices}
                 />
         } else if (actionData['choice_type'] === "pick1") {
             onSubmit = () => onChoiceSubmit(actionData['action'])
@@ -75,7 +81,10 @@ export default function GameAction(props) {
                     onSubmit={onSubmit}
                     onChange={(c) => setChoices(c)}
                     default={actionData['default']}
+                    disabledChoices={disabledChoices}
                 />
+        } else {
+            display = getLabel(actionData)
         }
     }
 
@@ -98,12 +107,7 @@ export default function GameAction(props) {
         setWaitTime(actionData['wait_time']);
     }
 
-    let newTimerKey = actionData['action'];
-    if (actionData['action'] === "wait") {
-        newTimerKey += `-${actionData['waiting_on']}`;
-    } else if (actionData['action'] === "witch_part_two") {
-        newTimerKey = "witch"
-    }
+    let newTimerKey = getTimerKey(actionData);
     if (newTimerKey !== timerKey) {
         setTimerKey(newTimerKey);
     }
@@ -128,6 +132,16 @@ GameAction.defaultProps = {
     actionData: {},
 }
 
+function getTimerKey(actionData) {
+    let newTimerKey = actionData['action'];
+    if (actionData['action'] === "wait") {
+        newTimerKey += `-${actionData['waiting_on']}`;
+    } else if (actionData['action'] === "witch_part_two") {
+        newTimerKey = "witch"
+    }
+    return newTimerKey;
+}
+
 function getLabel(actionData) {
     let title = actionData['action'];
     if (title === "witch_part_two") {
@@ -136,7 +150,8 @@ function getLabel(actionData) {
     let subtitle = actionData['help_text'];
 
     return <div>
-        <Typography variant="h4">{capitalize(title)}</Typography>
+        <Typography variant="h4">{(title) ? capitalize(title)
+            : null}</Typography>
         <Typography variant="subtitle1">{subtitle}</Typography>
     </div>
 
