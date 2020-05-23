@@ -18,7 +18,7 @@ logger = logging.getLogger("worker")
 logger.setLevel(logging.DEBUG)
 MAX_MB = 10 * 1000000
 
-fh = RotatingFileHandler("worker.log", maxBytes=MAX_MB, backupCount=5)
+fh = RotatingFileHandler("/logs/worker.log", maxBytes=MAX_MB, backupCount=5)
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)

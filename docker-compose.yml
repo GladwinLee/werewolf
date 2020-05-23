@@ -14,6 +14,7 @@ services:
     volumes:
       - .:/code
       - static:/code/src/werewolf/frontend/static
+      - logs:/logs/
     ports:
       - "80:8000"
     depends_on:
@@ -21,9 +22,10 @@ services:
       - redis
   worker:
     build: ./src/werewolf
-    command: python src/werewolf/manage.py runworker werewolf-channel
+    command: python src/werewolf/manage.py  runworker werewolf-channel
     volumes:
       - .:/code
+      - logs:/logs/
     depends_on:
       - redis
   redis:
@@ -32,3 +34,4 @@ services:
       - "6379:6379"
 volumes:
   static:
+  logs:

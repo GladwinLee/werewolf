@@ -15,3 +15,6 @@ Then run each in its own console
 - `python manage.py runworker werewolf-channel`
 - `python manage.py runserver`
 
+### Logs
+`docker run --mount src=werewolf_logs,dst=/werewolf_logs -it ubuntu`
+Run on the host, then read the logs in `/werewolf_logs`
