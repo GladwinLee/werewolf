@@ -5,12 +5,14 @@ from .role_constants import *
 
 logger = logging.getLogger("worker.game.role_manager")
 
+
 class RoleManager:
     def __init__(self):
         self.full_roles_map = {}  # name to role, including middle
         self.selected_roles = []
         self.action_log = []
         self.witch_middle_target = ""  # store the target of the witch in its 1st part
+        self.vote_counts = {}
 
     def get_configurable_roles(self):
         return all_special_roles
@@ -138,40 +140,103 @@ class RoleManager:
         self.full_roles_map[player_2] = player_2_new
 
     def get_winners(self, player_to_vote_choice):
-        dead_roles, vote_counts = self.get_dead_roles(player_to_vote_choice)
+        self.vote_counts = self.get_vote_counts(player_to_vote_choice)
+        dead_roles = self.get_dead_roles(player_to_vote_choice,
+                                         self.vote_counts.copy())
         winners = self.calculate_winners(dead_roles)
-        return ", ".join(winners), vote_counts
+        return ", ".join(winners), self.vote_counts
 
-    def get_dead_roles(self, player_to_vote_choice):
+    def get_vote_counts(self, player_to_vote_choice):
         vote_counts = {}
         for vote in player_to_vote_choice.values():
             vote_counts[vote] = vote_counts.setdefault(vote, 0) + 1
-        highest_vote = max(vote_counts.values())
         for name, vote in player_to_vote_choice.items():
             self.log_append(f"{name} votes {vote}")
+        return vote_counts
 
-        if highest_vote > 1:
-            dead_roles = {
-                self.full_roles_map[name]: name
-                for name, votes in vote_counts.items()
-                if votes == highest_vote
-            }
-            msg = "The village votes to kill " + ", ".join(dead_roles.values())
-            self.log_append(msg)
-        else:
-            dead_roles = {}
-            self.log_append(f"The village votes to kill no one")
+    def get_dead_roles(self, player_to_vote_choice, vote_counts):
+        dead_players_to_roles = self.get_village_vote_to_kill(vote_counts)
 
-        if HUNTER in dead_roles:
-            hunter_name = dead_roles[HUNTER]
-            hunter_choice = player_to_vote_choice[hunter_name]
-            dead_roles[self.full_roles_map[hunter_choice]] = hunter_name
-            self.log_append(
-                f"The Hunter {hunter_name} is voted off. They shoot {hunter_choice} before they die")
+        special_choices = self.get_special_vote_choices(player_to_vote_choice)
+        if BODYGUARD in special_choices:
+            dead_players_to_roles = self.handle_bodyguard(
+                dead_players_to_roles,
+                special_choices,
+                vote_counts
+            )
 
-        for role, name in dead_roles.items():
+        if HUNTER in dead_players_to_roles.values():
+            dead_players_to_roles = self.handle_hunter(
+                dead_players_to_roles,
+                player_to_vote_choice,
+                special_choices
+            )
+
+        for name, role in dead_players_to_roles.items():
             self.log_append(f"{name} the {role.capitalize()} dies")
-        return dead_roles, vote_counts
+        return dead_players_to_roles
+
+    def handle_hunter(self, dead_players_to_roles, player_to_vote_choice,
+        special_choices):
+        hunter_name = special_choices[HUNTER]["name"]
+        hunter_choice = special_choices[HUNTER]["choice"]
+        dead_players_to_roles[hunter_choice] = self.full_roles_map[
+            hunter_choice]
+        self.log_append(
+            f"The Hunter {hunter_name} shoots {hunter_choice} before they die")
+        if BODYGUARD in special_choices:
+            bodyguard_name = special_choices[BODYGUARD]["name"]
+            bodyguard_choice = special_choices[BODYGUARD]["choice"]
+            if bodyguard_choice == hunter_choice:
+                dead_players_to_roles.pop(
+                    player_to_vote_choice[bodyguard_name])
+                self.log_append(
+                    f"The Bodyguard {bodyguard_name} protects {bodyguard_choice} from the Hunter")
+        return dead_players_to_roles
+
+    def handle_bodyguard(self, dead_players_to_roles, special_choices,
+        vote_counts):
+        bodyguard_name = special_choices[BODYGUARD]["name"]
+        bodyguard_choice = special_choices[BODYGUARD]["choice"]
+        if dead_players_to_roles.pop(bodyguard_choice, None):
+            self.log_append(
+                f"The Bodyguard {bodyguard_name} protects {bodyguard_choice} from being voted off")
+            if len(dead_players_to_roles) == 0:
+                self.log_append(
+                    f"There will be a recount with the next highest voted being killed")
+                vote_counts.pop(bodyguard_choice)
+                dead_players_to_roles = self.get_village_vote_to_kill(
+                    vote_counts)
+        return dead_players_to_roles
+
+    def get_village_vote_to_kill(self, vote_counts):
+        highest_vote = max(vote_counts.values())
+        if highest_vote == 1:
+            self.log_append(f"The village votes to kill no one")
+            return {}
+        dead_players_to_roles = {
+            name: self.full_roles_map[name]
+            for name, votes in vote_counts.items()
+            if votes == highest_vote
+        }
+        self.log_append("The village votes to kill " + ", ".join(
+            dead_players_to_roles.keys()))
+        return dead_players_to_roles
+
+    def get_special_vote_choices(self, player_to_vote_choice):
+        special_choices = {}
+        # only support 1 of each right now
+        for special_vote in [HUNTER, BODYGUARD]:
+            if special_vote in self.get_players_to_roles().values():
+                name = [
+                    name for name, role
+                    in self.get_players_to_roles().items()
+                    if role == special_vote
+                ][0]
+                choice = player_to_vote_choice[name]
+                special_choices[special_vote] = {"name": name, "choice": choice}
+
+        return special_choices
 
     def calculate_winners(self, dead_roles):
         if len(dead_roles) == 0:

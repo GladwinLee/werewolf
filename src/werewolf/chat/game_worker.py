@@ -62,6 +62,7 @@ class GameWorker(AsyncConsumer):
 
     async def player_leave(self, data):
         player_list = self.game.remove_player(data[NAME_FIELD])
+        logger.info(f"{data[NAME_FIELD]} leaves")
 
         await self.group_send(
             data[ROOM_GROUP_NAME_FIELD],
@@ -74,6 +75,7 @@ class GameWorker(AsyncConsumer):
     async def name_select(self, data):
         player_list = self.game.add_player(data['name'])
         configurable_roles = self.game.get_configurable_roles()
+        logger.info(f"{data['name']} joins")
 
         # first player to join is the game master
         if len(player_list) == 1:
