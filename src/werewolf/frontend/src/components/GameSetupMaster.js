@@ -5,6 +5,8 @@ import CheckboxList from "./CheckboxList";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 import {useCookies} from "react-cookie";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 export default function GameSetupMaster(props) {
     const [cookies, setCookies] = useCookies(
@@ -13,38 +15,30 @@ export default function GameSetupMaster(props) {
     const initialSelectedRoles = {};
     if (props.configurableRoles) {
         props.configurableRoles.forEach(
-            (role) => {
-                if (cookies.selectedRoles) {
-                    initialSelectedRoles[role] = !!cookies.selectedRoles[role];
-                } else {
-                    initialSelectedRoles[role] = false;
-                }
-            }
+            (role) => initialSelectedRoles[role] = cookies.selectedRoles
+                && !!cookies.selectedRoles[role]
         );
     }
 
     const [selectedRoles, setSelectedRoles] = useState(initialSelectedRoles);
-    const handleRoleSelect = (choices) => {
-        setSelectedRoles(choices);
-    };
-
     const [roleWaitTime, setRoleWaitTime] = React.useState(
         (cookies.roleWaitTime == null) ? 7 : cookies.roleWaitTime
     );
-    const handleRoleWaitTimeChange = (event) => {
-        setRoleWaitTime(
-            event.target.value === '' ? '' : Number(event.target.value));
-    };
-
     const [voteWaitTime, setVoteWaitTime] = React.useState(
         (cookies.voteWaitTime == null) ? 5 : cookies.voteWaitTime
     );
-    const handleVoteWaitTimeChange = (event) => {
-        setVoteWaitTime(
-            event.target.value === '' ? '' : Number(event.target.value));
-    };
+    const handleRoleSelect = (choices) => setSelectedRoles(choices);
+    const handleRoleWaitTimeChange = (event) => setRoleWaitTime(
+        event.target.value);
+    const handleVoteWaitTimeChange = (event) => setVoteWaitTime(
+        event.target.value);
+
+    const error = props.numPlayers < 3;
 
     const handleSubmit = () => {
+        if (error) {
+            return;
+        }
         const settings = {
             "selected_roles": selectedRoles,
             "role_wait_time": roleWaitTime,
@@ -105,9 +99,14 @@ export default function GameSetupMaster(props) {
                 </Grid>
             </Grid>
             <Grid item xs={12}>
-                <Button variant="contained" onClick={handleSubmit}>
-                    {"Start"}
-                </Button>
+                <FormControl error={error}>
+                    <Button variant="contained" disabled={error}
+                            onClick={handleSubmit}>
+                        {"Start"}
+                    </Button>
+                    <FormHelperText>{error
+                    && "Minimum 3 players to start"}</FormHelperText>
+                </FormControl>
             </Grid>
         </Grid>
     )

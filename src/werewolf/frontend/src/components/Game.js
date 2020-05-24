@@ -195,6 +195,7 @@ class Game extends Component {
                                 visible={this.state.show_game_setup}
                                 isGameMaster={this.state.is_game_master}
                                 configurableRoles={this.state.configurable_roles}
+                                numPlayers={this.state.players.length}
                             />
                             <GameAction
                                 socket={this.socket}
@@ -255,6 +256,10 @@ class Game extends Component {
                                     <Link
                                         href={"https://www.fgbradleys.com/rules/rules2/OneNightUltimateWerewolf-rules.pdf"}>
                                         (Full Rules)
+                                    </Link>
+                                    <Link
+                                        href={"https://cdn.shopify.com/s/files/1/0740/4855/files/Daybreak_rules_for_BGG.pdf?338"}>
+                                        -(Daybreak Rules)
                                     </Link>
                                 </Typography>
                             </ExpansionPanelDetails>

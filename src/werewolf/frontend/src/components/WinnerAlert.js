@@ -25,7 +25,7 @@ export default function AlertDialog(props) {
                 <DialogTitle id="alert-dialog-title">{capitalize(props.winner) + " victory"}</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Check if your roles changed
+                        Check if your role changed
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

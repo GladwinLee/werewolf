@@ -1,46 +1,47 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 import {NameInput} from "./NameInput";
 import GameSetupMaster from "./GameSetupMaster";
+import PropTypes from "prop-types";
 
-class GameSetup extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            show_name_input: true,
-        }
+export default function GameSetup(props) {
+    const [showNameInput, setShowNameInput] = useState(true);
+
+    if (!props.visible) {
+        return null;
     }
 
-    nameSubmit(name) {
-        const success = this.props.nameSubmit(name);
+    const nameSubmit = (name) => {
+        const success = props.nameSubmit(name);
         if (success) {
-            this.setState({show_name_input: false});
+            setShowNameInput(false);
         }
         return success;
     }
 
-    render() {
-        if (!this.props.visible) {
-            return null;
-        }
-
-        let name_display = (this.state.show_name_input) ?
-            <NameInput onSubmit={(name) => this.nameSubmit(name)}/> :
-            null
-
-        let game_master_display = (this.props.isGameMaster) ?
-            <GameSetupMaster
-                handleStart={this.props.handleStart}
-                configurableRoles={this.props.configurableRoles}
-            /> :
-            null
-
-        return (
-            <div>
-                {name_display}
-                {game_master_display}
-            </div>
-        )
+    let name_display = (showNameInput) ? <NameInput onSubmit={nameSubmit}/>
+        : null
+    let game_master_display;
+    if (props.isGameMaster) {
+        game_master_display = <GameSetupMaster
+            handleStart={props.handleStart}
+            configurableRoles={props.configurableRoles}
+            numPlayers={props.numPlayers}
+        />
     }
+
+    return (
+        <div>
+            {name_display}
+            {game_master_display}
+        </div>
+    )
 }
 
-export default GameSetup;
+GameSetup.propTypes = {
+    visible: PropTypes.bool,
+    isGameMaster: PropTypes.bool,
+    handleStart: PropTypes.func,
+    nameSubmit: PropTypes.func,
+    configurableRoles: PropTypes.array,
+    numPlayers: PropTypes.number,
+}

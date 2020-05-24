@@ -139,3 +139,4 @@ class ConsumerRoleManager:
         if self.player_role == INSOMNIAC:
             return "role", {player_name: roles[player_name]}
         return None, None
+
