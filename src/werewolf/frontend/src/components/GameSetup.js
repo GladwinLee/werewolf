@@ -30,10 +30,10 @@ export default function GameSetup(props) {
     }
 
     return (
-        <div>
+        <>
             {name_display}
             {game_master_display}
-        </div>
+        </>
     )
 }
 

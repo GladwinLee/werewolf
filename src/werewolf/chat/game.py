@@ -27,8 +27,8 @@ class Game:
     def get_configurable_roles(self):
         return self.role_manager.get_configurable_roles()
 
-    def configure_roles(self, roles):
-        self.role_manager.configure_roles(roles)
+    def configure_roles(self, settings):
+        self.role_manager.configure_roles(settings)
 
     def start_game(self):
         self.role_manager.generate_roles(self.player_names)

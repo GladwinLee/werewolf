@@ -13,11 +13,14 @@ class RoleManager:
         self.action_log = []
         self.witch_middle_target = ""  # store the target of the witch in its 1st part
         self.vote_counts = {}
+        self.num_werewolves = 2
 
     def get_configurable_roles(self):
         return all_special_roles
 
-    def configure_roles(self, roles):
+    def configure_roles(self, settings):
+        self.num_werewolves = int(settings['num_werewolves'])
+        roles = settings['selected_roles']
         self.selected_roles = [role for role, selected in roles.items() if
                                selected]
 
@@ -31,18 +34,17 @@ class RoleManager:
             """
         num_players = len(players)
         total_roles = num_players + 3
-        num_werewolves = (num_players - 1) // 2
 
         roles = self.selected_roles.copy()
 
         if MASON in roles:
             roles.extend([MASON] * 1)
 
-        if len(roles) + num_werewolves > total_roles:
+        if len(roles) + self.num_werewolves > total_roles:
             random.shuffle(roles)
-            roles = roles[:(total_roles - num_werewolves)]
+            roles = roles[:(total_roles - self.num_werewolves)]
 
-        roles.extend([WEREWOLF] * num_werewolves)
+        roles.extend([WEREWOLF] * self.num_werewolves)
         if len(roles) < total_roles:
             roles.extend([VILLAGER] * (total_roles - len(roles)))
 

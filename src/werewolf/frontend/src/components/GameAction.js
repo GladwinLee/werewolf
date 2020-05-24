@@ -5,6 +5,7 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import CheckboxListSubmit from "./CheckboxListSubmit";
 import RadioChoice from "./RadioChoice";
 import PropTypes from "prop-types";
+import Grid from "@material-ui/core/Grid";
 
 export default function GameAction(props) {
     const [lastActionSent, setLastActionSent] = useState("");
@@ -112,14 +113,14 @@ export default function GameAction(props) {
         setTimerKey(newTimerKey);
     }
 
-    return <div>
+    return <Grid item>
         <Timer
             start={waitTime}
             timerKey={timerKey}
             callback={onAutoSubmit}
         />
         {display}
-    </div>
+    </Grid>
 }
 
 GameAction.propTypes = {

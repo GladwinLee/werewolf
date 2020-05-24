@@ -10,7 +10,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 
 export default function GameSetupMaster(props) {
     const [cookies, setCookies] = useCookies(
-        ["selectedRoles", "roleWaitTime", "voteWaitTime"]);
+        ["selectedRoles", "roleWaitTime", "voteWaitTime", "numWerewolves"]);
 
     const initialSelectedRoles = {};
     if (props.configurableRoles) {
@@ -27,14 +27,18 @@ export default function GameSetupMaster(props) {
     const [voteWaitTime, setVoteWaitTime] = React.useState(
         (cookies.voteWaitTime == null) ? 5 : cookies.voteWaitTime
     );
+    const [numWerewolves, setNumWerewolves] = React.useState(
+        (cookies.numWerewolves == null) ? 2 : cookies.numWerewolves
+    );
     const handleRoleSelect = (choices) => setSelectedRoles(choices);
     const handleRoleWaitTimeChange = (event) => setRoleWaitTime(
         event.target.value);
     const handleVoteWaitTimeChange = (event) => setVoteWaitTime(
         event.target.value);
+    const handleNumWerewolvesChange = (event) => setNumWerewolves(
+        event.target.value);
 
     const error = props.numPlayers < 3;
-
     const handleSubmit = () => {
         if (error) {
             return;
@@ -43,22 +47,24 @@ export default function GameSetupMaster(props) {
             "selected_roles": selectedRoles,
             "role_wait_time": roleWaitTime,
             "vote_wait_time": voteWaitTime,
+            "num_werewolves": numWerewolves,
         }
         props.handleStart(settings);
         setCookies("selectedRoles", selectedRoles);
         setCookies("roleWaitTime", roleWaitTime);
         setCookies("voteWaitTime", voteWaitTime);
+        setCookies("numWerewolves", numWerewolves);
     }
 
     return (
-        <Grid container spacing={3}>
+        <Grid container item spacing={3}>
             <Grid item xs={6}>
                 <CheckboxList
                     choices={selectedRoles}
                     handleSelect={handleRoleSelect}
                 />
             </Grid>
-            <Grid item xs={6} container spacing={3}>
+            <Grid item xs={6} container spacing={3} direction="column">
                 <Grid item>
                     <TextField
                         value={roleWaitTime}
@@ -94,6 +100,21 @@ export default function GameSetupMaster(props) {
                                 position="end">minutes</InputAdornment>
                         }}
                         label="Time for vote"
+                        variant="outlined"
+                    />
+                </Grid>
+                <Grid item>
+                    <TextField
+                        value={numWerewolves}
+                        onChange={handleNumWerewolvesChange}
+                        inputProps={{
+                            step: 1,
+                            min: 1,
+                            max: 60,
+                            type: 'number',
+                            'aria-labelledby': 'input-slider',
+                        }}
+                        label="Werewolves"
                         variant="outlined"
                     />
                 </Grid>

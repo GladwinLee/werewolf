@@ -33,7 +33,7 @@ export function NameInput(props) {
     }
 
     return (
-        <Grid container direction="row" alignItems="center">
+        <Grid container item direction="row" alignItems="center">
             <Grid item>
                 <TextField
                     error={error}

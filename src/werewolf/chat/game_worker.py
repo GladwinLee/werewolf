@@ -162,9 +162,10 @@ class GameWorker(AsyncConsumer):
         await self.send_next_action(room_group_name)
 
     def configure_settings(self, data):
-        self.game.configure_roles(data['settings']['selected_roles'])
+        self.game.configure_roles(data['settings'])
         self.wait_times['role'] = int(data['settings']['role_wait_time'])
-        self.wait_times['vote'] = int(data['settings']['vote_wait_time'] * 60)
+        self.wait_times['vote'] = int(
+            float(data['settings']['vote_wait_time']) * 60)
 
     async def role_action(self, data):
         player_name = data[NAME_FIELD]
