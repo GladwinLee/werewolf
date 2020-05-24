@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {NameInput} from "./NameInput";
+import {TitleNameSelect} from "./TitleNameSelect";
 import GameSetupMaster from "./GameSetupMaster";
 import PropTypes from "prop-types";
 
@@ -18,7 +18,8 @@ export default function GameSetup(props) {
         return success;
     }
 
-    let name_display = (showNameInput) ? <NameInput onSubmit={nameSubmit}/>
+    let name_display = (showNameInput) ? <TitleNameSelect
+            onSubmit={nameSubmit}/>
         : null
     let game_master_display;
     if (props.isGameMaster) {

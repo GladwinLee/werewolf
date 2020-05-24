@@ -4,9 +4,13 @@ import Game from './Game'
 
 const roomName = JSON.parse(document.getElementById('room_name').textContent);
 
+const socket = new WebSocket(
+    `ws://${window.location.host}/ws/werewolf/${roomName}/`
+);
+
 ReactDOM.render(
     <React.StrictMode>
-        <Game roomName={roomName}/>
+        <Game roomName={roomName} socket={socket}/>
     </React.StrictMode>,
     document.getElementById('root')
 );
