@@ -133,3 +133,9 @@ class ConsumerRoleManager:
 
     def set_sentinel_target(self, target):
         self.sentinel_target = target
+
+    def start_day(self, data, player_name):
+        roles = data['roles']
+        if self.player_role == INSOMNIAC:
+            return "role", {player_name: roles[player_name]}
+        return None, None

@@ -12,6 +12,7 @@ WITCH_PART_TWO = 'witch_part_two'
 BODYGUARD = "bodyguard"
 REVEALER = "revealer"
 SENTINEL = "sentinel"
+INSOMNIAC = "insomniac"
 
 NONE = "None"
 
@@ -22,7 +23,7 @@ MIDDLE_3 = 'Middle 3'
 SEPARATOR = ";"
 
 action_order = [SENTINEL, SEER, ROBBER, WITCH, TROUBLEMAKER, REVEALER]
-special_roles_no_action = [TANNER, MASON, MINION, HUNTER, BODYGUARD]
+special_roles_no_action = [TANNER, MASON, MINION, HUNTER, BODYGUARD, INSOMNIAC]
 all_special_roles = action_order + special_roles_no_action
 
 role_info_order = action_order + special_roles_no_action + [VILLAGER, WEREWOLF]
@@ -41,5 +42,6 @@ role_info = {
     HUNTER: "(Village Team) If voted out, will kill whoever they voted as well",
     BODYGUARD: "(Village Team) The person they vote will not be killed. Next most votes dies instead",
     REVEALER: "(Village Team) View another player's role. If it is not a Werewolf or Tanner, it is revealed to everyone",
-    SENTINEL: "(Village Team) Shield a player from any special night abilities, including their own"
+    SENTINEL: "(Village Team) Shield a player from any special night abilities, including their own",
+    INSOMNIAC: "(Village Team) See your own role when night ends"
 }

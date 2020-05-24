@@ -108,7 +108,7 @@ class Game extends Component {
                     action_data: data
                 });
                 break;
-            case 'worker.role_special':
+            case 'role_special':
                 switch (data["result_type"]) {
                     case "witch":
                     case "role_for_all":

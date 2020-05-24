@@ -147,6 +147,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             })
 
     async def worker_role_special(self, data):
+        data['type'] = "role_special"
         result_type = data['result_type']
         await self.send_json(data)
 
@@ -167,10 +168,20 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
     async def worker_winner(self, data):
         await self.send_json(data)
 
+    async def worker_start_day(self, data):
+        result_type, result = self.role_manager.start_day(data,
+                                                          self.player_name)
+        if result:
+            await self.send_json({
+                'type': 'role_special',
+                'result_type': result_type,
+                'result': result,
+            })
+
     # Private helpers
     async def send_to_worker(self, msg):
         logger.debug(f"{self.player_name} To worker name:%s :%s" % (
-        self.player_name, msg))
+            self.player_name, msg))
         msg['_name'] = self.player_name
         msg['_channel_name'] = self.channel_name
         msg['_room_group_name'] = self.room_group_name

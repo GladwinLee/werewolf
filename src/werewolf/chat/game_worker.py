@@ -99,7 +99,7 @@ class GameWorker(AsyncConsumer):
         action_type = data['action_type']
         choice = data['choice']
 
-        logger.info("%s %s: %s" % (name, action_type, choice))
+        logger.debug("%s %s: %s" % (name, action_type, choice))
         if action_type == 'vote':
             await self.vote(data)
         else:
@@ -195,6 +195,11 @@ class GameWorker(AsyncConsumer):
         next_action = self.game.get_next_action()
         if next_action == 'end':
             return
+        if next_action == 'vote':
+            await self.group_send(room_group_name, {
+                'type': 'worker.start_day',
+                'roles': self.game.get_players_to_roles(),
+            })
 
         await self.start_next_action_timer(next_action, room_group_name)
         await self.group_send(room_group_name, {
