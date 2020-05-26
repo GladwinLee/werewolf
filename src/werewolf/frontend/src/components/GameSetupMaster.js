@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
-import CheckboxList from "./CheckboxList";
+import RoleSelector from "./RoleSelector";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 import {useCookies} from "react-cookie";
@@ -12,9 +12,12 @@ export default function GameSetupMaster(props) {
     const [cookies, setCookies] = useCookies(
         ["selectedRoles", "roleWaitTime", "voteWaitTime", "numWerewolves"]);
 
+    const [configurableRoles, setConfigurableRoles] = useState(
+        props.configurableRoles)
+
     const initialSelectedRoles = {};
-    if (props.configurableRoles) {
-        props.configurableRoles.forEach(
+    if (configurableRoles) {
+        configurableRoles.forEach(
             (role) => initialSelectedRoles[role] = cookies.selectedRoles
                 && !!cookies.selectedRoles[role]
         );
@@ -30,6 +33,7 @@ export default function GameSetupMaster(props) {
     const [numWerewolves, setNumWerewolves] = React.useState(
         (cookies.numWerewolves == null) ? 2 : cookies.numWerewolves
     );
+
     const handleRoleSelect = (choices) => setSelectedRoles(choices);
     const handleRoleWaitTimeChange = (event) => setRoleWaitTime(
         event.target.value);
@@ -59,7 +63,7 @@ export default function GameSetupMaster(props) {
     return (
         <Grid container item spacing={3}>
             <Grid item xs={6}>
-                <CheckboxList
+                <RoleSelector
                     choices={selectedRoles}
                     handleSelect={handleRoleSelect}
                 />
@@ -125,8 +129,9 @@ export default function GameSetupMaster(props) {
                             onClick={handleSubmit}>
                         {"Start"}
                     </Button>
-                    <FormHelperText>{error
-                    && "Minimum 3 players to start"}</FormHelperText>
+                    <FormHelperText>
+                        {error && "Minimum 3 players to start"}
+                    </FormHelperText>
                 </FormControl>
             </Grid>
         </Grid>

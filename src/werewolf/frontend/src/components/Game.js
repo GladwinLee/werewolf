@@ -1,17 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import Container from "@material-ui/core/Container";
 import {TitleNameSelect} from "./TitleNameSelect";
+import PropTypes from 'prop-types';
+import GameLobby from "./GameLobby";
 
 export default function Game(props) {
+    const socket = props.socket;
     const [playerName, setPlayerName] = useState("")
-    const [message, setMessage] = useState({});
-    const [pageName, setPageName] = useState("TitleNameSelect");
+    const [players, setPlayers] = useState([])
+    const [page, setPage] = useState("TitleNameSelect");
+    const [master, setMaster] = useState(false);
+    const [serverMessage, setServerMessage] = useState({});
 
     useEffect(
         () => {
-            props.socket.onmessage = (e) => setMessage((JSON.parse(e.data)));
-            props.socket.onclose = () => console.error(
-                'socket closed unexpectedly');
+            socket.onmessage = (e) => setServerMessage((JSON.parse(e.data)));
+            socket.onclose = () => console.error('socket closed unexpectedly');
         },
         []
     )
@@ -19,25 +23,46 @@ export default function Game(props) {
     useEffect(
         () => {
             console.log("received message")
-            console.log(message)
+            console.log(serverMessage)
+            if (serverMessage['player_list']) {
+                setPlayers(
+                    serverMessage['player_list']);
+            }
+            if (serverMessage['page']) {
+                setPage(serverMessage['page']);
+            }
+            if (serverMessage['master']) {
+                setMaster(true);
+            }
         },
-        [message]
+        [serverMessage]
     )
 
-    const getPage = (pageName) => {
-        switch (pageName) {
+    const getPageComponent = (page) => {
+        switch (page) {
             case "TitleNameSelect":
                 return <TitleNameSelect
                     onSubmit={setPlayerName}
-                    playerList={["a,b"]}
-                    socket={props.socket}
+                    playerList={players}
+                    socket={socket}
+                />
+            case "GameLobby":
+                return <GameLobby
+                    players={players}
+                    serverMessage={serverMessage}
+                    master={master}
+                    socket={socket}
                 />
         }
         return null;
     }
     return <Container maxWidth="lg">
-        {getPage(pageName)}
+        {getPageComponent(page)}
     </Container>
+}
+
+Game.propTypes = {
+    socket: PropTypes.object.isRequired,
 }
 
 // const getInitialState = () => {
@@ -85,7 +110,7 @@ export default function Game(props) {
 //                 );
 //                 this.setState({
 //                     known_roles: data['known_roles'],
-//                     role_info: data['role_info']
+//                     role_info: data['role_info_map']
 //                 })
 //                 if (Object.entries(data['known_roles']).length > 1) {
 //                     let logMsg = "Known allies:";
@@ -149,18 +174,6 @@ export default function Game(props) {
 //             default:
 //                 console.log(data);
 //         }
-//     }
-//
-//     nameSubmit(name) {
-//         if (this.state.players.includes(name)) {
-//             return false;
-//         }
-//         this.setState({"player_name": name});
-//         this.socket.send(JSON.stringify({
-//             'type': "name_select",
-//             'name': name,
-//         }));
-//         return true;
 //     }
 //
 //     resetSubmit() {

@@ -27,8 +27,11 @@ class Game:
     def get_configurable_roles(self):
         return self.role_manager.get_configurable_roles()
 
-    def configure_roles(self, settings):
-        self.role_manager.configure_roles(settings)
+    def configure_settings(self, settings):
+        self.role_manager.configure_settings(settings)
+
+    def get_settings(self):
+        return self.role_manager.get_settings()
 
     def start_game(self):
         self.role_manager.generate_roles(self.player_names)
@@ -78,5 +81,5 @@ class Game:
     def get_action_log(self):
         return self.role_manager.get_action_log()
 
-    def get_role_info(self):
-        return self.role_manager.get_role_info()
+    def get_role_info_map(self):
+        return self.role_manager.get_role_info_map()

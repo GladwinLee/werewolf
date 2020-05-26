@@ -14,7 +14,7 @@ MAX_MB = 10 * 1000000
 fh = RotatingFileHandler("/logs/consumer.log", maxBytes=MAX_MB, backupCount=5)
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.DEBUG)  # todo set back to INFO
 
 formatter = logging.Formatter(
     fmt='%(asctime)s - %(levelname)s - %(thread)d - %(message)s',
@@ -85,14 +85,14 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             await self.send_to_worker(data)
         elif (msg_type == "action"
               or msg_type == "start"
+              or msg_type == "configure_settings"
               or msg_type == "reset"):
             await self.send_to_worker(data)
+        else:
+            logger.error(f"Invalid msg_type {msg_type}")
 
-    # Receive message from room group
-    async def chat_message(self, event):
-        await self.send_json({
-            'message': event['message']
-        })
+    async def worker_info(self, data):
+        await self.send_json(data)
 
     async def worker_player_list_change(self, data):
         self.player_list = data['player_list']
@@ -111,6 +111,9 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def worker_game_master(self, data):
+        await self.send_json(data)
+
+    async def worker_page_change(self, data):
         await self.send_json(data)
 
     async def worker_action(self, data):

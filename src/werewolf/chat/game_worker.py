@@ -21,7 +21,7 @@ MAX_MB = 10 * 1000000
 fh = RotatingFileHandler("/logs/worker.log", maxBytes=MAX_MB, backupCount=5)
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.DEBUG)  # todo set back to INFO
 
 formatter = logging.Formatter(
     fmt='%(asctime)s - %(levelname)s - %(message)s',
@@ -51,7 +51,6 @@ class GameWorker(AsyncConsumer):
 
     async def player_join(self, data):
         player_list = self.game.get_player_names()
-
         await self.channel_send(
             data[CHANNEL_NAME_FIELD],
             {
@@ -63,7 +62,6 @@ class GameWorker(AsyncConsumer):
     async def player_leave(self, data):
         player_list = self.game.remove_player(data[NAME_FIELD])
         logger.info(f"{data[NAME_FIELD]} leaves")
-
         await self.group_send(
             data[ROOM_GROUP_NAME_FIELD],
             {
@@ -76,17 +74,17 @@ class GameWorker(AsyncConsumer):
         player_list = self.game.add_player(data['name'])
         configurable_roles = self.game.get_configurable_roles()
         logger.info(f"{data['name']} joins")
-
+        msg = {
+            'type': 'worker.page_change',
+            'page': 'GameLobby',
+            'settings': self.game.get_settings(),
+        }
         # first player to join is the game master
         if len(player_list) == 1:
-            await self.channel_send(
-                data[CHANNEL_NAME_FIELD],
-                {
-                    'type': 'worker.game_master',
-                    'configurable_roles': configurable_roles,
-                }
-            )
+            msg['master'] = True
+            msg['configurable_roles'] = configurable_roles
 
+        await self.channel_send(data[CHANNEL_NAME_FIELD], msg)
         await self.group_send(
             data[ROOM_GROUP_NAME_FIELD],
             {
@@ -145,9 +143,7 @@ class GameWorker(AsyncConsumer):
         room_group_name = data[ROOM_GROUP_NAME_FIELD]
         logger.info("%s started the game" % name)
 
-        self.configure_settings(data)
         self.game.start_game()
-
         player_roles = self.game.get_players_to_roles()
 
         await self.group_send(
@@ -155,17 +151,25 @@ class GameWorker(AsyncConsumer):
             {
                 'type': 'worker.start',
                 'roles': player_roles,
-                'role_info': self.game.get_role_info(),
+                'role_info_map': self.game.get_role_info_map(),
             })
 
         sleep(self.get_wait_time("start"))
         await self.send_next_action(room_group_name)
 
-    def configure_settings(self, data):
-        self.game.configure_roles(data['settings'])
+    async def configure_settings(self, data):
+        self.game.configure_settings(data['settings'])
         self.wait_times['role'] = int(data['settings']['role_wait_time'])
         self.wait_times['vote'] = int(
             float(data['settings']['vote_wait_time']) * 60)
+
+        await self.group_send(
+            data[ROOM_GROUP_NAME_FIELD],
+            {
+                'type': "worker.info",
+                'settings': self.game.get_settings(),
+            },
+        )
 
     async def role_action(self, data):
         player_name = data[NAME_FIELD]

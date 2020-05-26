@@ -9,20 +9,26 @@ logger = logging.getLogger("worker.game.role_manager")
 class RoleManager:
     def __init__(self):
         self.full_roles_map = {}  # name to role, including middle
+        self.num_werewolves = None
         self.selected_roles = []
         self.action_log = []
         self.witch_middle_target = ""  # store the target of the witch in its 1st part
         self.vote_counts = {}
-        self.num_werewolves = 2
 
     def get_configurable_roles(self):
         return all_special_roles
 
-    def configure_roles(self, settings):
+    def configure_settings(self, settings):
         self.num_werewolves = int(settings['num_werewolves'])
         roles = settings['selected_roles']
         self.selected_roles = [role for role, selected in roles.items() if
                                selected]
+
+    def get_settings(self):
+        return {
+            "num_werewolves": self.num_werewolves,
+            "selected_roles": self.selected_roles,
+        }
 
     def generate_roles(self, players):
         # fill players_to_roles map by RNG
@@ -288,7 +294,7 @@ class RoleManager:
     def get_action_log(self):
         return self.action_log
 
-    def get_role_info(self):
+    def get_role_info_map(self):
         role_count = {role: 0 for role in role_info_order}
         for role in self.full_roles_map.values():
             role_count[role] += 1

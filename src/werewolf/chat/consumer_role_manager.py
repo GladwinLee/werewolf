@@ -20,7 +20,7 @@ class ConsumerRoleManager:
         return {
             'type': data['type'],
             'known_roles': self.get_known_roles(roles, player_name),
-            'role_info': data['role_info']
+            'role_info_map': data['role_info_map']
         }
 
     def get_known_roles(self, roles, player_name):

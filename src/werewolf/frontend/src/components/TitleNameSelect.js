@@ -54,6 +54,7 @@ export function TitleNameSelect({playerList, socket, onSubmit}) {
                   direction="column" spacing={3}>
                 <Grid item>
                     <TextField
+                        id="name-input"
                         error={!!errorMsg}
                         onKeyPress={(e) => e.key === "Enter" ? handleSubmit()
                             : null}
