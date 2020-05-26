@@ -5,11 +5,22 @@ import {useCookies} from "react-cookie";
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
+import {makeStyles} from "@material-ui/core/styles";
 
 const ERR_MSG_NAME_EMPTY = "Cannot be empty";
 const ERR_MSG_NAME_TAKEN = "Name already taken";
 
-export function TitleNameSelect({playerList, socket, onSubmit}) {
+const useStyles = makeStyles({
+    input: {
+        textAlign: "center",
+        fontSize: "large",
+        maxLength: 20,
+    }
+})
+
+export function NameSelectPage({playerList, socket, onSubmit}) {
+    const classes = useStyles();
+
     const [cookies, setCookie] = useCookies(['playerName'])
     const [name, setName] = useState(cookies.playerName)
     const [errorMsg, setErrorMsg] = useState(null);
@@ -54,19 +65,20 @@ export function TitleNameSelect({playerList, socket, onSubmit}) {
                   direction="column" spacing={3}>
                 <Grid item>
                     <TextField
-                        id="name-input"
+                        autoFocus
+                        fullWidth
                         error={!!errorMsg}
                         onKeyPress={(e) => e.key === "Enter" ? handleSubmit()
                             : null}
+                        inputProps={{className: classes.input}}
                         onChange={handleChange}
                         value={name}
                         helperText={errorMsg}
-                        label="Name"
                         variant="outlined"
                     />
                 </Grid>
                 <Grid item>
-                    <Button variant="contained" onClick={handleSubmit}>Enter
+                    <Button onClick={handleSubmit}>Enter
                         name</Button>
                 </Grid>
             </Grid>
@@ -74,7 +86,7 @@ export function TitleNameSelect({playerList, socket, onSubmit}) {
     );
 }
 
-TitleNameSelect.propTypes = {
+NameSelectPage.propTypes = {
     playerList: PropTypes.arrayOf(PropTypes.string),
     onSubmit: PropTypes.func,
     socket: PropTypes.object,

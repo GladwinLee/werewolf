@@ -20,7 +20,7 @@ const useStyles = makeStyles({
     }
 })
 
-export default function GameSettingsDialog(props) {
+export default function SettingsDialog(props) {
     const classes = useStyles();
     const [cookies, setCookies] = useCookies(
         ["selectedRoles", "roleWaitTime", "voteWaitTime", "numWerewolves"]);
@@ -35,13 +35,13 @@ export default function GameSettingsDialog(props) {
 
     const [selectedRoles, setSelectedRoles] = useState(initialSelectedRoles);
     const [roleWaitTime, setRoleWaitTime] = React.useState(
-        (cookies.roleWaitTime == null) ? 7 : cookies.roleWaitTime
+        (cookies.roleWaitTime == null) ? 7 : Number(cookies.roleWaitTime)
     );
     const [voteWaitTime, setVoteWaitTime] = React.useState(
-        (cookies.voteWaitTime == null) ? 5 : cookies.voteWaitTime
+        (cookies.voteWaitTime == null) ? 5 : Number(cookies.voteWaitTime)
     );
     const [numWerewolves, setNumWerewolves] = React.useState(
-        (cookies.numWerewolves == null) ? 2 : cookies.numWerewolves
+        (cookies.numWerewolves == null) ? 2 : Number(cookies.numWerewolves)
     );
 
     const settings = {
@@ -140,12 +140,12 @@ export default function GameSettingsDialog(props) {
     )
 }
 
-GameSettingsDialog.propTypes = {
+SettingsDialog.propTypes = {
     open: PropTypes.bool,
     handleClose: PropTypes.func.isRequired,
     configurableRoles: PropTypes.arrayOf(PropTypes.string),
 }
 
-GameSettingsDialog.defaultProps = {
+SettingsDialog.defaultProps = {
     open: false,
 }

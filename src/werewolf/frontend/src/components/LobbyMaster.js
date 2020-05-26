@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import GameSettingsDialog from "./GameSettingsDialog";
+import SettingsDialog from "./SettingsDialog";
 
-export default function GameLobbyMaster(props) {
+export default function LobbyMaster(props) {
     const configurableRoles = props.serverMessage['configurable_roles']
     const [openSettings, setOpenSettings] = useState(false);
     const error = props.numPlayers < 3;
@@ -41,7 +41,7 @@ export default function GameLobbyMaster(props) {
                     </Button>
                 </Grid>
             </Grid>
-            <GameSettingsDialog
+            <SettingsDialog
                 handleClose={onCloseSettings}
                 open={openSettings}
                 configurableRoles={configurableRoles}
@@ -50,10 +50,10 @@ export default function GameLobbyMaster(props) {
     )
 }
 
-GameLobbyMaster.propTypes = {
+LobbyMaster.propTypes = {
     socket: PropTypes.object.isRequired,
     numPlayers: PropTypes.number,
     serverMessage: PropTypes.object
 }
 
-GameLobbyMaster.defaultProps = {}
+LobbyMaster.defaultProps = {}

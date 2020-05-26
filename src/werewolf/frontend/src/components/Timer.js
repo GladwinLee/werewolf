@@ -34,23 +34,24 @@ export default function Timer(props) {
         }
     }, [secondsLeft])
 
-    if (!secondsLeft
-        || secondsLeft === 0
-        || props.timerKey == null
-    ) {
-        return null;
-    }
+    if (!secondsLeft) return null;
     return (
-        <Typography>Time remaining: {fmtMSS(secondsLeft)}</Typography>
+        <Typography>
+            {`${props.preText}${fmtMSS(secondsLeft)}${props.postText}`}
+        </Typography>
     )
 }
 
 Timer.propTypes = {
-    start: PropTypes.number,
+    start: PropTypes.number.isRequired,
+    preText: PropTypes.string,
+    postText: PropTypes.string,
     timerKey: PropTypes.any,
     callback: PropTypes.func,
 }
 
 Timer.defaultProps = {
     start: 0,
+    preText: "",
+    postText: "",
 }

@@ -1,20 +1,58 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useReducer} from 'react';
 import Container from "@material-ui/core/Container";
-import {TitleNameSelect} from "./TitleNameSelect";
+import {NameSelectPage} from "./NameSelectPage";
 import PropTypes from 'prop-types';
-import GameLobby from "./GameLobby";
+import LobbyPage from "./LobbyPage";
+import PreNightPage from "./PreNightPage";
+import Button from "@material-ui/core/Button";
+import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
+import ThemeProvider from "@material-ui/styles/ThemeProvider";
+
+const theme = createMuiTheme({
+    props: {
+        MuiTypography: {
+            align: "center",
+            variant: "h4",
+        },
+        MuiButton: {
+            size: "large",
+            variant: "contained",
+        },
+    }
+})
+
+const initialState = {
+    playerName: "",
+    players: [],
+    page: "NameSelectPage",
+    master: false,
+    serverMessage: {},
+}
+
+function reducer(state, {type, value}) {
+    if (type === "reset") return initialState;
+    if (state[type] == null) {
+        console.error(`Invalid setState`);
+        console.error(type);
+        console.error(value);
+        console.error(state);
+        return;
+    }
+    const result = {...state};
+    result[type] = value;
+    return result;
+}
 
 export default function Game(props) {
     const socket = props.socket;
-    const [playerName, setPlayerName] = useState("")
-    const [players, setPlayers] = useState([])
-    const [page, setPage] = useState("TitleNameSelect");
-    const [master, setMaster] = useState(false);
-    const [serverMessage, setServerMessage] = useState({});
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const {playerName, players, page, master, serverMessage} = state;
+    const setState = (type, value) => dispatch({type, value});
 
     useEffect(
         () => {
-            socket.onmessage = (e) => setServerMessage((JSON.parse(e.data)));
+            socket.onmessage = (e) => setState('serverMessage',
+                JSON.parse(e.data));
             socket.onclose = () => console.error('socket closed unexpectedly');
         },
         []
@@ -24,41 +62,50 @@ export default function Game(props) {
         () => {
             console.log("received message")
             console.log(serverMessage)
-            if (serverMessage['player_list']) {
-                setPlayers(
-                    serverMessage['player_list']);
-            }
-            if (serverMessage['page']) {
-                setPage(serverMessage['page']);
-            }
-            if (serverMessage['master']) {
-                setMaster(true);
-            }
+            if (serverMessage['type'] === 'worker.reset') setState('reset');
+            if (serverMessage['player_list']) setState("players",
+                serverMessage['player_list']);
+            if (serverMessage['page']) setState("page", serverMessage['page']);
+            if (serverMessage['master']) setState("master", true);
         },
         [serverMessage]
     )
 
     const getPageComponent = (page) => {
         switch (page) {
-            case "TitleNameSelect":
-                return <TitleNameSelect
-                    onSubmit={setPlayerName}
+            case "NameSelectPage":
+                return <NameSelectPage
+                    onSubmit={(name) => setState("playerName", name)}
                     playerList={players}
                     socket={socket}
                 />
-            case "GameLobby":
-                return <GameLobby
-                    players={players}
+            case "LobbyPage":
+                return <LobbyPage
                     serverMessage={serverMessage}
+                    players={players}
                     master={master}
                     socket={socket}
+                />
+            case "PreNightPage":
+                return <PreNightPage
+                    serverMessage={serverMessage}
+                    playerName={playerName}
                 />
         }
         return null;
     }
-    return <Container maxWidth="lg">
-        {getPageComponent(page)}
-    </Container>
+
+    const resetSubmit = () => {
+        socket.send(JSON.stringify({
+            'type': "reset",
+        }));
+    }
+    return <ThemeProvider theme={theme}>
+        <Container maxWidth="lg">
+            {getPageComponent(page)}
+            <Button onClick={() => resetSubmit()}>Reset</Button>
+        </Container>
+    </ThemeProvider>
 }
 
 Game.propTypes = {
@@ -176,11 +223,7 @@ Game.propTypes = {
 //         }
 //     }
 //
-//     resetSubmit() {
-//         this.socket.send(JSON.stringify({
-//             'type': "reset",
-//         }));
-//     }
+
 //
 //     startSubmit(settings) {
 //         this.socket.send(JSON.stringify({

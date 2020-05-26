@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TitleNameSelect} from "./TitleNameSelect";
+import {NameSelectPage} from "./NameSelectPage";
 import GameSetupMaster from "./GameSetupMaster";
 import PropTypes from "prop-types";
 
@@ -18,7 +18,7 @@ export default function GameSetup(props) {
         return success;
     }
 
-    let name_display = (showNameInput) ? <TitleNameSelect
+    let name_display = (showNameInput) ? <NameSelectPage
             onSubmit={nameSubmit}/>
         : null
     let game_master_display;

@@ -9,21 +9,12 @@ class ConsumerRoleManager:
     def __init__(self):
         self.player_role = ""
         self.sentinel_target = None
+        self.player_name = None
 
     def is_player_role(self, role):
         return self.player_role == role
 
-    def handle_start(self, data, player_name):
-        roles = data['roles']
-        self.player_role = roles[player_name]
-
-        return {
-            'type': data['type'],
-            'known_roles': self.get_known_roles(roles, player_name),
-            'role_info_map': data['role_info_map']
-        }
-
-    def get_known_roles(self, roles, player_name):
+    def get_known_roles(self, roles):
         if self.player_role == WEREWOLF:
             return {name: role for name, role in roles.items() if
                     role == WEREWOLF}
@@ -32,9 +23,8 @@ class ConsumerRoleManager:
                     role in [WEREWOLF, MINION]}
         elif self.player_role == MASON:
             return {name: role for name, role in roles.items() if role == MASON}
-
         else:
-            return {player_name: self.player_role}
+            return {self.player_name: roles[self.player_name]}
 
     def get_role_action_data(self, action_data, **kwargs):
         try:

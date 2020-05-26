@@ -43,14 +43,11 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'werewolf_%s' % self.room_name
 
-        # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
-
         await self.accept()
-
         await self.send_to_worker({
             'type': 'player_join',
             'channel_name': self.channel_name,
@@ -66,16 +63,13 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             'room_group_name': self.room_group_name,
         })
 
-        # Leave room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
-    # Receive message from WebSocket
     async def receive_json(self, data, **kwargs):
         logger.debug(f"{self.player_name} client sent: {data}")
-
         msg_type = data['type']
         if msg_type == "name_select":
             if self.player_name != "":
@@ -98,9 +92,23 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         self.player_list = data['player_list']
         await self.send_json(data)
 
+    async def worker_page_change(self, data):
+        page = data['page']
+        if page == "PreNightPage":
+            self.role_manager.player_name = self.player_name
+            known_roles = self.role_manager.get_known_roles(data['roles'])
+            msg = {
+                'page': data['page'],
+                'known_roles': known_roles,
+                'wait_time': data['wait_time']
+            }
+        else:
+            msg = data
+        await self.send_json(msg)
+
     async def worker_start(self, data):
         logger.debug(f"{self.player_name} Starting for %s" % self.player_name)
-        msg = self.role_manager.handle_start(data, self.player_name)
+        msg = self.role_manager.get_initial_role_info(data, self.player_name)
         await self.send_json(msg)
 
     async def worker_players_not_voted_list_change(self, data):
@@ -111,9 +119,6 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def worker_game_master(self, data):
-        await self.send_json(data)
-
-    async def worker_page_change(self, data):
         await self.send_json(data)
 
     async def worker_action(self, data):

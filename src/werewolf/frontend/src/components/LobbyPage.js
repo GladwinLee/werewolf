@@ -4,15 +4,13 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import PlayerList from "./PlayerList";
 import SettingsInfo from "./SettingsInfo";
-import GameLobbyMaster from "./GameLobbyMaster";
+import LobbyMaster from "./LobbyMaster";
 
-export default function GameLobby(props) {
+export default function LobbyPage(props) {
     const [settingsMap, setSettingsMap] = useState(null);
     useEffect(
         () => {
-            if (props.serverMessage["settings"] == null) {
-                return;
-            }
+            if (props.serverMessage["settings"] == null) return;
             setSettingsMap(props.serverMessage["settings"]);
         },
         [props.serverMessage]
@@ -20,8 +18,7 @@ export default function GameLobby(props) {
 
     return (
         <>
-            <Typography variant="h2" align="center" color="textPrimary"
-                        gutterBottom>
+            <Typography variant="h2" gutterBottom>
                 One-Night Werewolf
             </Typography>
             <Grid container spacing={3} justify="center">
@@ -32,10 +29,10 @@ export default function GameLobby(props) {
                     <SettingsInfo settingsMap={settingsMap}/>
                 </Grid>
                 {(props.master) ?
-                    <GameLobbyMaster
+                    <LobbyMaster
                         socket={props.socket}
                         serverMessage={props.serverMessage}
-                        players={props.players.length}
+                        numPlayers={props.players.length}
                     />
                     : <Grid item>
                         <Typography>Waiting for game master to start the
@@ -47,14 +44,14 @@ export default function GameLobby(props) {
     )
 }
 
-GameLobby.propTypes = {
+LobbyPage.propTypes = {
     players: PropTypes.arrayOf(PropTypes.string),
     socket: PropTypes.object,
     master: PropTypes.bool,
     serverMessage: PropTypes.object,
 }
 
-GameLobby.defaultProps = {
+LobbyPage.defaultProps = {
     players: [],
     master: false,
     serverMessage: {},

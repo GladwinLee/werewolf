@@ -38,7 +38,7 @@ logger.addHandler(ch)
 # This doesn't work with multiple rooms atm
 class GameWorker(AsyncConsumer):
     wait_times = {
-        "start": 2,
+        "start": 10,
         "role": 5,
         "vote": 300,
     }
@@ -76,7 +76,7 @@ class GameWorker(AsyncConsumer):
         logger.info(f"{data['name']} joins")
         msg = {
             'type': 'worker.page_change',
-            'page': 'GameLobby',
+            'page': 'LobbyPage',
             'settings': self.game.get_settings(),
         }
         # first player to join is the game master
@@ -91,6 +91,40 @@ class GameWorker(AsyncConsumer):
                 'type': 'worker.player_list_change',
                 'player_list': player_list
             })
+
+    async def configure_settings(self, data):
+        self.game.configure_settings(data['settings'])
+        self.wait_times['role'] = int(data['settings']['role_wait_time'])
+        self.wait_times['vote'] = int(
+            float(data['settings']['vote_wait_time']) * 60)
+
+        await self.group_send(
+            data[ROOM_GROUP_NAME_FIELD],
+            {
+                'type': "worker.info",
+                'settings': self.game.get_settings(),
+            },
+        )
+
+    async def start(self, data):
+        name = data[NAME_FIELD]
+        room_group_name = data[ROOM_GROUP_NAME_FIELD]
+        logger.info("%s started the game" % name)
+
+        self.game.start_game()
+        player_roles = self.game.get_players_to_roles()
+
+        await self.group_send(
+            room_group_name,
+            {
+                'type': 'worker.page_change',
+                'page': "PreNightPage",
+                'roles': player_roles,
+                'wait_time': self.get_wait_time("start")
+            })
+
+        sleep(self.get_wait_time("start"))
+        await self.send_next_action(room_group_name)
 
     async def action(self, data):
         name = data[NAME_FIELD]
@@ -137,39 +171,6 @@ class GameWorker(AsyncConsumer):
                 'known_roles': roles,
                 'action_log': action_log,
             })
-
-    async def start(self, data):
-        name = data[NAME_FIELD]
-        room_group_name = data[ROOM_GROUP_NAME_FIELD]
-        logger.info("%s started the game" % name)
-
-        self.game.start_game()
-        player_roles = self.game.get_players_to_roles()
-
-        await self.group_send(
-            room_group_name,
-            {
-                'type': 'worker.start',
-                'roles': player_roles,
-                'role_info_map': self.game.get_role_info_map(),
-            })
-
-        sleep(self.get_wait_time("start"))
-        await self.send_next_action(room_group_name)
-
-    async def configure_settings(self, data):
-        self.game.configure_settings(data['settings'])
-        self.wait_times['role'] = int(data['settings']['role_wait_time'])
-        self.wait_times['vote'] = int(
-            float(data['settings']['vote_wait_time']) * 60)
-
-        await self.group_send(
-            data[ROOM_GROUP_NAME_FIELD],
-            {
-                'type': "worker.info",
-                'settings': self.game.get_settings(),
-            },
-        )
 
     async def role_action(self, data):
         player_name = data[NAME_FIELD]
