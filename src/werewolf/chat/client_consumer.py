@@ -116,6 +116,13 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             }
             msg.update(self.get_action_msg(data['action']))
             msg.update(self.role_manager.get_day_role_info(data))
+        elif page == "EndPage":
+            msg = {
+                'page': page,
+                'winners': data["winners"],
+                'roles': data["roles"],
+                'action_log': data["action_log"],
+            }
         else:
             msg = data
         await self.send_json(msg)
@@ -129,7 +136,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             return {
                 "action": "vote",
                 "choices": self.player_list.copy(),
-                "disabledChoices": self.player_name,
+                "disabledChoices": {self.player_name: True},
                 "default": player_after_self,
                 "choice_type": "pick1",
             }

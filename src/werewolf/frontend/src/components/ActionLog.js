@@ -8,7 +8,7 @@ import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
 
 export default function ActionLog(props) {
-    if (!props.actionLog || props.actionLog.length === 0) return null;
+    if (props.actionLog.length === 0) return null;
 
     const display = props.actionLog.map((s, i) => {
         return (
@@ -34,5 +34,5 @@ export default function ActionLog(props) {
 }
 
 ActionLog.propTypes = {
-    actionLog: PropTypes.arrayOf(PropTypes.string),
+    actionLog: PropTypes.arrayOf(PropTypes.string).isRequired,
 }

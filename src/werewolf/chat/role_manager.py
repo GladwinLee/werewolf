@@ -176,7 +176,7 @@ class RoleManager:
         dead_roles = self.get_dead_roles(player_to_vote_choice,
                                          self.vote_counts.copy())
         winners = self.calculate_winners(dead_roles)
-        return ", ".join(winners), self.vote_counts
+        return winners
 
     def get_vote_counts(self, player_to_vote_choice):
         vote_counts = {}
@@ -188,7 +188,6 @@ class RoleManager:
 
     def get_dead_roles(self, player_to_vote_choice, vote_counts):
         dead_players_to_roles = self.get_village_vote_to_kill(vote_counts)
-
         special_choices = self.get_special_vote_choices(player_to_vote_choice)
         if BODYGUARD in special_choices:
             dead_players_to_roles = self.handle_bodyguard(
@@ -251,8 +250,10 @@ class RoleManager:
             for name, votes in vote_counts.items()
             if votes == highest_vote
         }
-        self.log_append("The village votes to kill " + ", ".join(
-            dead_players_to_roles.keys()))
+        msg = "The village votes to kill "
+        msg += ", ".join(dead_players_to_roles.keys())
+        msg += f" with {highest_vote} votes"
+        self.log_append(msg)
         return dead_players_to_roles
 
     def get_special_vote_choices(self, player_to_vote_choice):
@@ -275,19 +276,19 @@ class RoleManager:
             if WEREWOLF in self.get_players_to_roles().values():
                 self.log_append(
                     f"The Werewolves infiltrated the village")
-                return [WEREWOLF]
+                return ["werewolf"]
             else:
                 self.log_append(
                     f"There were no Werewolves in the village. The village is safe")
-                return [VILLAGER]
+                return ["village"]
 
         winners = []
         if WEREWOLF in dead_roles:
-            winners.append(VILLAGER)
+            winners.append("village")
         if TANNER in dead_roles:
-            winners.append(TANNER)
+            winners.append("tanner")
         if len(winners) == 0:
-            winners.append(WEREWOLF)
+            winners.append("werewolf")
         return winners
 
     def is_role_action(self, action_type):

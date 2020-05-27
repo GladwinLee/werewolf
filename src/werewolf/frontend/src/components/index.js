@@ -31,25 +31,27 @@ const onCloseSnackbar = key => () => notistackRef.current.closeSnackbar(key);
 
 ReactDOM.render(
     <React.StrictMode>
-        <ThemeProvider theme={theme}><SnackbarProvider
-            dense
-            ref={notistackRef}
-            anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'center',
-            }}
-            action={(key) => (
-                <IconButton
-                    onClick={onCloseSnackbar(key)}
-                    aria-label="close"
-                    color="inherit"
-                >
-                    <CloseIcon/>
-                </IconButton>
-            )}>
-            <Game roomName={roomName} socket={socket}/>
+        <ThemeProvider theme={theme}>
+            <SnackbarProvider
+                dense
+                ref={notistackRef}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                action={(key) => (
+                    <IconButton
+                        onClick={onCloseSnackbar(key)}
+                        aria-label="close"
+                        color="inherit"
+                    >
+                        <CloseIcon/>
+                    </IconButton>
+                )}>
+                <Game roomName={roomName} socket={socket}/>
 
-        </SnackbarProvider></ThemeProvider>
+            </SnackbarProvider>
+        </ThemeProvider>
     </React.StrictMode>,
     document.getElementById('root')
 );

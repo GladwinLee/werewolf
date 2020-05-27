@@ -15,3 +15,11 @@ export const roleInfo = {
     sentinel: "(Village Team) Shield a player from any special night abilities, including their own",
     insomniac: "(Village Team) See your own role when night ends"
 }
+
+export const teamRoles = {
+    werewolf: new Set(["werewolf", "minion"]),
+    village: new Set(
+        ["seer", "robber", "witch", "troublemaker", "villager", "mason",
+            "hunter", "bodyguard", "revealer", "sentinel", "insomniac"]),
+    tanner: new Set(["tanner"]),
+}

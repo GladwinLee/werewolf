@@ -52,7 +52,7 @@ class Game:
     def remove_next_action(self):
         return self.action_order.pop(0)
 
-    def get_winner(self):
+    def get_winners(self):
         return self.role_manager.get_winners(self.player_to_vote_choice)
 
     def is_role_action(self, action_type):

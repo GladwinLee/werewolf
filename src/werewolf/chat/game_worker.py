@@ -193,16 +193,16 @@ class GameWorker(AsyncConsumer):
         except AttributeError:
             pass
 
-        winner, vote_results = self.game.get_winner()
+        winners = self.game.get_winners()
         roles = self.game.get_full_roles_map()
         action_log = self.game.get_action_log()
         await self.group_send(
             room_group_name,
             {
-                'type': 'worker.winner',
-                'winner': winner,
-                'vote_results': vote_results,
-                'known_roles': roles,
+                'type': 'worker.page_change',
+                'page': 'EndPage',
+                'winners': winners,
+                'roles': roles,
                 'action_log': action_log,
             })
 

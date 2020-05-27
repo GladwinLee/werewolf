@@ -9,6 +9,7 @@ import NightPage from "./NightPage";
 import {useSnackbar} from "notistack";
 import DayPage from "./DayPage";
 import Typography from "@material-ui/core/Typography";
+import EndPage from "./EndPage";
 
 const initialState = {
     playerName: "",
@@ -36,7 +37,7 @@ function reducer(state, {type, value}) {
 export default function Game(props) {
     const socket = props.socket;
     const [state, dispatch] = useReducer(reducer, initialState);
-    const {enqueueSnackbar} = useSnackbar();
+    const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     const {playerName, players, page, master, serverMessage, settingsMap} = state;
     const setState = (type, value) => dispatch({type, value});
     const setIfNotUndefined = (field, value) => {
@@ -56,7 +57,10 @@ export default function Game(props) {
         () => {
             console.log("received message")
             console.log(serverMessage)
-            if (serverMessage['type'] === 'worker.reset') setState('reset');
+            if (serverMessage['type'] === 'worker.reset') {
+                closeSnackbar();
+                setState('reset');
+            }
             setIfNotUndefined("players", serverMessage['player_list']);
             setIfNotUndefined("page", serverMessage['page']);
             setIfNotUndefined("master", serverMessage['master']);
@@ -106,6 +110,12 @@ export default function Game(props) {
                     socket={socket}
                     serverMessage={serverMessage}
                     roles={settingsMap['selected_roles']}
+                />
+            case "EndPage":
+                return <EndPage
+                    socket={socket}
+                    serverMessage={serverMessage}
+                    master={master}
                 />
         }
         return null;
