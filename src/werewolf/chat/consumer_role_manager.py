@@ -8,6 +8,7 @@ logger = logging.getLogger("consumer.consumer_role_manager")
 class ConsumerRoleManager:
     def __init__(self):
         self.sentinel_target = None
+        self.revealer_target = None
         self.player_name = None
         self.player_role = None
 
@@ -119,11 +120,51 @@ class ConsumerRoleManager:
         msg['help_text'] = "Block abilities affecting selected"
         return msg
 
-    def set_sentinel_target(self, target):
-        self.sentinel_target = target
-
-    def start_day(self, data):
+    def get_day_role_info(self, data):
         roles = data['roles']
+        msg = {}
+        player_labels = {}
         if self.player_role == INSOMNIAC:
-            return "role", {self.player_name: roles[self.player_name]}
-        return None, None
+            msg[
+                "info_message"] = f"You wake up and see you are a {roles[self.player_name].capitalize()}"
+        if self.sentinel_target:
+            player_labels[self.sentinel_target] = "shielded"
+        if self.revealer_target:
+            player_labels[self.revealer_target] = roles[self.revealer_target]
+        if len(player_labels) > 0:
+            msg["player_labels"] = player_labels
+        return msg
+
+    @staticmethod
+    def is_revealable(role):
+        return role not in [TANNER, WEREWOLF]
+
+    def get_info_message(self, role_action, result):
+        message = ""
+        if role_action == SEER:
+            message = "You see "
+            message += ", ".join(
+                [f"{name} is a {role.capitalize()}"
+                 for name, role in result.items()]
+            )
+        elif role_action == ROBBER:
+            message = f"You swap roles. You are now a {result.capitalize()}"
+        elif role_action == WITCH_PART_TWO:
+            middle_target, player_target, target_role = result
+            if player_target == self.player_name:
+                message = f"You swap roles. You are now a {result.capitalize()}"
+            message = f"Swapped roles for {middle_target} and {player_target}." \
+                      f" {player_target} is now a {result.capitalize()}"
+        elif role_action == TROUBLEMAKER:
+            player_1, player_2 = result
+            message = f"Swapped {player_1} and {player_2}"
+        elif role_action == REVEALER:
+            target, target_role = result
+            if self.is_revealable(target_role):
+                message = f"Revealer announcement: {target} is a {target_role.capitalize()}. "
+            else:
+                message = f"You see {target} is a {target_role.capitalize()}. You do not announce it."
+        elif role_action == SENTINEL:
+            message = f"The Sentinel shields {result}"
+
+        return message

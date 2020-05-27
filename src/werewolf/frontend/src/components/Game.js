@@ -5,25 +5,10 @@ import PropTypes from 'prop-types';
 import LobbyPage from "./LobbyPage";
 import PreNightPage from "./PreNightPage";
 import Button from "@material-ui/core/Button";
-import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
-import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import NightPage from "./NightPage";
-import {SnackbarProvider} from "notistack";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-
-const theme = createMuiTheme({
-    props: {
-        MuiTypography: {
-            align: "center",
-            variant: "h4",
-        },
-        MuiButton: {
-            size: "large",
-            variant: "contained",
-        },
-    }
-})
+import {useSnackbar} from "notistack";
+import DayPage from "./DayPage";
+import Typography from "@material-ui/core/Typography";
 
 const initialState = {
     playerName: "",
@@ -51,12 +36,12 @@ function reducer(state, {type, value}) {
 export default function Game(props) {
     const socket = props.socket;
     const [state, dispatch] = useReducer(reducer, initialState);
+    const {enqueueSnackbar} = useSnackbar();
     const {playerName, players, page, master, serverMessage, settingsMap} = state;
     const setState = (type, value) => dispatch({type, value});
-
-    const notistackRef = React.createRef();
-    const onCloseSnackbar = key => () => notistackRef.current.closeSnackbar(
-        key);
+    const setIfNotUndefined = (field, value) => {
+        if (value) setState(field, value)
+    };
 
     useEffect(
         () => {
@@ -72,15 +57,19 @@ export default function Game(props) {
             console.log("received message")
             console.log(serverMessage)
             if (serverMessage['type'] === 'worker.reset') setState('reset');
-            if (serverMessage['player_list']) setState("players",
-                serverMessage['player_list']);
-            if (serverMessage['page']) {
-                console.log("Page" + serverMessage['page']);
-                setState("page", serverMessage['page']);
-            }
-            if (serverMessage['master']) setState("master", true);
-            if (serverMessage["settings"]) setState("settingsMap",
-                serverMessage["settings"]);
+            setIfNotUndefined("players", serverMessage['player_list']);
+            setIfNotUndefined("page", serverMessage['page']);
+            setIfNotUndefined("master", serverMessage['master']);
+            setIfNotUndefined("settingsMap", serverMessage['settings']);
+        },
+        [serverMessage]
+    )
+
+    useEffect(
+        () => {
+            const {info_message: infoMessage} = serverMessage
+            if (!infoMessage) return;
+            enqueueSnackbar(<InfoMessage message={infoMessage}/>);
         },
         [serverMessage]
     )
@@ -112,6 +101,12 @@ export default function Game(props) {
                     serverMessage={serverMessage}
                     roles={settingsMap['selected_roles']}
                 />
+            case "DayPage":
+                return <DayPage
+                    socket={socket}
+                    serverMessage={serverMessage}
+                    roles={settingsMap['selected_roles']}
+                />
         }
         return null;
     }
@@ -121,31 +116,19 @@ export default function Game(props) {
             'type': "reset",
         }));
     }
-    return <ThemeProvider theme={theme}><SnackbarProvider
-        dense
-        ref={notistackRef}
-        anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-        }}
-        action={(key) => (
-            <IconButton
-                onClick={onCloseSnackbar(key)}
-                aria-label="close"
-                color="inherit"
-            >
-                <CloseIcon/>
-            </IconButton>
-        )}>
-        <Container maxWidth="lg">
-            {getPageComponent(page)}
-            <Button onClick={() => resetSubmit()}>Reset</Button>
-        </Container>
-    </SnackbarProvider></ThemeProvider>
+
+    return <Container maxWidth="lg">
+        {getPageComponent(page)}
+        <Button onClick={() => resetSubmit()}>Reset</Button>
+    </Container>
 }
 
 Game.propTypes = {
     socket: PropTypes.object.isRequired,
+}
+
+function InfoMessage({message}) {
+    return <Typography>{message}</Typography>;
 }
 
 // const getInitialState = () => {
@@ -221,7 +204,7 @@ Game.propTypes = {
 //             case 'role_special':
 //                 switch (data["result_type"]) {
 //                     case "witch":
-//                     case "role_for_all":
+//                     case "revealer'":
 //                     case "role": {
 //                         const newKnownRoles = {...this.state.known_roles, ...data['result']}
 //                         logRevealedRoles(data['result']);

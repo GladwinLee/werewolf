@@ -58,13 +58,14 @@ class Game:
     def is_role_action(self, action_type):
         return self.role_manager.is_role_action(action_type)
 
-    def handle_role_action(self, action, player_name, choice):
-        if action != self.get_next_action():
-            return "ERROR", "Not expecting action %s" % action
+    def handle_role_action(self, role_action, player_name, choice):
+        if role_action != self.get_next_action():
+            return "ERROR", "Not expecting action %s" % role_action
         self.remove_next_action()
-        if action == WITCH and choice == NONE:
+        if role_action == WITCH and choice == NONE:
             self.remove_next_action()
-        return self.role_manager.handle_role_action(action, player_name, choice)
+        return self.role_manager.handle_role_action(role_action, player_name,
+                                                    choice)
 
     def vote(self, voter, votee):
         self.player_to_vote_choice[voter] = votee

@@ -4,7 +4,8 @@ from logging.handlers import RotatingFileHandler
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
 from .consumer_role_manager import ConsumerRoleManager
-from .game_worker import WEREWOLF_CHANNEL
+from .game_worker import WEREWOLF_CHANNEL, NAME_FIELD, ROOM_GROUP_NAME_FIELD, \
+    CHANNEL_NAME_FIELD
 from .role_constants import WITCH_PART_TWO
 
 logger = logging.getLogger("consumer")
@@ -108,6 +109,13 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 'wait_time': data['wait_time']
             }
             msg.update(self.get_action_msg(data['action']))
+        elif page == "DayPage":
+            msg = {
+                'page': page,
+                'wait_time': data['wait_time']
+            }
+            msg.update(self.get_action_msg(data['action']))
+            msg.update(self.role_manager.get_day_role_info(data))
         else:
             msg = data
         await self.send_json(msg)
@@ -118,18 +126,16 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 (self.player_list.index(self.player_name) + 1) % len(
                     self.player_list)
                 ]
-            choices = self.player_list.copy()
-            choices.remove(self.player_name)
             return {
                 "action": "vote",
-                "choices": choices,
+                "choices": self.player_list.copy(),
+                "disabledChoices": self.player_name,
                 "default": player_after_self,
                 "choice_type": "pick1",
             }
         elif self.role_manager.is_player_role(action):
             return self.role_manager.get_role_action_data(
                 action,
-                player_name=self.player_name,
                 player_list=self.player_list
             )
         else:
@@ -138,11 +144,6 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 "waiting_on": action,
             }
 
-    async def worker_start(self, data):
-        logger.debug(f"{self.player_name} Starting for %s" % self.player_name)
-        msg = self.role_manager.get_initial_role_info(data, self.player_name)
-        await self.send_json(msg)
-
     async def worker_players_not_voted_list_change(self, data):
         await self.send_json(data)
 
@@ -150,13 +151,11 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         self.reset()
         await self.send_json(data)
 
-    async def worker_game_master(self, data):
-        await self.send_json(data)
-
     async def worker_role_special(self, data):
-        result_type = data['result_type']
-        if result_type == "witch":
-            target, target_role = list(data['result'].items())[0]
+        role_action = data['role_action']
+        result = data['result']
+        if role_action == "witch":
+            target, target_role = result
             msg = {
                 'page': 'NightPage',
                 # will continue wait_time where witch part1 ended
@@ -168,30 +167,30 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 role_to_swap=target_role
             ))
             await self.send_json(msg)
-        elif result_type == "sentinel":
-            self.role_manager.set_sentinel_target(data['result'])
-        else:
-            await self.send_json(data)
+            return
+
+        if role_action == "sentinel":
+            self.role_manager.sentinel_target = result
+        elif (role_action == "revealer"
+              and self.role_manager.is_revealable(role_action)):
+            target, _ = result
+            self.role_manager.revealer_target = target
+
+        await self.send_json({
+            'info_message': self.role_manager.get_info_message(role_action,
+                                                               result)
+        })
 
     async def worker_winner(self, data):
         await self.send_json(data)
-
-    async def worker_start_day(self, data):
-        result_type, result = self.role_manager.start_day(data)
-        if result:
-            await self.send_json({
-                'type': 'role_special',
-                'result_type': result_type,
-                'result': result,
-            })
 
     # Private helpers
     async def send_to_worker(self, msg):
         logger.debug(f"{self.player_name} To worker name:%s :%s" % (
             self.player_name, msg))
-        msg['_name'] = self.player_name
-        msg['_channel_name'] = self.channel_name
-        msg['_room_group_name'] = self.room_group_name
+        msg[NAME_FIELD] = self.player_name
+        msg[CHANNEL_NAME_FIELD] = self.channel_name
+        msg[ROOM_GROUP_NAME_FIELD] = self.room_group_name
 
         await self.channel_layer.send(
             WEREWOLF_CHANNEL,

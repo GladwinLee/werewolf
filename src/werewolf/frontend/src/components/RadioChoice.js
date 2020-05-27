@@ -7,26 +7,28 @@ import Radio from "@material-ui/core/Radio";
 import PropTypes from 'prop-types';
 
 export default function RadioChoice(props) {
-    const [value, setValue] = useState(props.default)
-    const choices = props.choices.map((p) => {
-        return (
-            <FormControlLabel
-                value={p}
-                label={p}
-                key={p}
-                control={<Radio/>}
-                disabled={props.disabledChoices[p]}
-            />
-        )
-    });
+    const [value, setValue] = useState(props.default);
+
+    const GetLabel = ({p}) => {
+        const specialLabel = props.specialChoiceLabels[p];
+        return (specialLabel) ? specialLabel : p;
+    }
+
+    const choices = props.choices.map((p) => (
+        <FormControlLabel
+            value={p}
+            label={<GetLabel p={p}/>}
+            key={p}
+            control={<Radio/>}
+            disabled={(props.disabledChoices[p] || props.disableAll)}
+        />
+    ));
 
     const handleChange = (e) => {
         setValue(e.target.value);
         props.onChange(e.target.value);
     }
-    const handleSubmit = () => {
-        props.onSubmit(value);
-    }
+    const handleSubmit = () => props.onSubmit(value);
 
     return (
         <div>
@@ -39,7 +41,8 @@ export default function RadioChoice(props) {
             >
                 {choices}
             </RadioGroup>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button variant="contained" onClick={handleSubmit}
+                    disabled={props.disableAll}>
                 Submit
             </Button>
         </div>
@@ -53,6 +56,8 @@ RadioChoice.propTypes = {
     default: PropTypes.string,
     label: PropTypes.node,
     disabledChoices: PropTypes.object,
+    disableAll: PropTypes.bool,
+    specialChoiceLabels: PropTypes.object,
 }
 
 RadioChoice.defaultProps = {
@@ -60,4 +65,6 @@ RadioChoice.defaultProps = {
     onChange: () => {
     },
     disabledChoices: {},
+    disableAll: false,
+    specialChoiceLabels: {},
 }

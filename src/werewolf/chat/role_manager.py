@@ -3,6 +3,10 @@ import random
 
 from .role_constants import *
 
+ALL = "all"
+
+SENDER = "sender"
+
 logger = logging.getLogger("worker.game.role_manager")
 
 
@@ -89,7 +93,7 @@ class RoleManager:
         log_msg += ",".join(
             [f" {key} as {role.capitalize()}" for key, role in result.items()])
         self.log_append(log_msg)
-        return "role", result
+        return SENDER, result
 
     def robber(self, player_name, target):
         if target == NONE:
@@ -98,11 +102,10 @@ class RoleManager:
             return
         switch_role = self.full_roles_map[target]
         self.log_append(
-            f"The Robber {player_name} robs {target}, and becomes a {switch_role.capitalize()}")
+            f"The Robber {player_name} robs {target}, and sees that they became a {switch_role.capitalize()}")
         self.full_roles_map[player_name] = switch_role
         self.full_roles_map[target] = ROBBER
-        return "role", {player_name: self.full_roles_map[player_name],
-                        target: ROBBER}
+        return SENDER, self.full_roles_map[player_name]
 
     def witch(self, player_name, target):
         if target == "None":
@@ -113,7 +116,7 @@ class RoleManager:
         target_role = self.full_roles_map[target]
         self.log_append(
             f"The Witch {player_name} looks at {target} and sees {target_role.capitalize()}.")
-        return "witch", {target: target_role}
+        return SENDER, (target, target_role)
 
     def witch_part_two(self, player_name, target):
         middle_target = self.witch_middle_target
@@ -126,9 +129,7 @@ class RoleManager:
 
         self.full_roles_map[target] = target_new
         self.full_roles_map[self.witch_middle_target] = middle_new
-        if target != player_name:
-            middle_new = ""
-        return "role", {middle_target: middle_new, target: target_new}
+        return SENDER, (self.witch_middle_target, target, target_new)
 
     def troublemaker(self, player_name, choice):
         choices = choice.split(SEPARATOR)
@@ -146,6 +147,7 @@ class RoleManager:
 
         self.full_roles_map[player_1] = player_1_new
         self.full_roles_map[player_2] = player_2_new
+        return SENDER, (player_1, player_2)
 
     def revealer(self, player_name, target):
         if target == NONE:
@@ -153,13 +155,13 @@ class RoleManager:
                 f"The Revealer {player_name} chooses not to see a role")
             return
         target_role = self.full_roles_map[target]
-        result = {target: target_role}
+        result = (target, target_role)
         self.log_append(
             f"The Revealer {player_name} sees {target} as {target_role.capitalize()}")
         if target_role in [TANNER, WEREWOLF]:
-            return "role", result
+            return SENDER, result
         else:
-            return "role_for_all", result
+            return ALL, result
 
     def sentinel(self, player_name, target):
         if target == NONE:
@@ -167,7 +169,7 @@ class RoleManager:
                 f"The Sentinel {player_name} chooses not to shield anyone")
             return
         self.log_append(f"The Sentinel {player_name} shields {target}")
-        return "sentinel", target
+        return ALL, target
 
     def get_winners(self, player_to_vote_choice):
         self.vote_counts = self.get_vote_counts(player_to_vote_choice)
