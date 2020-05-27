@@ -38,7 +38,7 @@ logger.addHandler(ch)
 # This doesn't work with multiple rooms atm
 class GameWorker(AsyncConsumer):
     wait_times = {
-        "start": 10,
+        "start": 3,
         "role": 5,
         "vote": 300,
     }
@@ -126,6 +126,24 @@ class GameWorker(AsyncConsumer):
         sleep(self.get_wait_time("start"))
         await self.send_next_action(room_group_name)
 
+    async def send_next_action(self, room_group_name):
+        next_action = self.game.get_next_action()
+        if next_action == 'end':
+            return
+        if next_action == 'vote':
+            await self.group_send(room_group_name, {
+                'type': 'worker.start_day',
+                'roles': self.game.get_players_to_roles(),
+            })
+
+        await self.start_next_action_timer(next_action, room_group_name)
+        await self.group_send(room_group_name, {
+            'type': 'worker.page_change',
+            'page': 'NightPage',
+            'action': next_action,
+            'wait_time': self.get_wait_time(next_action),
+        })
+
     async def action(self, data):
         name = data[NAME_FIELD]
         action_type = data['action_type']
@@ -182,6 +200,7 @@ class GameWorker(AsyncConsumer):
 
         if not response:
             return
+
         result_type, result = response
         msg = {
             'type': 'worker.role_special',
@@ -196,23 +215,6 @@ class GameWorker(AsyncConsumer):
     async def handle_action_timeout(self, action, room_group_name):
         self.game.handle_action_timeout(action)
         await self.send_next_action(room_group_name)
-
-    async def send_next_action(self, room_group_name):
-        next_action = self.game.get_next_action()
-        if next_action == 'end':
-            return
-        if next_action == 'vote':
-            await self.group_send(room_group_name, {
-                'type': 'worker.start_day',
-                'roles': self.game.get_players_to_roles(),
-            })
-
-        await self.start_next_action_timer(next_action, room_group_name)
-        await self.group_send(room_group_name, {
-            'type': 'worker.action',
-            'action': next_action,
-            'wait_time': self.get_wait_time(next_action),
-        })
 
     def get_wait_time(self, action):
         if action in self.wait_times:

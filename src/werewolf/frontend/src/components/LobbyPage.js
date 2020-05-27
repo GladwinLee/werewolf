@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -7,15 +7,6 @@ import SettingsInfo from "./SettingsInfo";
 import LobbyMaster from "./LobbyMaster";
 
 export default function LobbyPage(props) {
-    const [settingsMap, setSettingsMap] = useState(null);
-    useEffect(
-        () => {
-            if (props.serverMessage["settings"] == null) return;
-            setSettingsMap(props.serverMessage["settings"]);
-        },
-        [props.serverMessage]
-    )
-
     return (
         <>
             <Typography variant="h2" gutterBottom>
@@ -26,7 +17,7 @@ export default function LobbyPage(props) {
                     <PlayerList players={props.players}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <SettingsInfo settingsMap={settingsMap}/>
+                    <SettingsInfo settingsMap={props.settingsMap}/>
                 </Grid>
                 {(props.master) ?
                     <LobbyMaster
@@ -45,14 +36,14 @@ export default function LobbyPage(props) {
 }
 
 LobbyPage.propTypes = {
-    players: PropTypes.arrayOf(PropTypes.string),
-    socket: PropTypes.object,
+    settingsMap: PropTypes.object.isRequired,
+    players: PropTypes.arrayOf(PropTypes.string).isRequired,
+    socket: PropTypes.object.isRequired,
     master: PropTypes.bool,
     serverMessage: PropTypes.object,
 }
 
 LobbyPage.defaultProps = {
-    players: [],
     master: false,
     serverMessage: {},
 }

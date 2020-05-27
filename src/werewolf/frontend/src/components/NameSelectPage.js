@@ -35,9 +35,10 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
     };
 
     const handleChange = (e) => {
-        setName(e.target.value);
+        let value = e.target.value.replace(/[\W_]+/g, "");
+        setName(value);
         if (errorMsg) {
-            setErrorMsg(getErrorMsg(e.target.value));
+            setErrorMsg(getErrorMsg(value));
         }
     }
 

@@ -24,6 +24,7 @@
   "dependencies": {
     "@material-ui/icons": "^4.9.1",
     "@material-ui/styles": "^4.10.0",
+    "notistack": "^0.9.16",
     "prop-types": "^15.7.2",
     "react-cookie": "^4.0.3"
   }

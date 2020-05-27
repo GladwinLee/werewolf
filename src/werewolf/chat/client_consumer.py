@@ -98,13 +98,45 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             self.role_manager.player_name = self.player_name
             known_roles = self.role_manager.get_known_roles(data['roles'])
             msg = {
-                'page': data['page'],
+                'page': page,
                 'known_roles': known_roles,
                 'wait_time': data['wait_time']
             }
+        elif page == "NightPage":
+            msg = {
+                'page': page,
+                'wait_time': data['wait_time']
+            }
+            msg.update(self.get_action_msg(data['action']))
         else:
             msg = data
         await self.send_json(msg)
+
+    def get_action_msg(self, action):
+        if action == 'vote':
+            player_after_self = self.player_list[
+                (self.player_list.index(self.player_name) + 1) % len(
+                    self.player_list)
+                ]
+            choices = self.player_list.copy()
+            choices.remove(self.player_name)
+            return {
+                "action": "vote",
+                "choices": choices,
+                "default": player_after_self,
+                "choice_type": "pick1",
+            }
+        elif self.role_manager.is_player_role(action):
+            return self.role_manager.get_role_action_data(
+                action,
+                player_name=self.player_name,
+                player_list=self.player_list
+            )
+        else:
+            return {
+                "action": "wait",
+                "waiting_on": action,
+            }
 
     async def worker_start(self, data):
         logger.debug(f"{self.player_name} Starting for %s" % self.player_name)
@@ -121,64 +153,31 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
     async def worker_game_master(self, data):
         await self.send_json(data)
 
-    async def worker_action(self, data):
-        action = data['action']
-        wait_time = data['wait_time']
-
-        if action == 'vote':
-            player_after_self = self.player_list[
-                (self.player_list.index(self.player_name) + 1) % len(
-                    self.player_list)
-                ]
-            choices = self.player_list.copy()
-            choices.remove(self.player_name)
-            await self.send_json({
-                "type": "action",
-                "action": "vote",
-                "choices": choices,
-                "default": player_after_self,
-                "choice_type": "pick1",
-                "wait_time": wait_time,
-            })
-        elif self.role_manager.is_player_role(action):
-            await self.send_json(self.role_manager.get_role_action_data(
-                data,
-                player_name=self.player_name,
-                player_list=self.player_list
-            ))
-        else:
-            await self.send_json({
-                "type": "action",
-                "action": "wait",
-                "waiting_on": action,
-                'wait_time': wait_time,
-            })
-
     async def worker_role_special(self, data):
-        data['type'] = "role_special"
         result_type = data['result_type']
-        await self.send_json(data)
-
         if result_type == "witch":
-            result_role = list(data['result'].values())[0]
-            await self.send_json(self.role_manager.get_role_action_data(
-                {
-                    "action": WITCH_PART_TWO,
-                    "wait_time": "continue",
-                },
-                player_name=self.player_name,
+            target, target_role = list(data['result'].items())[0]
+            msg = {
+                'page': 'NightPage',
+                # will continue wait_time where witch part1 ended
+            }
+            msg.update(self.role_manager.get_role_action_data(
+                WITCH_PART_TWO,
                 player_list=self.player_list,
-                role_to_swap=result_role
+                target=target,
+                role_to_swap=target_role
             ))
+            await self.send_json(msg)
         elif result_type == "sentinel":
             self.role_manager.set_sentinel_target(data['result'])
+        else:
+            await self.send_json(data)
 
     async def worker_winner(self, data):
         await self.send_json(data)
 
     async def worker_start_day(self, data):
-        result_type, result = self.role_manager.start_day(data,
-                                                          self.player_name)
+        result_type, result = self.role_manager.start_day(data)
         if result:
             await self.send_json({
                 'type': 'role_special',
@@ -202,5 +201,5 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
     # Send message to WebSocket
     async def send_json(self, msg, close=False):
         logger.debug(f"{self.player_name} To client name:%s :%s" % (
-        self.player_name, msg))
+            self.player_name, msg))
         await super().send_json(msg, close)

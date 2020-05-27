@@ -7,6 +7,10 @@ import PreNightPage from "./PreNightPage";
 import Button from "@material-ui/core/Button";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
+import NightPage from "./NightPage";
+import {SnackbarProvider} from "notistack";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 const theme = createMuiTheme({
     props: {
@@ -27,6 +31,7 @@ const initialState = {
     page: "NameSelectPage",
     master: false,
     serverMessage: {},
+    settingsMap: {},
 }
 
 function reducer(state, {type, value}) {
@@ -46,8 +51,12 @@ function reducer(state, {type, value}) {
 export default function Game(props) {
     const socket = props.socket;
     const [state, dispatch] = useReducer(reducer, initialState);
-    const {playerName, players, page, master, serverMessage} = state;
+    const {playerName, players, page, master, serverMessage, settingsMap} = state;
     const setState = (type, value) => dispatch({type, value});
+
+    const notistackRef = React.createRef();
+    const onCloseSnackbar = key => () => notistackRef.current.closeSnackbar(
+        key);
 
     useEffect(
         () => {
@@ -65,8 +74,13 @@ export default function Game(props) {
             if (serverMessage['type'] === 'worker.reset') setState('reset');
             if (serverMessage['player_list']) setState("players",
                 serverMessage['player_list']);
-            if (serverMessage['page']) setState("page", serverMessage['page']);
+            if (serverMessage['page']) {
+                console.log("Page" + serverMessage['page']);
+                setState("page", serverMessage['page']);
+            }
             if (serverMessage['master']) setState("master", true);
+            if (serverMessage["settings"]) setState("settingsMap",
+                serverMessage["settings"]);
         },
         [serverMessage]
     )
@@ -83,6 +97,7 @@ export default function Game(props) {
                 return <LobbyPage
                     serverMessage={serverMessage}
                     players={players}
+                    settingsMap={settingsMap}
                     master={master}
                     socket={socket}
                 />
@@ -90,6 +105,12 @@ export default function Game(props) {
                 return <PreNightPage
                     serverMessage={serverMessage}
                     playerName={playerName}
+                />
+            case "NightPage":
+                return <NightPage
+                    socket={socket}
+                    serverMessage={serverMessage}
+                    roles={settingsMap['selected_roles']}
                 />
         }
         return null;
@@ -100,12 +121,27 @@ export default function Game(props) {
             'type': "reset",
         }));
     }
-    return <ThemeProvider theme={theme}>
+    return <ThemeProvider theme={theme}><SnackbarProvider
+        dense
+        ref={notistackRef}
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+        }}
+        action={(key) => (
+            <IconButton
+                onClick={onCloseSnackbar(key)}
+                aria-label="close"
+                color="inherit"
+            >
+                <CloseIcon/>
+            </IconButton>
+        )}>
         <Container maxWidth="lg">
             {getPageComponent(page)}
             <Button onClick={() => resetSubmit()}>Reset</Button>
         </Container>
-    </ThemeProvider>
+    </SnackbarProvider></ThemeProvider>
 }
 
 Game.propTypes = {

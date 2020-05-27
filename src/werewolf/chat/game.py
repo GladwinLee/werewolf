@@ -1,8 +1,11 @@
+from logging import getLogger
+
 from .role_constants import WITCH, NONE
 from .role_manager import RoleManager
 
+logger = getLogger("worker.game")
 
-# Server side
+
 class Game:
     def __init__(self):
         self.reset()

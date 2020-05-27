@@ -301,7 +301,6 @@ class RoleManager:
         return {
             role: {
                 "count": count,
-                "info": role_info[role]
             }
             for role, count in role_count.items() if count > 0
         }
