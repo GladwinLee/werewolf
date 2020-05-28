@@ -1,15 +1,20 @@
 import React from "react";
 import capitalize from "@material-ui/core/utils/capitalize";
 import PropTypes from "prop-types";
-import GridListTile from "@material-ui/core/GridListTile";
 import Button from "@material-ui/core/Button";
-import GridList from "@material-ui/core/GridList";
 import {makeStyles} from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles({
-    gridListItem: {
+    grid: {
         height: "100%",
         width: "100%",
+    },
+    root: {
+        borderRadius: 0,
+    },
+    label: {
+        fontSize: "1.2rem",
     }
 })
 
@@ -23,23 +28,33 @@ export default function RoleSelector(props) {
     const choices = Object.entries(props.choices).map(
         ([choice, checked]) => {
             return (
-                <GridListTile key={"role-GridList-" + choice} cols={1}
-                              className={classes.gridListItem}>
+                <Grid item xs={6}
+                      key={"role-GridList-" + choice}
+                      className={classes.grid}
+                >
                     <Button
+                        classes={{
+                            root: classes.root,
+                            label: classes.label,
+                        }}
                         color="primary"
                         variant={(checked) ? "contained" : "outlined"}
                         onClick={() => handleRoleSelect(choice)}
+                        size="small"
+                        fullWidth
                     >
                         {capitalize(choice)}
                     </Button>
-                </GridListTile>
+                </Grid>
             )
         })
 
     return (
-        <GridList cellHeight={40} cols={4}>
-            {choices}
-        </GridList>
+        <>
+            <Grid container>
+                {choices}
+            </Grid>
+        </>
     )
 }
 

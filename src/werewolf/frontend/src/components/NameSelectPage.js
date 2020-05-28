@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import {makeStyles} from "@material-ui/core/styles";
+import PageGrid from "./PageGrid";
 
 const ERR_MSG_NAME_EMPTY = "Cannot be empty";
 const ERR_MSG_NAME_TAKEN = "Name already taken";
@@ -13,9 +14,8 @@ const ERR_MSG_NAME_TAKEN = "Name already taken";
 const useStyles = makeStyles({
     input: {
         textAlign: "center",
-        fontSize: "large",
-        maxLength: 20,
-    }
+        fontSize: "2rem"
+    },
 })
 
 export function NameSelectPage({playerList, socket, onSubmit}) {
@@ -35,11 +35,11 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
     };
 
     const handleChange = (e) => {
-        let value = e.target.value.replace(/[\W_]+/g, "");
+        let value = e.target.value;
+        if (value.length > 11) return;
+        value = value.replace(/[\W_]+/g, "").toUpperCase();
         setName(value);
-        if (errorMsg) {
-            setErrorMsg(getErrorMsg(value));
-        }
+        if (errorMsg) setErrorMsg(getErrorMsg(value));
     }
 
     const handleSubmit = () => {
@@ -57,18 +57,20 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
     }
 
     return (
-        <>
-            <Typography variant="h2" align="center" color="textPrimary"
-                        gutterBottom>
-                One-Night Werewolf
-            </Typography>
-            <Grid container alignItems="center" justify="center"
-                  direction="column" spacing={3}>
-                <Grid item>
+        <PageGrid height={"80%"}>
+            <Grid item xs={12}>
+                <Typography variant="h1" align="center" color="textPrimary"
+                            gutterBottom>
+                    One-Night Werewolf
+                </Typography>
+            </Grid>
+            <Grid container item spacing={3} justify="center">
+                <Grid item xs={10}>
                     <TextField
                         autoFocus
                         fullWidth
                         error={!!errorMsg}
+                        spellCheck={false}
                         onKeyPress={(e) => e.key === "Enter" ? handleSubmit()
                             : null}
                         inputProps={{className: classes.input}}
@@ -79,11 +81,10 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
                     />
                 </Grid>
                 <Grid item>
-                    <Button onClick={handleSubmit}>Enter
-                        name</Button>
+                    <Button onClick={handleSubmit}>Enter name</Button>
                 </Grid>
             </Grid>
-        </>
+        </PageGrid>
     );
 }
 

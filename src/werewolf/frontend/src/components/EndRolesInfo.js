@@ -9,7 +9,7 @@ const middle = ["Middle 1", "Middle 2", "Middle 3"];
 export default function EndRolesInfo({playersToRoles, winners}) {
     const middleRoles = [];
     middle.forEach(m => {
-        middleRoles.push(playersToRoles[m]);
+        middleRoles.push(capitalize(playersToRoles[m]));
         delete playersToRoles[m];
     });
 
@@ -48,6 +48,7 @@ EndRolesInfo.propTypes = {
 function RoleToPlayer({rolesToPlayers, roles}) {
     const rtp = Object.entries(rolesToPlayers).filter(
         ([role, name]) => roles.includes(role));
+    if (rtp.length === 0) return <Typography variant="h5">None</Typography>
     return rtp.map(([role, names]) => (
         <Typography key={"rtp-" + role} variant="h5">
             {`${capitalize(role)}: ${names.join(", ")}`}

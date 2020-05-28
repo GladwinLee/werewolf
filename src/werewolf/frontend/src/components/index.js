@@ -6,6 +6,8 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
 
 const roomName = JSON.parse(document.getElementById('room_name').textContent);
 
@@ -13,24 +15,48 @@ const socket = new WebSocket(
     `ws://${window.location.host}/ws/werewolf/${roomName}/`
 );
 
-const theme = createMuiTheme({
+let theme = createMuiTheme();
+theme = {
+    ...theme,
+    overrides: {
+        MuiTypography: {
+            body1: {
+                fontSize: "1.3rem",
+            },
+        },
+        MuiButton: {
+            label: {
+                fontSize: "1.5rem",
+            }
+        },
+        MuiTooltip: {
+            tooltip: {
+                backgroundColor: theme.palette.common.white,
+                color: 'rgba(0, 0, 0, 0.87)',
+                boxShadow: theme.shadows[1],
+                fontSize: "1.3rem",
+            }
+        },
+    },
     props: {
         MuiTypography: {
             align: "center",
-            variant: "h4",
         },
         MuiButton: {
             size: "large",
             variant: "contained",
         },
     }
-})
+};
+
+theme = responsiveFontSizes(theme);
 
 const notistackRef = React.createRef();
 const onCloseSnackbar = key => () => notistackRef.current.closeSnackbar(key);
 
 ReactDOM.render(
     <React.StrictMode>
+        <CssBaseline/>
         <ThemeProvider theme={theme}>
             <SnackbarProvider
                 dense
@@ -49,10 +75,10 @@ ReactDOM.render(
                     </IconButton>
                 )}>
                 <Game roomName={roomName} socket={socket}/>
-
             </SnackbarProvider>
         </ThemeProvider>
-    </React.StrictMode>,
+    </React.StrictMode>
+    ,
     document.getElementById('root')
 );
 

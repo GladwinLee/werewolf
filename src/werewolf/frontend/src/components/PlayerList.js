@@ -2,18 +2,23 @@ import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import PropTypes from 'prop-types';
 import Divider from "@material-ui/core/Divider";
+import Grid from "@material-ui/core/Grid";
 
 export default function PlayersList({players}) {
     return (
-        <div>
-            <Typography>Players</Typography>
+        <Grid container item spacing={2}>
+            <Grid item xs={12}>
+                <Typography variant="h4" align="center">Player List</Typography>
+            </Grid>
             <Divider/>
             {players.map((p) => (
-                <Typography key={`players-list-${p}`}>
-                    {p}
-                </Typography>
+                <Grid item xs={6} key={`players-list-${p}`}>
+                    <Typography align={"center"}>
+                        {p}
+                    </Typography>
+                </Grid>
             ))}
-        </div>
+        </Grid>
     );
 }
 

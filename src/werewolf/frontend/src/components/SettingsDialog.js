@@ -4,24 +4,32 @@ import RoleSelector from "./RoleSelector";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 import {useCookies} from "react-cookie";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import Dialog from "@material-ui/core/Dialog";
 import PropTypes from "prop-types";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 import {makeStyles} from "@material-ui/core/styles";
 import WerewolfSelector from "./WerewolfSelector";
-import Container from "@material-ui/core/Container";
 
-const useStyles = makeStyles({
-    dialogTitle: {
-        justifyContent: "flex-end",
-        width: "100%",
-    }
-})
+const useStyles = makeStyles((theme) => ({
+    dialog: {
+        height: "100%",
+    },
+    paper: {
+        overflow: "hidden",
+    },
+    dialogGrid: {
+        height: "100%",
+        padding: theme.spacing(3),
+    },
+    closeButton: {
+        position: 'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500],
+    },
+}))
 
 export default function SettingsDialog(props) {
-    const classes = useStyles();
+    const classes = useStyles(props);
     const [cookies, setCookies] = useCookies(
         ["selectedRoles", "roleWaitTime", "voteWaitTime", "numWerewolves"]);
 
@@ -34,13 +42,13 @@ export default function SettingsDialog(props) {
     }
 
     const [selectedRoles, setSelectedRoles] = useState(initialSelectedRoles);
-    const [roleWaitTime, setRoleWaitTime] = React.useState(
+    const [roleWaitTime, setRoleWaitTime] = useState(
         (cookies.roleWaitTime == null) ? 7 : Number(cookies.roleWaitTime)
     );
-    const [voteWaitTime, setVoteWaitTime] = React.useState(
+    const [voteWaitTime, setVoteWaitTime] = useState(
         (cookies.voteWaitTime == null) ? 5 : Number(cookies.voteWaitTime)
     );
-    const [numWerewolves, setNumWerewolves] = React.useState(
+    const [numWerewolves, setNumWerewolves] = useState(
         (cookies.numWerewolves == null) ? 2 : Number(cookies.numWerewolves)
     );
 
@@ -51,15 +59,9 @@ export default function SettingsDialog(props) {
         "num_werewolves": numWerewolves,
     };
 
-    if (settings.role_wait_time == null) {
-        settings.role_wait_time = 7
-    }
-    if (settings.vote_wait_time == null) {
-        settings.vote_wait_time = 5
-    }
-    if (settings.num_werewolves == null) {
-        settings.num_werewolves = 2
-    }
+    if (settings.role_wait_time == null) settings.role_wait_time = 7;
+    if (settings.vote_wait_time == null) settings.vote_wait_time = 5;
+    if (settings.num_werewolves == null) settings.num_werewolves = 2;
 
     // Send initial settings on first render
     useEffect(() => props.handleClose(settings), [])
@@ -80,22 +82,22 @@ export default function SettingsDialog(props) {
     }
 
     return (
-        <Dialog open={props.open} onClose={handleClose}>
-            <DialogTitle className={classes.dialogTitle}>
-                <IconButton onClick={handleClose}>
-                    <CloseIcon/>
-                </IconButton>
-            </DialogTitle>
-            <Container>
-                <WerewolfSelector
-                    numWerewolves={numWerewolves}
-                    handleChange={handleNumWerewolvesChange}
-                />
-                <RoleSelector
-                    choices={selectedRoles}
-                    handleSelect={handleRoleSelect}
-                />
-                <Grid container justify="space-evenly">
+        <Dialog open={props.open} onClose={handleClose}
+                classes={{paper: classes.paper}}>
+            <Grid container spacing={3} className={classes.dialogGrid}>
+                <Grid item xs={12}>
+                    <WerewolfSelector
+                        numWerewolves={numWerewolves}
+                        handleChange={handleNumWerewolvesChange}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <RoleSelector
+                        choices={selectedRoles}
+                        handleSelect={handleRoleSelect}
+                    />
+                </Grid>
+                <Grid container item justify={"space-evenly"}>
                     <Grid item>
                         <TextField
                             value={roleWaitTime}
@@ -109,7 +111,7 @@ export default function SettingsDialog(props) {
                             }}
                             InputProps={{
                                 endAdornment: <InputAdornment
-                                    position="end">seconds</InputAdornment>
+                                    position="end">sec</InputAdornment>
                             }}
                             label="Time for role action"
                             variant="outlined"
@@ -128,14 +130,14 @@ export default function SettingsDialog(props) {
                             }}
                             InputProps={{
                                 endAdornment: <InputAdornment
-                                    position="end">minutes</InputAdornment>
+                                    position="end">min</InputAdornment>
                             }}
                             label="Time for vote"
                             variant="outlined"
                         />
                     </Grid>
                 </Grid>
-            </Container>
+            </Grid>
         </Dialog>
     )
 }

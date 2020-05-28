@@ -23,25 +23,26 @@ export default function WerewolfSelector({numWerewolves, handleChange}) {
                 <Grid item>
                     <IconButton
                         aria-label="expand row"
-                        size="small"
+                        size="medium"
                         onClick={onRemove}
                     >
                         <RemoveCircleIcon/>
                     </IconButton>
                 </Grid>
                 <Grid item>
-                    <Typography>Werewolves x{numWerewolves}</Typography>
+                    <Typography variant="h4">
+                        Werewolves x{numWerewolves}
+                    </Typography>
                 </Grid>
                 <Grid item>
                     <IconButton
                         aria-label="expand row"
-                        size="small"
+                        size="medium"
                         onClick={onAdd}
                     >
                         <AddCircleIcon/>
                     </IconButton>
                 </Grid>
-
             </Grid>
         </>
     )

@@ -4,9 +4,9 @@ export const roleInfo = {
     witch: "(Village Team) View a role in the middle. If you do, you must then choose another player to swap with that role",
     troublemaker: "(Village Team) Swap the roles of 2 players",
     villager: "(Village Team) No special ability",
-    werewolf: "(Werewolf Team) Knows the identity of the other werewolves",
+    werewolf: "(Werewolf Team) Knows the identity of the other Werewolves",
     tanner: "(No Team) Wins if they are voted out",
-    mason: "(Village Team) Knows the identity of the other masons",
+    mason: "(Village Team) Knows the identity of the other Masons",
     minion: "(Werewolf Team) Knows the identity of the Werewolves, but the Werewolves do not know the Minion. "
         + "Being voted out will not lead to Village victory",
     hunter: "(Village Team) If voted out, will kill whoever they voted as well",
