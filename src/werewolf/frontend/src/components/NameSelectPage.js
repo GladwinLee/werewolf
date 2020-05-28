@@ -7,6 +7,8 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import {makeStyles} from "@material-ui/core/styles";
 import PageGrid from "./PageGrid";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControl from "@material-ui/core/FormControl";
 
 const ERR_MSG_NAME_EMPTY = "Cannot be empty";
 const ERR_MSG_NAME_TAKEN = "Name already taken";
@@ -16,9 +18,12 @@ const useStyles = makeStyles({
         textAlign: "center",
         fontSize: "2rem"
     },
+    helperText: {
+        textAlign: "center",
+    }
 })
 
-export function NameSelectPage({playerList, socket, onSubmit}) {
+export function NameSelectPage({playerList, socket, onChange, onSubmit, blockJoin}) {
     const classes = useStyles();
 
     const [cookies, setCookie] = useCookies(['playerName'])
@@ -40,11 +45,12 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
         value = value.replace(/[\W_]+/g, "").toUpperCase();
         setName(value);
         if (errorMsg) setErrorMsg(getErrorMsg(value));
+        onChange(value);
     }
 
     const handleSubmit = () => {
         const newErrorMsg = getErrorMsg(name);
-        if (newErrorMsg) {
+        if (blockJoin || newErrorMsg) {
             setErrorMsg(newErrorMsg)
             return;
         }
@@ -66,6 +72,10 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
             </Grid>
             <Grid container item spacing={3} justify="center">
                 <Grid item xs={10}>
+                    <FormHelperText error={!!errorMsg}
+                                    className={classes.helperText}>
+                        {errorMsg || " "}
+                    </FormHelperText>
                     <TextField
                         autoFocus
                         fullWidth
@@ -76,12 +86,18 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
                         inputProps={{className: classes.input}}
                         onChange={handleChange}
                         value={name}
-                        helperText={errorMsg}
                         variant="outlined"
                     />
                 </Grid>
                 <Grid item>
-                    <Button onClick={handleSubmit}>Enter name</Button>
+                    <FormControl disabled={blockJoin}>
+                        <Button onClick={handleSubmit} disabled={blockJoin}>Enter
+                            name</Button>
+                        <FormHelperText>
+                            {(blockJoin) ? "Game Started - Wait for next game"
+                                : " "}
+                        </FormHelperText>
+                    </FormControl>
                 </Grid>
             </Grid>
         </PageGrid>
@@ -91,5 +107,7 @@ export function NameSelectPage({playerList, socket, onSubmit}) {
 NameSelectPage.propTypes = {
     playerList: PropTypes.arrayOf(PropTypes.string),
     onSubmit: PropTypes.func,
+    onChange: PropTypes.func,
     socket: PropTypes.object,
+    blockJoin: PropTypes.bool
 }

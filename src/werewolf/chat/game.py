@@ -15,6 +15,7 @@ class Game:
         self.role_manager = RoleManager()
         self.player_to_vote_choice = {}
         self.action_order = []
+        self.started = False
 
     def add_player(self, name):
         self.player_names.append(name)
@@ -38,7 +39,10 @@ class Game:
 
     def start_game(self):
         self.role_manager.generate_roles(self.player_names)
-        self.action_order = self.role_manager.get_role_order() + ['vote', 'end']
+        self.action_order = [
+                                'pre_night'] + self.role_manager.get_role_order() + [
+                                'vote']
+        self.started = True
 
     def get_players_to_roles(self):
         return self.role_manager.get_players_to_roles()

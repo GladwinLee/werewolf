@@ -1,40 +1,50 @@
-import React from "react";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import React, {useState} from "react";
 import Dialog from "@material-ui/core/Dialog";
 import PropTypes from "prop-types";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 import {makeStyles} from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
+import Grid from "@material-ui/core/Grid";
+import Tooltip from "@material-ui/core/Tooltip";
+import {roleInfo} from "./roleConstants";
 
-const useStyles = makeStyles({
-    dialogTitle: {
-        justifyContent: "flex-end",
-        width: "100%",
-    }
-})
+const useStyles = makeStyles((theme) => ({
+    dialog: {
+        height: "100%",
+    },
+    paper: {
+        overflow: "hidden",
+    },
+    dialogGrid: {
+        height: "100%",
+        padding: theme.spacing(3),
+    },
+    input: {
+        fontSize: "1.3rem"
+    },
+}))
 
-export default function RoleInfoDialog({roles, open, handleClose}) {
+export default function RoleInfoDialog({roleCount: propRoleCount, open, handleClose}) {
     const classes = useStyles();
+    const [roleCount, setRoleCount] = useState(propRoleCount);
 
     return (
-        <Dialog open={open} onClose={handleClose}>
-            <DialogTitle className={classes.dialogTitle}>
-                <IconButton onClick={handleClose}>
-                    <CloseIcon/>
-                </IconButton>
-            </DialogTitle>
-            <Container>
-                {roles.map((role) => (
-                    <div key={"role-info-" + role}>
-                        <Typography>
-                            {capitalize(role)}
-                        </Typography>
-                    </div>
+        <Dialog open={open} onClose={handleClose}
+                classes={{paper: classes.paper}}>
+            <Grid container spacing={3} className={classes.dialogGrid}>
+                {Object.entries(roleCount).map(([role, count]) => (
+                    <Grid item xs={6} key={"role-info-" + role}>
+                        <Tooltip title={roleInfo[role]} enterTouchDelay={150}
+                                 arrow
+                                 placement="top">
+                            <Typography>
+                                {`${capitalize(role)} ${(count) ? `x${count}`
+                                    : ""}`}
+                            </Typography>
+                        </Tooltip>
+                    </Grid>
                 ))}
-            </Container>
+            </Grid>
         </Dialog>
     )
 }
@@ -42,7 +52,7 @@ export default function RoleInfoDialog({roles, open, handleClose}) {
 RoleInfoDialog.propTypes = {
     open: PropTypes.bool,
     handleClose: PropTypes.func.isRequired,
-    roles: PropTypes.object,
+    roleCount: PropTypes.object,
 }
 
 RoleInfoDialog.defaultProps = {

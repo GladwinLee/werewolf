@@ -5,15 +5,16 @@ import Radio from "@material-ui/core/Radio";
 import PropTypes from 'prop-types';
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Grid from "@material-ui/core/Grid";
 
-const useStyle = makeStyles({
+const useStyles = makeStyles({
     buttonGroup: {
         borderRadius: "borderRadius"
     }
 })
 
 export default function RadioChoice(props) {
-    const classes = useStyle();
+    const classes = useStyles();
     const [value, setValue] = useState(props.default);
 
     const GetLabel = ({p}) => {
@@ -40,22 +41,32 @@ export default function RadioChoice(props) {
     const handleSubmit = () => props.onSubmit(value);
 
     return (
-        <div>
-            <Typography variant="h4">{props.label}</Typography>
-            <ButtonGroup
-                className={classes.buttonGroup}
-                orientation="vertical"
-                color="primary"
-                size="large"
-            >
-                {choices}
-            </ButtonGroup>
-            {props.onSubmit && <Button variant="contained"
-                                       onClick={handleSubmit}
-                                       disabled={props.disableAll}>
-                Submit
-            </Button>}
-        </div>
+        <Grid container item justify="center" spacing={3}>
+            <Grid item xs={12}>
+                <Typography variant="h4">{props.label}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+                <ButtonGroup
+                    className={classes.buttonGroup}
+                    orientation="vertical"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                >
+                    {choices}
+                </ButtonGroup>
+            </Grid>
+            {props.onSubmit &&
+            <Grid container item xs={12} justify="center">
+                <Button
+                    variant="contained"
+                    onClick={handleSubmit}
+                    disabled={props.disableAll}
+                >
+                    Submit
+                </Button>
+            </Grid>}
+        </Grid>
     );
 }
 

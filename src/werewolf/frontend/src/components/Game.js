@@ -31,6 +31,8 @@ const initialState = {
     master: false,
     serverMessage: {},
     settingsMap: {},
+    blockJoin: false,
+    knownRoles: {},
 }
 
 function reducer(state, {type, value}) {
@@ -52,7 +54,16 @@ export default function Game(props) {
     const socket = props.socket;
     const [state, dispatch] = useReducer(reducer, initialState);
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
-    const {playerName, players, page, master, serverMessage, settingsMap} = state;
+    const {
+        playerName,
+        players,
+        page,
+        master,
+        serverMessage,
+        settingsMap,
+        blockJoin,
+        knownRoles,
+    } = state;
     const setState = (type, value) => dispatch({type, value});
     const setIfNotUndefined = (field, value) => {
         if (value) setState(field, value)
@@ -60,9 +71,9 @@ export default function Game(props) {
 
     useEffect(
         () => {
-            socket.onmessage = (e) => setState('serverMessage',
-                JSON.parse(e.data));
             socket.onclose = () => console.error('socket closed unexpectedly');
+            socket.onmessage = (e) =>
+                setState('serverMessage', JSON.parse(e.data));
         },
         []
     )
@@ -79,6 +90,8 @@ export default function Game(props) {
             setIfNotUndefined("page", serverMessage['page']);
             setIfNotUndefined("master", serverMessage['master']);
             setIfNotUndefined("settingsMap", serverMessage['settings']);
+            setIfNotUndefined("blockJoin", serverMessage['block_join']);
+            setIfNotUndefined("knownRoles", serverMessage['known_roles']);
         },
         [serverMessage]
     )
@@ -97,8 +110,10 @@ export default function Game(props) {
             case "NameSelectPage":
                 return <NameSelectPage
                     onSubmit={(name) => setState("playerName", name)}
+                    onChange={(name) => setState("playerName", name)}
                     playerList={players}
                     socket={socket}
+                    blockJoin={blockJoin}
                 />
             case "LobbyPage":
                 return <LobbyPage
@@ -112,18 +127,19 @@ export default function Game(props) {
                 return <PreNightPage
                     serverMessage={serverMessage}
                     playerName={playerName}
+                    knownRoles={knownRoles}
                 />
             case "NightPage":
                 return <NightPage
                     socket={socket}
                     serverMessage={serverMessage}
                     roles={settingsMap['selected_roles']}
+                    playerRole={knownRoles[playerName]}
                 />
             case "DayPage":
                 return <DayPage
                     socket={socket}
                     serverMessage={serverMessage}
-                    roles={settingsMap['selected_roles']}
                 />
             case "EndPage":
                 return <EndPage
@@ -141,11 +157,13 @@ export default function Game(props) {
         }));
     }
 
+    if (serverMessage && serverMessage['type' === "worker.reset"]) return null;
     return <Container maxWidth="xs" className={classes.container}>
         {getPageComponent(page)}
-        <Button onClick={() => resetSubmit()}
-                size="small" className={classes.resetButton}>Reset
-        </Button>
+        {playerName === "KEN" && <Button onClick={() => resetSubmit()}
+                                         size="small"
+                                         className={classes.resetButton}>Reset
+        </Button>}
     </Container>
 }
 

@@ -18,7 +18,8 @@ export default function GameSetup(props) {
         return success;
     }
 
-    let name_display = (showNameInput) ? <NameSelectPage
+    let name_display = (showNameInput) ?
+        <NameSelectPage
             onSubmit={nameSubmit}/>
         : null
     let game_master_display;

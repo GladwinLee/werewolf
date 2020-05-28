@@ -43,7 +43,7 @@ export default function LobbyRoleInfo({settingsMap}) {
                 <Typography variant="h4" align="center">Selected
                     Roles</Typography>
                 <Typography align="center">
-                    {numWerewolves && `${numWerewolves} Werewolves`}
+                    {numWerewolves && `Werewolves x${numWerewolves}`}
                 </Typography>
             </Grid>
             {display}

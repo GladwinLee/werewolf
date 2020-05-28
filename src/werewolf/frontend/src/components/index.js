@@ -37,6 +37,11 @@ theme = {
                 fontSize: "1.3rem",
             }
         },
+        MuiGrid: {
+            item: {
+                align: "center",
+            }
+        }
     },
     props: {
         MuiTypography: {

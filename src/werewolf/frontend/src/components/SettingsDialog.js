@@ -20,64 +20,95 @@ const useStyles = makeStyles((theme) => ({
         height: "100%",
         padding: theme.spacing(3),
     },
-    closeButton: {
-        position: 'absolute',
-        right: theme.spacing(1),
-        top: theme.spacing(1),
-        color: theme.palette.grey[500],
+    input: {
+        fontSize: "1.3rem"
     },
 }))
+
+const defaultPreNightWait = 10
+const defaultRoleWait = 7;
+const defaultVoteWait = 5;
+const defaultNumWerewolves = 2;
+
+function validOrDefault(v, defaultValue) {
+    return (!v || v < 0) ? defaultValue : v
+}
 
 export default function SettingsDialog(props) {
     const classes = useStyles(props);
     const [cookies, setCookies] = useCookies(
-        ["selectedRoles", "roleWaitTime", "voteWaitTime", "numWerewolves"]);
+        ["selectedRoles", "preNightWaitTime", "roleWaitTime", "voteWaitTime",
+            "numWerewolves"]);
 
     const initialSelectedRoles = {};
     if (props.configurableRoles) {
         props.configurableRoles.forEach(
-            (role) => initialSelectedRoles[role] = cookies.selectedRoles
-                && !!cookies.selectedRoles[role]
-        );
+            (role) => initialSelectedRoles[role] =
+                cookies.selectedRoles && !!cookies.selectedRoles[role]);
     }
 
     const [selectedRoles, setSelectedRoles] = useState(initialSelectedRoles);
+    const [preNightWaitTime, setPreNightWaitTime] = useState(
+        (cookies.preNightWaitTime == null) ?
+            defaultPreNightWait : Number(cookies.preNightWaitTime));
     const [roleWaitTime, setRoleWaitTime] = useState(
-        (cookies.roleWaitTime == null) ? 7 : Number(cookies.roleWaitTime)
-    );
+        (cookies.roleWaitTime == null) ?
+            defaultRoleWait : Number(cookies.roleWaitTime));
     const [voteWaitTime, setVoteWaitTime] = useState(
-        (cookies.voteWaitTime == null) ? 5 : Number(cookies.voteWaitTime)
-    );
+        (cookies.voteWaitTime == null) ?
+            defaultVoteWait : Number(cookies.voteWaitTime));
     const [numWerewolves, setNumWerewolves] = useState(
-        (cookies.numWerewolves == null) ? 2 : Number(cookies.numWerewolves)
-    );
+        (cookies.numWerewolves == null) ?
+            defaultNumWerewolves : Number(cookies.numWerewolves));
+
+    const validPreNightWaitTime = validOrDefault(preNightWaitTime,
+        defaultPreNightWait);
+    const validRoleWaitTime = validOrDefault(roleWaitTime);
+    const validVoteWaitTime = validOrDefault(voteWaitTime);
+    const validNumWerewolves = validOrDefault(numWerewolves);
+
+    const handleRoleSelect = (choices) => setSelectedRoles(choices);
+    const handlePreNightWaitTimeChange = (event) => {
+        let value = event.target.value;
+        if (value > 60) return;
+        setPreNightWaitTime(value);
+    };
+    const handleRoleWaitTimeChange = (event) => {
+        let value = event.target.value;
+        if (value > 60) return;
+        setRoleWaitTime(value);
+    };
+    const handleVoteWaitTimeChange = (event) => {
+        let value = event.target.value;
+        if (value > 60) return;
+        setVoteWaitTime(value);
+    }
+    const handleNumWerewolvesChange = setNumWerewolves;
 
     const settings = {
         "selected_roles": selectedRoles,
-        "role_wait_time": roleWaitTime,
-        "vote_wait_time": voteWaitTime,
-        "num_werewolves": numWerewolves,
+        "pre_night_wait_time": validPreNightWaitTime,
+        "role_wait_time": validRoleWaitTime,
+        "vote_wait_time": validVoteWaitTime,
+        "num_werewolves": validNumWerewolves,
     };
-
-    if (settings.role_wait_time == null) settings.role_wait_time = 7;
-    if (settings.vote_wait_time == null) settings.vote_wait_time = 5;
-    if (settings.num_werewolves == null) settings.num_werewolves = 2;
 
     // Send initial settings on first render
     useEffect(() => props.handleClose(settings), [])
 
-    const handleRoleSelect = (choices) => setSelectedRoles(choices);
-    const handleRoleWaitTimeChange = (event) => setRoleWaitTime(
-        event.target.value);
-    const handleVoteWaitTimeChange = (event) => setVoteWaitTime(
-        event.target.value);
-    const handleNumWerewolvesChange = setNumWerewolves;
-
     const handleClose = () => {
         setCookies("selectedRoles", selectedRoles);
-        setCookies("roleWaitTime", roleWaitTime);
-        setCookies("voteWaitTime", voteWaitTime);
-        setCookies("numWerewolves", numWerewolves);
+        setCookies("preNightWaitTime", validPreNightWaitTime);
+        setCookies("roleWaitTime", validRoleWaitTime);
+        setCookies("voteWaitTime", validVoteWaitTime);
+        setCookies("numWerewolves", validNumWerewolves);
+
+        // Set the state for if they re open
+        setPreNightWaitTime(validPreNightWaitTime);
+        setRoleWaitTime(validRoleWaitTime);
+        setVoteWaitTime(validVoteWaitTime);
+        setNumWerewolves(validNumWerewolves);
+
         props.handleClose(settings);
     }
 
@@ -100,18 +131,37 @@ export default function SettingsDialog(props) {
                 <Grid container item justify={"space-evenly"}>
                     <Grid item>
                         <TextField
+                            value={preNightWaitTime}
+                            onChange={handlePreNightWaitTimeChange}
+                            inputProps={{
+                                step: 1,
+                                min: 3,
+                                max: 60,
+                                type: 'number',
+                                className: classes.input,
+                            }}
+                            InputProps={{
+                                endAdornment: <InputAdornment
+                                    position="end">s</InputAdornment>
+                            }}
+                            label="Time before night"
+                            variant="outlined"
+                        />
+                    </Grid>
+                    <Grid item>
+                        <TextField
                             value={roleWaitTime}
                             onChange={handleRoleWaitTimeChange}
                             inputProps={{
                                 step: 1,
-                                min: 1,
+                                min: 2,
                                 max: 60,
                                 type: 'number',
-                                'aria-labelledby': 'input-slider',
+                                className: classes.input,
                             }}
                             InputProps={{
                                 endAdornment: <InputAdornment
-                                    position="end">sec</InputAdornment>
+                                    position="end">s</InputAdornment>
                             }}
                             label="Time for role action"
                             variant="outlined"
@@ -126,11 +176,11 @@ export default function SettingsDialog(props) {
                                 min: 0,
                                 max: 60,
                                 type: 'number',
-                                'aria-labelledby': 'input-slider',
+                                className: classes.input,
                             }}
                             InputProps={{
                                 endAdornment: <InputAdornment
-                                    position="end">min</InputAdornment>
+                                    position="end">m</InputAdornment>
                             }}
                             label="Time for vote"
                             variant="outlined"

@@ -1,33 +1,26 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import {roleInfo} from "./roleConstants";
 import Timer from "./Timer";
 import capitalize from "@material-ui/core/utils/capitalize";
+import PageGrid from "./PageGrid";
+import Grid from "@material-ui/core/Grid";
+import Divider from "@material-ui/core/Divider";
 
-export default function PreNightPage({serverMessage, playerName}) {
-    const [role, setRole] = useState();
-    const [teamMates, setTeamMates] = useState();
-    const [waitTime, setWaitTime] = useState();
+export default function PreNightPage({serverMessage, playerName, knownRoles}) {
+    const {wait_time: newWaitTime,} = serverMessage;
+    const newPlayerRole = knownRoles[playerName];
+    let propTeamMates = [];
 
-    useEffect(
-        () => {
-            const {
-                known_roles: knownRoles,
-                wait_time: newWaitTime,
-            } = serverMessage;
-            if (knownRoles) {
-                const newPlayerRole = knownRoles[playerName]
-                setRole(newPlayerRole);
-                if (['mason', 'werewolf', 'minion'].includes(newPlayerRole)) {
-                    delete knownRoles[playerName]
-                    setTeamMates(Object.entries(knownRoles));
-                }
-            }
-            if (newWaitTime) setWaitTime(newWaitTime);
-        },
-        [serverMessage]
-    )
+    if (['mason', 'werewolf', 'minion'].includes(newPlayerRole)) {
+        propTeamMates = Object.entries(knownRoles).filter(([name, role]) => (
+            name !== playerName));
+    }
+
+    const [role, setRole] = useState(newPlayerRole);
+    const [teamMates, setTeamMates] = useState(propTeamMates);
+    const [waitTime, setWaitTime] = useState(newWaitTime);
 
     const getTeamMateDisplay = () => {
         if (!teamMates) return null;
@@ -38,28 +31,44 @@ export default function PreNightPage({serverMessage, playerName}) {
             if (role === 'minion') text = "There are no Werewolves";
             return <Typography variant="h4">{text}</Typography>
         } else {
-            return <>
-                <Typography variant="h4">Your allies are</Typography>
-                {teamMates.map(([name, role]) => {
-                    return <Typography
-                        variant="h4">{`${name} the ${role}`}</Typography>
-                })}
-            </>
+            return <Grid item xs={12}>
+                <Typography variant="h4">Your allies</Typography>
+                <Divider/>
+                {teamMates.map(([name, role]) => (
+                    <Typography variant="h4" key={`ally-${name}`}>
+                        {`${name} the ${role}`}
+                    </Typography>)
+                )}
+            </Grid>
         }
     }
 
     return (
-        <>
-            <Typography variant="h3">{role && `You are a ${capitalize(
-                role)}`}</Typography>
-            {getTeamMateDisplay()}
-            <Typography>{roleInfo[role]}</Typography>
-            <Timer start={waitTime} preText={"Night begins in "}/>
-        </>
+        <PageGrid height={"80%"} alignContent="space-between">
+            <Grid container item xs={12} spacing={3}>
+                <Grid item xs={12}>
+                    <Typography variant="h3">
+                        {role && `You are a ${capitalize(role)}`}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography style={{whiteSpace: 'pre-line'}}>
+                        {roleInfo[role]}
+                    </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                    {getTeamMateDisplay()}
+                </Grid>
+            </Grid>
+            <Grid item xs={12}>
+                <Timer start={waitTime} preText={"Night begins in "}/>
+            </Grid>
+        </PageGrid>
     )
 }
 
 PreNightPage.propTypes = {
     serverMessage: PropTypes.object,
     playerName: PropTypes.string.isRequired,
+    knownRoles: PropTypes.object.isRequired,
 }

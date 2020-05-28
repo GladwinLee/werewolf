@@ -5,8 +5,19 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import CheckboxListSubmit from "./CheckboxListSubmit";
 import RadioChoice from "./RadioChoice";
 import PropTypes from "prop-types";
+import PageGrid from "./PageGrid";
+import Grid from "@material-ui/core/Grid";
+import makeStyles from "@material-ui/core/styles/makeStyles";
 
-export default function NightAction({action, waitTime: propsWaitTime, serverMessage, socket}) {
+const useStyles = makeStyles(theme => ({
+    choiceGrid: {
+        justifyContent: "center",
+        padding: [["0px", theme.spacing(2)]],
+    },
+}));
+
+export default function NightAction({action, waitTime: propsWaitTime, serverMessage, socket, ...props}) {
+    const classes = useStyles(props);
     let {
         choices,
         disabledChoices,
@@ -45,26 +56,30 @@ export default function NightAction({action, waitTime: propsWaitTime, serverMess
         sendChoice(choicesString);
     }
 
-    let display;
+    let actionDisplay;
     let onSubmit = () => {};
     if (choiceType === "pick2") {
         onSubmit = onCheckBoxSubmit;
-        display =
+        actionDisplay =
             <CheckboxListSubmit
                 choices={choices}
-                onSubmit={onSubmit}
                 onChange={(c) => setSelectedChoices(c)}
                 minChoice={2}
                 maxChoice={2}
                 disabledChoices={disabledChoices}
+                noAboveMax
             />
     } else if (choiceType === "pick1") {
         onSubmit = onChoiceSubmit;
-        display =
+        let onChange = setSelectedChoices;
+        if (action === "witch") onChange = (c) => {
+            setSelectedChoices(c);
+            sendChoice(c);
+        }
+        actionDisplay =
             <RadioChoice
                 choices={choices}
-                onSubmit={onSubmit}
-                onChange={(c) => setSelectedChoices(c)}
+                onChange={onChange}
                 default={defaultChoice}
                 disabledChoices={disabledChoices}
             />
@@ -75,15 +90,21 @@ export default function NightAction({action, waitTime: propsWaitTime, serverMess
         else onSubmit();
     }
 
-    return <>
-        <ActionLabel action={action} helpText={helpText}/>
-        <Timer
-            start={waitTime}
-            timerKey={getTimerKey(action)}
-            callback={onAutoSubmit}
-        />
-        {display}
-    </>
+    return <PageGrid>
+        <Grid item xs={12}>
+            <ActionLabel action={action} helpText={helpText}/>
+        </Grid>
+        <Grid item xs={12} className={classes.choiceGrid}>
+            {actionDisplay}
+        </Grid>
+        <Grid item xs={12}>
+            <Timer
+                start={waitTime}
+                timerKey={getTimerKey(action)}
+                callback={onAutoSubmit}
+            />
+        </Grid>
+    </PageGrid>
 }
 
 NightAction.propTypes = {

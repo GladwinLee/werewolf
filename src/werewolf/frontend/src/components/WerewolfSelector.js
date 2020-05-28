@@ -19,7 +19,7 @@ export default function WerewolfSelector({numWerewolves, handleChange}) {
 
     return (
         <>
-            <Grid container justify="center">
+            <Grid container justify="center" alignItems="center">
                 <Grid item>
                     <IconButton
                         aria-label="expand row"

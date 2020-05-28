@@ -30,8 +30,9 @@ export default function LobbyPage(props) {
                     numPlayers={props.players.length}
                 />
                 : <Grid item xs={12}>
-                    <Typography>Waiting for game master to start the
-                        game</Typography>
+                    <Typography>
+                        Waiting for Game Master to start
+                    </Typography>
                 </Grid>
             }
         </PageGrid>

@@ -39,6 +39,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         self.player_list = []
         self.player_role = ""
         self.role_manager = ConsumerRoleManager()
+        self.block_join = False
 
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -96,13 +97,19 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
     async def worker_page_change(self, data):
         page = data['page']
         if page == "PreNightPage":
-            self.role_manager.player_name = self.player_name
-            known_roles = self.role_manager.get_known_roles(data['roles'])
-            msg = {
-                'page': page,
-                'known_roles': known_roles,
-                'wait_time': data['wait_time']
-            }
+            if self.player_name == "":
+                self.block_join = True
+                msg = {
+                    'block_join': True,
+                }
+            else:
+                self.role_manager.player_name = self.player_name
+                known_roles = self.role_manager.get_known_roles(data['roles'])
+                msg = {
+                    'page': page,
+                    'known_roles': known_roles,
+                    'wait_time': data['wait_time']
+                }
         elif page == "NightPage":
             msg = {
                 'page': page,
@@ -155,8 +162,8 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(data)
 
     async def worker_reset(self, data):
+        await self.send_json(data, bypass_block=True)
         self.reset()
-        await self.send_json(data)
 
     async def worker_role_special(self, data):
         role_action = data['role_action']
@@ -184,8 +191,8 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             self.role_manager.revealer_target = target
 
         await self.send_json({
-            'info_message': self.role_manager.get_info_message(role_action,
-                                                               result)
+            'info_message': self.role_manager.get_info_message(
+                role_action, result)
         })
 
     async def worker_winner(self, data):
@@ -205,7 +212,12 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         )
 
     # Send message to WebSocket
-    async def send_json(self, msg, close=False):
+    async def send_json(self, msg, close=False, bypass_block=False):
         logger.debug(f"{self.player_name} To client name:%s :%s" % (
             self.player_name, msg))
         await super().send_json(msg, close)
+
+    async def dispatch(self, message):
+        if self.block_join and message['type'] != 'worker.reset':
+            return
+        await super().dispatch(message)

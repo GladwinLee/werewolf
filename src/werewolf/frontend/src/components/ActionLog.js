@@ -2,7 +2,6 @@ import React from "react";
 import Table from "@material-ui/core/Table";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
-import Collapsible from "./Collapsible";
 import PropTypes from "prop-types";
 import TableBody from "@material-ui/core/TableBody";
 import Typography from "@material-ui/core/Typography";
@@ -23,13 +22,14 @@ export default function ActionLog(props) {
     })
 
     return (
-        <Collapsible value={"Action Log"}>
+        <>
+            <Typography align="center">Action Log</Typography>
             <Table size={"small"}>
                 <TableBody>
                     {display}
                 </TableBody>
             </Table>
-        </Collapsible>
+        </>
     )
 }
 

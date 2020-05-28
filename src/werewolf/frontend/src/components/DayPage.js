@@ -9,15 +9,26 @@ import RoleInfoDialog from "./RoleInfoDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import SecurityIcon from "@material-ui/icons/Security";
 import Grid from "@material-ui/core/Grid";
+import PageGrid from "./PageGrid";
+import {makeStyles} from "@material-ui/core/styles";
 
-export default function DayPage({socket, serverMessage, roles}) {
+const useStyles = makeStyles(theme => ({
+    choiceGrid: {
+        justifyContent: "center",
+        padding: [["0px", theme.spacing(2)]],
+    },
+}));
+export default function DayPage({socket, serverMessage, roles, ...props}) {
+    const classes = useStyles(props);
+
     const [initialMessage, setInitialMessage] = useState(serverMessage);
     let {
         choices,
         default: defaultChoice,
         disabledChoices,
         wait_time: waitTime,
-        player_labels: playerLabels
+        player_labels: playerLabels,
+        role_count: roleCount,
     } = initialMessage;
 
     const [selectedChoice, setSelectedChoice] = useState();
@@ -44,26 +55,42 @@ export default function DayPage({socket, serverMessage, roles}) {
     )
 
     return (
-        <>
-            <Typography variant="h3">Vote</Typography>
-            <Button variant="contained"
-                    onClick={() => setShowDialog(true)}>Roles</Button>
-            <RadioChoice
-                choices={choices}
-                onSubmit={sendChoice}
-                onChange={setSelectedChoice}
-                default={defaultChoice}
-                disabledChoices={disabledChoices}
-                disableAll={disableChoices}
-                specialChoiceLabels={getSpecialLabels(playerLabels)}
-            />
-            <Timer start={waitTime} preText={"Time Remaining "}/>
+        <PageGrid justify="space-between">
+            <Grid container item xs={12} justify="space-around">
+                <Grid item xs={4}>{/* empty */}</Grid>
+                <Grid item xs={4}>
+                    <Typography variant="h3">Vote</Typography>
+                </Grid>
+                <Grid item xs={4}>
+                    <Button
+                        variant="contained"
+                        onClick={() => setShowDialog(true)}
+                        size="small"
+                    >
+                        Roles
+                    </Button>
+                </Grid>
+            </Grid>
+            <Grid item xs={12} className={classes.choiceGrid}>
+                <RadioChoice
+                    choices={choices}
+                    onSubmit={sendChoice}
+                    onChange={setSelectedChoice}
+                    default={defaultChoice}
+                    disabledChoices={disabledChoices}
+                    disableAll={disableChoices}
+                    specialChoiceLabels={getSpecialLabels(playerLabels)}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <Timer start={waitTime} preText={"Time Remaining "}/>
+            </Grid>
             <RoleInfoDialog
-                roles={roles}
+                roleCount={roleCount}
                 open={showDialog}
                 handleClose={() => setShowDialog(false)}
             />
-        </>
+        </PageGrid>
     )
 }
 
