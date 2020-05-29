@@ -123,7 +123,7 @@ function getSpecialLabels(playerLabels) {
 }
 
 function ShieldedLabel({playerName}) {
-    return <Grid container>
+    return <Grid container justify="center" alignItems="center">
         <Grid item>
             {playerName}
         </Grid>

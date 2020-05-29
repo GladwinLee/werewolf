@@ -19,7 +19,7 @@ export default function EndRolesInfo(props) {
 
     const rolesToPlayers = {}
     Object.entries(playersToRoles).filter(
-        ([name, role]) => middle.includes(name)).map(
+        ([name, role]) => !middle.includes(name)).map(
         ([playerName, role]) => {
             rolesToPlayers[role] = rolesToPlayers[role] || [];
             rolesToPlayers[role].push(playerName);

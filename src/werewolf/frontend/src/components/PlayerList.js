@@ -12,7 +12,7 @@ export default function PlayersList({players}) {
             </Grid>
             <Divider/>
             {players.map((p) => (
-                <Grid item xs={6} key={`players-list-${p}`}>
+                <Grid item key={`players-list-${p}`}>
                     <Typography align={"center"}>
                         {p}
                     </Typography>

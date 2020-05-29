@@ -160,9 +160,13 @@ export default function Game(props) {
     if (serverMessage && serverMessage['type' === "worker.reset"]) return null;
     return <Container maxWidth="xs" className={classes.container}>
         {getPageComponent(page)}
-        {playerName === "KEN" && <Button onClick={() => resetSubmit()}
-                                         size="small"
-                                         className={classes.resetButton}>Reset
+        {playerName === "KEN" &&
+        <Button
+            onClick={() => resetSubmit()}
+            size="small"
+            className={classes.resetButton}
+        >
+            Reset
         </Button>}
     </Container>
 }

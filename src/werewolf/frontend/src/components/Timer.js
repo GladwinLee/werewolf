@@ -26,10 +26,10 @@ export default function Timer(props) {
         if (secondsLeft === 0 && props.start !== 0) props.callback();
     }, [secondsLeft])
 
-    if (!secondsLeft) return null;
     return (
         <Typography>
-            {`${props.preText}${fmtMSS(secondsLeft)}${props.postText}`}
+            {(!secondsLeft) ?
+                " " : `${props.preText}${fmtMSS(secondsLeft)}${props.postText}`}
         </Typography>
     )
 }

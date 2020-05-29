@@ -19,8 +19,8 @@ export default function EndPage({socket, serverMessage, master}) {
     const resetSubmit = () => socket.send(JSON.stringify({'type': "reset",}));
 
     return (
-        <PageGrid>
-            <Grid container item xs={12} spacing={3}>
+        <PageGrid spacing={3}>
+            <Grid container item xs={12}>
                 <Grid item xs={12}>
                     <Typography variant="h1">
                         {`${winners
