@@ -32,7 +32,7 @@ theme = {
         MuiTooltip: {
             tooltip: {
                 backgroundColor: theme.palette.common.white,
-                color: 'rgba(0, 0, 0, 0.87)',
+                color: 'rgba(0,0,0,0.87)',
                 boxShadow: theme.shadows[1],
                 fontSize: "1.3rem",
             }
@@ -67,9 +67,10 @@ ReactDOM.render(
                 dense
                 ref={notistackRef}
                 anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
+                    vertical: 'top',
+                    horizontal: 'left',
                 }}
+                variant={"info"}
                 action={(key) => (
                     <IconButton
                         onClick={onCloseSnackbar(key)}

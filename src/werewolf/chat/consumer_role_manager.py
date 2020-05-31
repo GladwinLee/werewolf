@@ -7,19 +7,25 @@ logger = logging.getLogger("consumer.consumer_role_manager")
 
 class ConsumerRoleManager:
     def __init__(self):
-        self.sentinel_target = None
+        self.sentinel_target = ""
         self.revealer_target = None
         self.player_name = None
         self.player_role = None
+        self.num_werewolves = None
 
     def is_player_role(self, role):
         return self.player_role == role
 
     def get_known_roles(self, roles):
+        roles.pop(MIDDLE_1)
+        roles.pop(MIDDLE_2)
+        roles.pop(MIDDLE_3)
         self.player_role = roles[self.player_name]
         if self.player_role == WEREWOLF:
-            return {name: role for name, role in roles.items() if
-                    role == WEREWOLF}
+            werewolves = {name: role for name, role in roles.items() if
+                          role == WEREWOLF}
+            self.num_werewolves = len(werewolves)
+            return werewolves
         elif self.player_role == MINION:
             return {name: role for name, role in roles.items() if
                     role in [WEREWOLF, MINION]}
@@ -43,6 +49,16 @@ class ConsumerRoleManager:
         except KeyError:
             logger.error(f"Not a role action:", action)
 
+    def werewolf(self, msg, **kwargs):
+        if self.num_werewolves != 1:
+            msg['help_text'] = "You are not a Lone Wolf. No Night action"
+            return msg
+        msg['choices'] = [MIDDLE_1, MIDDLE_2, MIDDLE_3, NONE]
+        msg['default'] = NONE
+        msg['choice_type'] = "pick1"
+        msg['help_text'] = "Reveal the role of selected"
+        return msg
+
     def seer(self, msg, player_list, **kwargs):
         choices = player_list.copy()
         choices.remove(self.player_name)
@@ -60,8 +76,8 @@ class ConsumerRoleManager:
 
     def robber(self, msg, player_list, **kwargs):
         if self.sentinel_target == self.player_name:
-            msg[
-                'help_text'] = "The Sentinel shielded you. You cannot swap yourself with another player"
+            msg['help_text'] = \
+                "The Sentinel shielded you. You cannot swap yourself with another player"
             return msg
         choices = player_list.copy()
         choices.remove(self.player_name)
@@ -95,8 +111,8 @@ class ConsumerRoleManager:
             msg['default'] = player_list[
                 (player_list.index(self.player_name) + 1) % len(player_list)]
         msg['choice_type'] = "pick1"
-        msg[
-            'help_text'] = f"Swap the role of selected with the {role_to_swap.capitalize()} role from {target}"
+        msg['help_text'] = \
+            f"Swap the role of selected with the {role_to_swap.capitalize()} role from {target}"
         return msg
 
     def revealer(self, msg, player_list, **kwargs):
@@ -106,8 +122,8 @@ class ConsumerRoleManager:
         msg['choices'] = choices
         msg['choice_type'] = "pick1"
         msg['default'] = NONE
-        msg[
-            'help_text'] = "Reveal role of selected. If not Werewolf or Tanner, everyone sees it too"
+        msg['help_text'] = \
+            "Reveal role of selected. If not Werewolf or Tanner, everyone sees it too"
         return msg
 
     def sentinel(self, msg, player_list, **kwargs):
@@ -127,14 +143,13 @@ class ConsumerRoleManager:
         if self.player_role == INSOMNIAC:
             msg["info_message"] = \
                 f"You wake up and see you are a {roles[self.player_name].capitalize()}"
-        if self.sentinel_target:
+        if self.sentinel_target != "":
             player_labels[self.sentinel_target] = "shielded"
         if self.revealer_target:
             player_labels[self.revealer_target] = roles[self.revealer_target]
         if len(player_labels) > 0:
             msg["player_labels"] = player_labels
 
-        msg['role_count'] = self.get_role_count(roles)
         return msg
 
     @staticmethod
@@ -154,7 +169,7 @@ class ConsumerRoleManager:
 
     def get_info_message(self, role_action, result):
         message = ""
-        if role_action == SEER:
+        if role_action in [SEER, WEREWOLF]:
             message = "You see "
             message += ", ".join(
                 [f"{name} is a {role.capitalize()}"

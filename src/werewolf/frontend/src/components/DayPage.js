@@ -11,6 +11,7 @@ import SecurityIcon from "@material-ui/icons/Security";
 import Grid from "@material-ui/core/Grid";
 import PageGrid from "./PageGrid";
 import {makeStyles} from "@material-ui/core/styles";
+import InfoMessagesDialog from "./InfoMessagesDialog";
 
 const useStyles = makeStyles(theme => ({
     choiceGrid: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles(theme => ({
         padding: [["0px", theme.spacing(2)]],
     },
 }));
-export default function DayPage({socket, serverMessage, roles, ...props}) {
+export default function DayPage({socket, serverMessage, roleCount, infoMessages, ...props}) {
     const classes = useStyles(props);
 
     const [initialMessage, setInitialMessage] = useState(serverMessage);
@@ -28,11 +29,11 @@ export default function DayPage({socket, serverMessage, roles, ...props}) {
         disabledChoices,
         wait_time: waitTime,
         player_labels: playerLabels,
-        role_count: roleCount,
     } = initialMessage;
 
     const [selectedChoice, setSelectedChoice] = useState();
-    const [showDialog, setShowDialog] = useState(false);
+    const [showRoleInfoDialog, setShowRoleInfoDialog] = useState(false);
+    const [showInfoMessagesDialog, setShowInfoMessagesDialog] = useState(false);
     const [disableChoices, setDisableChoices] = useState(false);
 
     useEffect(() => {
@@ -57,14 +58,22 @@ export default function DayPage({socket, serverMessage, roles, ...props}) {
     return (
         <PageGrid justify="space-between">
             <Grid container item xs={12} justify="space-around">
-                <Grid item xs={4}>{/* empty */}</Grid>
+                <Grid item xs={4}>
+                    <Button
+                        variant="contained"
+                        onClick={() => setShowInfoMessagesDialog(true)}
+                        size="small"
+                    >
+                        Messages
+                    </Button>
+                </Grid>
                 <Grid item xs={4}>
                     <Typography variant="h3">Vote</Typography>
                 </Grid>
                 <Grid item xs={4}>
                     <Button
                         variant="contained"
-                        onClick={() => setShowDialog(true)}
+                        onClick={() => setShowRoleInfoDialog(true)}
                         size="small"
                     >
                         Roles
@@ -87,8 +96,13 @@ export default function DayPage({socket, serverMessage, roles, ...props}) {
             </Grid>
             <RoleInfoDialog
                 roleCount={roleCount}
-                open={showDialog}
-                handleClose={() => setShowDialog(false)}
+                open={showRoleInfoDialog}
+                handleClose={() => setShowRoleInfoDialog(false)}
+            />
+            <InfoMessagesDialog
+                infoMessages={infoMessages}
+                open={showInfoMessagesDialog}
+                handleClose={() => setShowInfoMessagesDialog(false)}
             />
         </PageGrid>
     )
@@ -97,11 +111,11 @@ export default function DayPage({socket, serverMessage, roles, ...props}) {
 DayPage.propTypes = {
     socket: PropTypes.object,
     serverMessage: PropTypes.object,
-    roles: PropTypes.arrayOf(PropTypes.string),
+    roleCount: PropTypes.object,
+    infoMessages: PropTypes.arrayOf(PropTypes.string),
 }
 
 DayPage.defaultProps = {
-    players: [],
     serverMessage: {},
 }
 

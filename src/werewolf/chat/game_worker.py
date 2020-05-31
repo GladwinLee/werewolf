@@ -78,6 +78,7 @@ class GameWorker(AsyncConsumer):
                 'player_list': player_list,
             }
         )
+        await self.reset(data)
 
     async def name_select(self, data):
         if self.game.started:
@@ -142,13 +143,12 @@ class GameWorker(AsyncConsumer):
             return
 
         if next_action == 'pre_night':
-            player_roles = self.game.get_players_to_roles()
             await self.group_send(
                 room_group_name,
                 {
                     'type': 'worker.page_change',
                     'page': "PreNightPage",
-                    'roles': player_roles,
+                    'roles': self.game.get_full_roles_map(),
                     'wait_time': self.get_wait_time("pre_night")
                 })
         else:

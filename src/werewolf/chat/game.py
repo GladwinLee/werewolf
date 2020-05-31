@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from .role_constants import WITCH, NONE
+from .role_constants import WITCH, NONE, configurable_roles
 from .role_manager import RoleManager
 
 logger = getLogger("worker.game")
@@ -29,7 +29,7 @@ class Game:
         return self.player_names
 
     def get_configurable_roles(self):
-        return self.role_manager.get_configurable_roles()
+        return configurable_roles
 
     def configure_settings(self, settings):
         self.role_manager.configure_settings(settings)
@@ -39,16 +39,15 @@ class Game:
 
     def start_game(self):
         self.role_manager.generate_roles(self.player_names)
-        self.action_order = [
-                                'pre_night'] + self.role_manager.get_role_order() + [
-                                'vote']
+        self.action_order = \
+            ['pre_night'] + self.role_manager.get_role_order() + ['vote']
         self.started = True
 
     def get_players_to_roles(self):
         return self.role_manager.get_players_to_roles()
 
     def get_full_roles_map(self):
-        return self.role_manager.get_full_roles_map()
+        return self.role_manager.full_roles_map
 
     def get_next_action(self):
         return self.action_order[0]
@@ -88,6 +87,3 @@ class Game:
 
     def get_action_log(self):
         return self.role_manager.get_action_log()
-
-    def get_role_info_map(self):
-        return self.role_manager.get_role_info_map()

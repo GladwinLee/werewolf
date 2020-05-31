@@ -38,7 +38,7 @@ export default function LobbyRoleInfo({settingsMap}) {
         role => <Role role={role} key={"role-" + role}/>);
 
     return (
-        <Grid container item xs={12} spacing={3}>
+        <Grid container item xs={12}>
             <Grid item xs={12}>
                 <Typography variant="h4" align="center">Selected
                     Roles</Typography>

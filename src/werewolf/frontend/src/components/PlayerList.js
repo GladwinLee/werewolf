@@ -1,24 +1,29 @@
 import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import PropTypes from 'prop-types';
-import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
+import {makeStyles} from "@material-ui/core/styles";
+import Chip from "@material-ui/core/Chip";
 
-export default function PlayersList({players}) {
+const useStyles = makeStyles((theme) => ({
+    playerChip: {
+        margin: theme.spacing(0.5),
+    }
+}));
+export default function PlayersList({players, ...props}) {
+    const classes = useStyles(props);
     return (
-        <Grid container item spacing={2}>
-            <Grid item xs={12}>
-                <Typography variant="h4" align="center">Player List</Typography>
+        <>
+            <Typography variant="h4" align="center">Player List</Typography>
+            <Grid container justify={"center"}>
+                {players.map(p => <Chip
+                    key={p}
+                    label={p}
+                    className={classes.playerChip}
+                    variant={"outlined"}
+                />)}
             </Grid>
-            <Divider/>
-            {players.map((p) => (
-                <Grid item key={`players-list-${p}`}>
-                    <Typography align={"center"}>
-                        {p}
-                    </Typography>
-                </Grid>
-            ))}
-        </Grid>
+        </>
     );
 }
 

@@ -19,9 +19,6 @@ class RoleManager:
         self.witch_middle_target = ""  # store the target of the witch in its 1st part
         self.vote_counts = {}
 
-    def get_configurable_roles(self):
-        return all_special_roles
-
     def configure_settings(self, settings):
         self.num_werewolves = int(settings['num_werewolves'])
         roles = settings['selected_roles']
@@ -64,7 +61,12 @@ class RoleManager:
 
     def get_role_order(self):
         current_roles = set(self.full_roles_map.values())
-        role_order = [role for role in action_order if role in current_roles]
+        role_order = []
+
+        werewolf_players = list(self.get_players_to_roles().values()).count(
+            WEREWOLF)
+
+        role_order += [role for role in action_order if role in current_roles]
         if WITCH in role_order:
             role_order.insert(role_order.index(WITCH) + 1, WITCH_PART_TWO)
         return role_order
@@ -76,24 +78,29 @@ class RoleManager:
         players_to_roles.pop(MIDDLE_3)
         return players_to_roles
 
-    def get_full_roles_map(self):
-        return self.full_roles_map
-
     def handle_role_action(self, role, player_name, choice):
         return getattr(RoleManager, role)(self, player_name, choice)
 
-    def seer(self, player_name, target):
+    def reveal_role(self, role_text, player_name, target):
         if target == NONE:
             self.log_append(
-                f"The Seer {player_name} chooses not to see a role")
+                f"The {role_text} {player_name} chooses not to see a role")
             return
         keys = target.split(SEPARATOR)
         result = {key: self.full_roles_map[key] for key in keys}
-        log_msg = f"The Seer {player_name} sees:"
+        log_msg = f"The {role_text} {player_name} sees"
+        if len(result) > 1:
+            log_msg += ": "
         log_msg += ",".join(
             [f" {key} as {role.capitalize()}" for key, role in result.items()])
         self.log_append(log_msg)
         return SENDER, result
+
+    def werewolf(self, player_name, target):
+        return self.reveal_role("Lone Wolf", player_name, target)
+
+    def seer(self, player_name, target):
+        return self.reveal_role("Seer", player_name, target)
 
     def robber(self, player_name, target):
         if target == NONE:
@@ -296,17 +303,6 @@ class RoleManager:
 
     def get_action_log(self):
         return self.action_log
-
-    def get_role_info_map(self):
-        role_count = {role: 0 for role in role_info_order}
-        for role in self.full_roles_map.values():
-            role_count[role] += 1
-        return {
-            role: {
-                "count": count,
-            }
-            for role, count in role_count.items() if count > 0
-        }
 
     def log_append(self, msg):
         logger.info(msg)

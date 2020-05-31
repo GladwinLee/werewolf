@@ -33,7 +33,7 @@ export default function RoleInfoDialog({roleCount: propRoleCount, open, handleCl
                 classes={{paper: classes.paper}}>
             <Grid container spacing={3} className={classes.dialogGrid}>
                 {Object.entries(roleCount).map(([role, count]) => (
-                    <Grid item xs={6} key={"role-info-" + role}>
+                    <Grid item xs={12} key={"role-info-" + role}>
                         <Tooltip title={roleInfo[role]} enterTouchDelay={150}
                                  arrow
                                  placement="top">

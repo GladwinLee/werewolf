@@ -10,7 +10,7 @@ import PageGrid from "./PageGrid";
 export default function LobbyPage(props) {
     return (
         <PageGrid alignContent="space-between">
-            <Grid container item xs={12} spacing={3}>
+            <Grid container item xs={12}>
                 <Grid item xs={12}>
                     <Typography variant="h3" color="textPrimary">
                         Lobby

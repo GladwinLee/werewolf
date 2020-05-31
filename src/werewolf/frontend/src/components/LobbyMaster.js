@@ -29,7 +29,7 @@ export default function LobbyMaster(props) {
 
     return (
         <>
-            <Grid container item xs={12} spacing={3} justify="space-evenly">
+            <Grid container item xs={12} justify="space-evenly">
                 <Grid item>
                     <Button variant="contained" onClick={clickStart}>
                         Start

@@ -33,6 +33,8 @@ const initialState = {
     settingsMap: {},
     blockJoin: false,
     knownRoles: {},
+    infoMessages: [],
+    roleCount: {},
 }
 
 function reducer(state, {type, value}) {
@@ -63,6 +65,8 @@ export default function Game(props) {
         settingsMap,
         blockJoin,
         knownRoles,
+        infoMessages,
+        roleCount,
     } = state;
     const setState = (type, value) => dispatch({type, value});
     const setIfNotUndefined = (field, value) => {
@@ -92,6 +96,7 @@ export default function Game(props) {
             setIfNotUndefined("settingsMap", serverMessage['settings']);
             setIfNotUndefined("blockJoin", serverMessage['block_join']);
             setIfNotUndefined("knownRoles", serverMessage['known_roles']);
+            setIfNotUndefined("roleCount", serverMessage['role_count']);
         },
         [serverMessage]
     )
@@ -100,6 +105,8 @@ export default function Game(props) {
         () => {
             const {info_message: infoMessage} = serverMessage
             if (!infoMessage) return;
+            infoMessages.push(infoMessage)
+            setIfNotUndefined("infoMessages", infoMessages);
             enqueueSnackbar(<InfoMessage message={infoMessage}/>);
         },
         [serverMessage]
@@ -133,13 +140,15 @@ export default function Game(props) {
                 return <NightPage
                     socket={socket}
                     serverMessage={serverMessage}
-                    roles={settingsMap['selected_roles']}
                     playerRole={knownRoles[playerName]}
+                    roleCount={roleCount}
                 />
             case "DayPage":
                 return <DayPage
                     socket={socket}
                     serverMessage={serverMessage}
+                    infoMessages={infoMessages}
+                    roleCount={roleCount}
                 />
             case "EndPage":
                 return <EndPage

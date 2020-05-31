@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
@@ -6,14 +6,22 @@ import Timer from "./Timer";
 import PageGrid from "./PageGrid";
 import Grid from "@material-ui/core/Grid";
 import {makeStyles} from "@material-ui/core/styles";
+import Tooltip from "@material-ui/core/Tooltip";
+import {roleInfo} from "./roleConstants";
 
 const useStyles = makeStyles({
     typography: {
         fontSize: "1.5em"
+    },
+    timerGrid: {
+        height: "5vh",
     }
 })
 
-export default function NightWait({currentRole, roles, waitTime, playerRole}) {
+export default function NightWait({currentRole, roleCount, waitTime, playerRole}) {
+    useEffect(
+        () => {console.log("Regen")}
+        , [])
     const classes = useStyles();
     return (
         <PageGrid>
@@ -23,22 +31,28 @@ export default function NightWait({currentRole, roles, waitTime, playerRole}) {
                 </Typography>
             </Grid>
             <Grid item xs={12}>
-                {roles.map((role) => {
+                {Object.entries(roleCount).map(([role, count]) => {
                     let color = "textSecondary";
                     if (role === currentRole) color = "textPrimary";
                     if (role === playerRole) color = "primary";
                     return (
-                        <Typography
-                            key={"night-wait-" + role}
-                            color={color}
-                            className={classes.typography}
+                        <Tooltip
+                            title={roleInfo[role]} enterTouchDelay={150}
+                            arrow
+                            placement="top"
                         >
-                            {capitalize(role)}
-                        </Typography>
+                            <Typography
+                                key={"night-wait-" + role}
+                                color={color}
+                                className={classes.typography}
+                            >
+                                {`${capitalize(role)}${(count && `x${count}`)}`}
+                            </Typography>
+                        </Tooltip>
                     )
                 })}
             </Grid>
-            <Grid item xs={12}><Timer
+            <Grid item xs={12} className={classes.timerGrid}><Timer
                 start={waitTime}
                 preText={`Waiting for ${capitalize(currentRole)}: `}
                 timerKey={currentRole}
@@ -49,7 +63,7 @@ export default function NightWait({currentRole, roles, waitTime, playerRole}) {
 
 NightWait.propTypes = {
     currentRole: PropTypes.string.isRequired,
-    roles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    roleCount: PropTypes.object.isRequired,
     playerRole: PropTypes.string.isRequired,
     waitTime: PropTypes.oneOfType([
         PropTypes.string,

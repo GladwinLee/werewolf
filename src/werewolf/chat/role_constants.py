@@ -22,8 +22,10 @@ MIDDLE_3 = 'Middle 3'
 
 SEPARATOR = ";"
 
-action_order = [SENTINEL, SEER, ROBBER, WITCH, TROUBLEMAKER, REVEALER]
+action_order = [SENTINEL, WEREWOLF, SEER, ROBBER, WITCH, TROUBLEMAKER, REVEALER]
 special_roles_no_action = [TANNER, MASON, MINION, HUNTER, BODYGUARD, INSOMNIAC]
-all_special_roles = action_order + special_roles_no_action
 
-role_info_order = action_order + special_roles_no_action + [VILLAGER, WEREWOLF]
+role_info_order = action_order + special_roles_no_action + [VILLAGER]
+
+configurable_roles = action_order.copy() + special_roles_no_action
+configurable_roles.remove(WEREWOLF)

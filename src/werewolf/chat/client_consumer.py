@@ -104,11 +104,13 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                 }
             else:
                 self.role_manager.player_name = self.player_name
-                known_roles = self.role_manager.get_known_roles(data['roles'])
+                roles = data['roles']
+                known_roles = self.role_manager.get_known_roles(roles.copy())
                 msg = {
                     'page': page,
                     'known_roles': known_roles,
-                    'wait_time': data['wait_time']
+                    'wait_time': data['wait_time'],
+                    'role_count': self.role_manager.get_role_count(roles),
                 }
         elif page == "NightPage":
             msg = {
@@ -182,7 +184,6 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
             ))
             await self.send_json(msg)
             return
-
         if role_action == "sentinel":
             self.role_manager.sentinel_target = result
         elif (role_action == "revealer"
