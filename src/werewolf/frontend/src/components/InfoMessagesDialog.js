@@ -25,9 +25,11 @@ export default function InfoMessagesDialog({infoMessages, open, handleClose}) {
     return (
         <Dialog open={open} onClose={handleClose}
                 classes={{paper: classes.paper}}>
-            {infoMessages.map(message => (
-                <Typography>{message}</Typography>
-            ))}
+            {(infoMessages.length > 1) ?
+                infoMessages.map(message => (
+                    <Typography>{message}</Typography>
+                ))
+                : <Typography>No info messages</Typography>}
         </Dialog>
     )
 }

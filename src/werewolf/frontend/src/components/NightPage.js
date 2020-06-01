@@ -20,7 +20,6 @@ export default function NightPage({socket, serverMessage, roleCount, playerRole}
         }, [serverMessage]
     )
 
-    console.log(action);
     return (
         <>
             {(action === "wait") ?

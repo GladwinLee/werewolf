@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
@@ -19,9 +19,6 @@ const useStyles = makeStyles({
 })
 
 export default function NightWait({currentRole, roleCount, waitTime, playerRole}) {
-    useEffect(
-        () => {console.log("Regen")}
-        , [])
     const classes = useStyles();
     return (
         <PageGrid>
@@ -40,9 +37,9 @@ export default function NightWait({currentRole, roleCount, waitTime, playerRole}
                             title={roleInfo[role]} enterTouchDelay={150}
                             arrow
                             placement="top"
+                            key={"night-wait-" + role}
                         >
                             <Typography
-                                key={"night-wait-" + role}
                                 color={color}
                                 className={classes.typography}
                             >

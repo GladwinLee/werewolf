@@ -3,11 +3,10 @@ import ReactDOM from 'react-dom';
 import Game from './Game'
 import {SnackbarProvider} from "notistack";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
+import InfoMessage from "./InfoMessage";
 
 const roomName = JSON.parse(document.getElementById('room_name').textContent);
 
@@ -70,16 +69,12 @@ ReactDOM.render(
                     vertical: 'top',
                     horizontal: 'left',
                 }}
+                hideIconVariant
                 variant={"info"}
-                action={(key) => (
-                    <IconButton
-                        onClick={onCloseSnackbar(key)}
-                        aria-label="close"
-                        color="inherit"
-                    >
-                        <CloseIcon/>
-                    </IconButton>
-                )}>
+                content={(key, message) => (
+                    <InfoMessage id={key} message={message}/>
+                )}
+            >
                 <Game roomName={roomName} socket={socket}/>
             </SnackbarProvider>
         </ThemeProvider>
