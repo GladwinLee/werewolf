@@ -1,7 +1,6 @@
-import React, {useEffect, useReducer} from 'react';
+import React, {useContext, useEffect, useReducer} from 'react';
 import Container from "@material-ui/core/Container";
 import {NameSelectPage} from "./NameSelectPage";
-import PropTypes from 'prop-types';
 import LobbyPage from "./LobbyPage";
 import PreNightPage from "./PreNightPage";
 import Button from "@material-ui/core/Button";
@@ -11,6 +10,7 @@ import DayPage from "./DayPage";
 import Typography from "@material-ui/core/Typography";
 import EndPage from "./EndPage";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import WebSocketContext from "./WebSocketContext";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -29,7 +29,6 @@ const initialState = {
     players: [],
     page: "NameSelectPage",
     master: false,
-    serverMessage: {},
     settingsMap: {},
     blockJoin: false,
     knownRoles: {},
@@ -53,7 +52,8 @@ function reducer(state, {type, value}) {
 
 export default function Game(props) {
     const classes = useStyles(props);
-    const socket = props.socket;
+    const {socket, serverMessage} = useContext(WebSocketContext);
+
     const [state, dispatch] = useReducer(reducer, initialState);
     const {enqueueSnackbar, closeSnackbar} = useSnackbar();
     const {
@@ -61,7 +61,6 @@ export default function Game(props) {
         players,
         page,
         master,
-        serverMessage,
         settingsMap,
         blockJoin,
         knownRoles,
@@ -75,17 +74,6 @@ export default function Game(props) {
 
     useEffect(
         () => {
-            socket.onclose = () => console.error('socket closed unexpectedly');
-            socket.onmessage = (e) =>
-                setState('serverMessage', JSON.parse(e.data));
-        },
-        []
-    )
-
-    useEffect(
-        () => {
-            console.log("received message")
-            console.log(serverMessage)
             if (serverMessage['type'] === 'worker.reset') {
                 closeSnackbar();
                 setState('reset');
@@ -107,7 +95,9 @@ export default function Game(props) {
             if (!infoMessage) return;
             infoMessages.push(infoMessage)
             setIfNotUndefined("infoMessages", infoMessages);
-            enqueueSnackbar(<InfoMessage message={infoMessage}/>);
+            console.log("New info message")
+            console.log(infoMessages)
+            enqueueSnackbar(infoMessage);
         },
         [serverMessage]
     )
@@ -119,12 +109,10 @@ export default function Game(props) {
                     onSubmit={(name) => setState("playerName", name)}
                     onChange={(name) => setState("playerName", name)}
                     playerList={players}
-                    socket={socket}
                     blockJoin={blockJoin}
                 />
             case "LobbyPage":
                 return <LobbyPage
-                    serverMessage={serverMessage}
                     players={players}
                     settingsMap={settingsMap}
                     master={master}
@@ -132,28 +120,21 @@ export default function Game(props) {
                 />
             case "PreNightPage":
                 return <PreNightPage
-                    serverMessage={serverMessage}
                     playerName={playerName}
                     knownRoles={knownRoles}
                 />
             case "NightPage":
                 return <NightPage
-                    socket={socket}
-                    serverMessage={serverMessage}
                     playerRole={knownRoles[playerName]}
                     roleCount={roleCount}
                 />
             case "DayPage":
                 return <DayPage
-                    socket={socket}
-                    serverMessage={serverMessage}
                     infoMessages={infoMessages}
                     roleCount={roleCount}
                 />
             case "EndPage":
                 return <EndPage
-                    socket={socket}
-                    serverMessage={serverMessage}
                     master={master}
                 />
         }
@@ -181,7 +162,6 @@ export default function Game(props) {
 }
 
 Game.propTypes = {
-    socket: PropTypes.object.isRequired,
 }
 
 function InfoMessage({message}) {

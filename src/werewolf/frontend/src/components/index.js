@@ -7,6 +7,7 @@ import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
 import InfoMessage from "./InfoMessage";
+import WebSocketProvider from "./WebSocketProvider";
 
 const roomName = JSON.parse(document.getElementById('room_name').textContent);
 
@@ -54,29 +55,29 @@ theme = {
 };
 
 theme = responsiveFontSizes(theme);
-
 const notistackRef = React.createRef();
-const onCloseSnackbar = key => () => notistackRef.current.closeSnackbar(key);
 
 ReactDOM.render(
     <React.StrictMode>
         <CssBaseline/>
         <ThemeProvider theme={theme}>
-            <SnackbarProvider
-                dense
-                ref={notistackRef}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-                hideIconVariant
-                variant={"info"}
-                content={(key, message) => (
-                    <InfoMessage id={key} message={message}/>
-                )}
-            >
-                <Game roomName={roomName} socket={socket}/>
-            </SnackbarProvider>
+            <WebSocketProvider socket={socket}>
+                <SnackbarProvider
+                    dense
+                    ref={notistackRef}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    hideIconVariant
+                    variant={"info"}
+                    content={(key, message) => (
+                        <InfoMessage id={key} message={message}/>
+                    )}
+                >
+                    <Game roomName={roomName}/>
+                </SnackbarProvider>
+            </WebSocketProvider>
         </ThemeProvider>
     </React.StrictMode>
     ,

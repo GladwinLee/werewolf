@@ -1,6 +1,6 @@
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {useCookies} from "react-cookie";
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
@@ -9,6 +9,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import PageGrid from "./PageGrid";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
+import WebSocketContext from "./WebSocketContext";
 
 const ERR_MSG_NAME_EMPTY = "Cannot be empty";
 const ERR_MSG_NAME_TAKEN = "Name already taken";
@@ -23,7 +24,8 @@ const useStyles = makeStyles({
     }
 })
 
-export function NameSelectPage({playerList, socket, onChange, onSubmit, blockJoin}) {
+export function NameSelectPage({playerList, onChange, onSubmit, blockJoin}) {
+    const {socket} = useContext(WebSocketContext)
     const classes = useStyles();
 
     const [cookies, setCookie] = useCookies(['playerName'])
@@ -108,6 +110,5 @@ NameSelectPage.propTypes = {
     playerList: PropTypes.arrayOf(PropTypes.string),
     onSubmit: PropTypes.func,
     onChange: PropTypes.func,
-    socket: PropTypes.object,
     blockJoin: PropTypes.bool
 }

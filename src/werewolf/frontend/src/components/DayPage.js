@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import RadioChoice from "./RadioChoice";
 import Timer from "./Timer";
@@ -12,6 +12,7 @@ import Grid from "@material-ui/core/Grid";
 import PageGrid from "./PageGrid";
 import {makeStyles} from "@material-ui/core/styles";
 import InfoMessagesDialog from "./InfoMessagesDialog";
+import WebSocketContext from "./WebSocketContext";
 
 const useStyles = makeStyles(theme => ({
     choiceGrid: {
@@ -19,8 +20,9 @@ const useStyles = makeStyles(theme => ({
         padding: [["0px", theme.spacing(2)]],
     },
 }));
-export default function DayPage({socket, serverMessage, roleCount, infoMessages, ...props}) {
+export default function DayPage({roleCount, infoMessages, ...props}) {
     const classes = useStyles(props);
+    const {socket, serverMessage} = useContext(WebSocketContext)
 
     const [initialMessage, setInitialMessage] = useState(serverMessage);
     let {
@@ -109,14 +111,11 @@ export default function DayPage({socket, serverMessage, roleCount, infoMessages,
 }
 
 DayPage.propTypes = {
-    socket: PropTypes.object,
-    serverMessage: PropTypes.object,
     roleCount: PropTypes.object,
     infoMessages: PropTypes.arrayOf(PropTypes.string),
 }
 
 DayPage.defaultProps = {
-    serverMessage: {},
 }
 
 function getSpecialLabels(playerLabels) {

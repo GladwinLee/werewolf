@@ -25,8 +25,6 @@ export default function LobbyPage(props) {
             </Grid>
             {(props.master) ?
                 <LobbyMaster
-                    socket={props.socket}
-                    serverMessage={props.serverMessage}
                     numPlayers={props.players.length}
                 />
                 : <Grid item xs={12}>
@@ -42,12 +40,9 @@ export default function LobbyPage(props) {
 LobbyPage.propTypes = {
     settingsMap: PropTypes.object.isRequired,
     players: PropTypes.arrayOf(PropTypes.string).isRequired,
-    socket: PropTypes.object.isRequired,
     master: PropTypes.bool,
-    serverMessage: PropTypes.object,
 }
 
 LobbyPage.defaultProps = {
     master: false,
-    serverMessage: {},
 }

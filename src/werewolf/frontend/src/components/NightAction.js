@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Timer from "./Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import PageGrid from "./PageGrid";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import WebSocketContext from "./WebSocketContext";
 
 const useStyles = makeStyles(theme => ({
     choiceGrid: {
@@ -16,7 +17,9 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function NightAction({action, waitTime: propsWaitTime, serverMessage, socket, ...props}) {
+export default function NightAction({action, waitTime: propsWaitTime, ...props}) {
+    const {socket, serverMessage} = useContext(WebSocketContext)
+
     const classes = useStyles(props);
     let {
         choices,

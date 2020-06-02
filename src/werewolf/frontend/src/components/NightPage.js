@@ -1,9 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import NightWait from "./NightWait";
 import NightAction from "./NightAction";
+import WebSocketContext from "./WebSocketContext";
 
-export default function NightPage({socket, serverMessage, roleCount, playerRole}) {
+export default function NightPage({roleCount, playerRole}) {
+    const {serverMessage} = useContext(WebSocketContext)
+
     const [action, setAction] = useState(serverMessage['action']);
     const [waitingOn, setWaitingOn] = useState(serverMessage['waiting_on']);
     const [waitTime, setWaitTime] = useState(serverMessage['wait_time']);
@@ -32,21 +35,16 @@ export default function NightPage({socket, serverMessage, roleCount, playerRole}
                 : <NightAction
                     action={action}
                     waitTime={waitTime}
-                    serverMessage={serverMessage}
-                    socket={socket}
                 />}
         </>
     )
 }
 
 NightPage.propTypes = {
-    socket: PropTypes.object,
-    serverMessage: PropTypes.object,
     roleCount: PropTypes.object,
     playerRole: PropTypes.string,
 }
 
 NightPage.defaultProps = {
     players: [],
-    serverMessage: {},
 }

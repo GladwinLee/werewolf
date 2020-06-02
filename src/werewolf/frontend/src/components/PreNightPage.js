@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
 import {roleInfo} from "./roleConstants";
@@ -7,8 +7,10 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import PageGrid from "./PageGrid";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
+import WebSocketContext from "./WebSocketContext";
 
-export default function PreNightPage({serverMessage, playerName, knownRoles}) {
+export default function PreNightPage({playerName, knownRoles}) {
+    const {serverMessage} = useContext(WebSocketContext)
     const {wait_time: newWaitTime,} = serverMessage;
     const newPlayerRole = knownRoles[playerName];
     let propTeamMates = [];

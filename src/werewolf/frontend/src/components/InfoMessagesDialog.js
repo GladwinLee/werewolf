@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme) => ({
     },
     paper: {
         overflow: "hidden",
+        padding: theme.spacing(3)
     },
     dialogGrid: {
         height: "100%",
@@ -25,9 +26,10 @@ export default function InfoMessagesDialog({infoMessages, open, handleClose}) {
     return (
         <Dialog open={open} onClose={handleClose}
                 classes={{paper: classes.paper}}>
-            {(infoMessages.length > 1) ?
+            {(infoMessages.length > 0) ?
                 infoMessages.map(message => (
-                    <Typography>{message}</Typography>
+                    <Typography
+                        key={`info-message-dialog-${message}`}>{message}</Typography>
                 ))
                 : <Typography>No info messages</Typography>}
         </Dialog>

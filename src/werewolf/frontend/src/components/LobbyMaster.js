@@ -1,11 +1,14 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import SettingsDialog from "./SettingsDialog";
+import WebSocketContext from "./WebSocketContext";
 
 export default function LobbyMaster(props) {
-    const configurableRoles = props.serverMessage['configurable_roles']
+    const {socket, serverMessage} = useContext(WebSocketContext)
+
+    const configurableRoles = serverMessage['configurable_roles']
     const [openSettings, setOpenSettings] = useState(false);
     const error = props.numPlayers < 3;
 
@@ -13,14 +16,14 @@ export default function LobbyMaster(props) {
         if (error) {
             return;
         }
-        props.socket.send(JSON.stringify({
+        socket.send(JSON.stringify({
             'type': "start",
         }));
     }
 
     const clickSettings = () => setOpenSettings(true);
     const onCloseSettings = (settings) => {
-        props.socket.send(JSON.stringify({
+        socket.send(JSON.stringify({
             'type': "configure_settings",
             'settings': settings,
         }));
@@ -51,9 +54,7 @@ export default function LobbyMaster(props) {
 }
 
 LobbyMaster.propTypes = {
-    socket: PropTypes.object.isRequired,
     numPlayers: PropTypes.number,
-    serverMessage: PropTypes.object
 }
 
 LobbyMaster.defaultProps = {}
