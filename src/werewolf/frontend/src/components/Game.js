@@ -34,6 +34,7 @@ const initialState = {
     knownRoles: {},
     infoMessages: [],
     roleCount: {},
+    totalWaitTime: 0,
 }
 
 function reducer(state, {type, value}) {
@@ -66,6 +67,7 @@ export default function Game(props) {
         knownRoles,
         infoMessages,
         roleCount,
+        totalWaitTime,
     } = state;
     const setState = (type, value) => dispatch({type, value});
     const setIfNotUndefined = (field, value) => {
@@ -85,6 +87,8 @@ export default function Game(props) {
             setIfNotUndefined("blockJoin", serverMessage['block_join']);
             setIfNotUndefined("knownRoles", serverMessage['known_roles']);
             setIfNotUndefined("roleCount", serverMessage['role_count']);
+            setIfNotUndefined("totalWaitTime",
+                serverMessage['total_wait_time']);
         },
         [serverMessage]
     )
@@ -127,6 +131,7 @@ export default function Game(props) {
                 return <NightPage
                     playerRole={knownRoles[playerName]}
                     roleCount={roleCount}
+                    totalWaitTime={totalWaitTime}
                 />
             case "DayPage":
                 return <DayPage

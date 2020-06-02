@@ -5,7 +5,6 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import CheckboxListSubmit from "./CheckboxListSubmit";
 import RadioChoice from "./RadioChoice";
 import PropTypes from "prop-types";
-import PageGrid from "./PageGrid";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import WebSocketContext from "./WebSocketContext";
@@ -93,7 +92,7 @@ export default function NightAction({action, waitTime: propsWaitTime, ...props})
         else onSubmit();
     }
 
-    return <PageGrid>
+    return <>
         <Grid item xs={12}>
             <ActionLabel action={action} helpText={helpText}/>
         </Grid>
@@ -107,7 +106,7 @@ export default function NightAction({action, waitTime: propsWaitTime, ...props})
                 callback={onAutoSubmit}
             />
         </Grid>
-    </PageGrid>
+    </>
 }
 
 NightAction.propTypes = {

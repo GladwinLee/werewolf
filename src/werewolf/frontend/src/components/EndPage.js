@@ -8,8 +8,15 @@ import EndRolesInfo from "./EndRolesInfo";
 import PageGrid from "./PageGrid";
 import Grid from "@material-ui/core/Grid";
 import WebSocketContext from "./WebSocketContext";
+import makeStyles from "@material-ui/core/styles/makeStyles";
 
-export default function EndPage({master}) {
+const useStyles = makeStyles(theme => ({
+    actionLog: {
+        marginTop: theme.spacing(3),
+    },
+}));
+export default function EndPage({master, ...props}) {
+    const classes = useStyles(props);
     const {socket, serverMessage} = useContext(WebSocketContext)
 
     const [initialMessage, setInitialMessage] = useState(serverMessage);
@@ -36,7 +43,8 @@ export default function EndPage({master}) {
                     <EndRolesInfo playersToRoles={roles} winners={winners}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <ActionLog actionLog={actionLog}/>
+                    <ActionLog actionLog={actionLog}
+                               className={classes.actionLog}/>
                 </Grid>
             </Grid>
             {master && <Grid container item xs={12} justify="center">

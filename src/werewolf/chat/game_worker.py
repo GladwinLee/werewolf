@@ -6,6 +6,7 @@ from threading import Timer
 from channels.consumer import AsyncConsumer
 
 from .game import Game
+from .role_manager import action_order
 
 NAME_FIELD = '_name'
 ROOM_GROUP_NAME_FIELD = '_room_group_name'
@@ -149,7 +150,8 @@ class GameWorker(AsyncConsumer):
                     'type': 'worker.page_change',
                     'page': "PreNightPage",
                     'roles': self.game.get_full_roles_map(),
-                    'wait_time': self.get_wait_time("pre_night")
+                    'wait_time': self.get_wait_time("pre_night"),
+                    'total_wait_time': self.get_total_wait_time(),
                 })
         else:
             await self.group_send(room_group_name, {
@@ -246,6 +248,12 @@ class GameWorker(AsyncConsumer):
         if action in self.wait_times:
             return self.wait_times[action]
         return self.wait_times["role"]
+
+    def get_total_wait_time(self):
+        roles = self.game.get_full_roles_map()
+        current_action_roles = [role for role in roles.values() if
+                                role in action_order]
+        return len(current_action_roles) * self.wait_times["role"]
 
     async def reset(self, data):
         logger.info("%s reset the game" % data[NAME_FIELD])

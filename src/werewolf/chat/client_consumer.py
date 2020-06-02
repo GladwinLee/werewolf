@@ -110,6 +110,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                     'page': page,
                     'known_roles': known_roles,
                     'wait_time': data['wait_time'],
+                    'total_wait_time': data['total_wait_time'],
                     'role_count': self.role_manager.get_role_count(roles),
                 }
         elif page == "NightPage":
@@ -219,6 +220,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         await super().send_json(msg, close)
 
     async def dispatch(self, message):
+        logger.debug(f"Received message {message['type']}")
         if self.block_join and message['type'] != 'worker.reset':
             return
         await super().dispatch(message)

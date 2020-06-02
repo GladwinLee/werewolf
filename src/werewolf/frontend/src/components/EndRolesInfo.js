@@ -3,23 +3,35 @@ import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
 import PropTypes from "prop-types";
 import {teamRoles} from "./roleConstants";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import clsx from "clsx";
 
 const middle = ["Middle 1", "Middle 2", "Middle 3"];
 
+const useStyles = makeStyles(theme => ({
+    bold: {
+        fontWeight: "bold",
+    },
+    winner: {
+        marginBottom: theme.spacing(3)
+    },
+}))
+
 export default function EndRolesInfo(props) {
-    const [initialData, setInitialData] = useState(props);
+    const classes = useStyles(props);
+    const [initialData] = useState(props);
     const {
         playersToRoles,
         winners,
     } = initialData;
 
-    const [middleRoles, setMiddleRoles] = useState(
+    const [middleRoles] = useState(
         middle.map(m => (
             capitalize(playersToRoles[m]))));
 
     const rolesToPlayers = {}
     Object.entries(playersToRoles).filter(
-        ([name, role]) => !middle.includes(name)).map(
+        ([name]) => !middle.includes(name)).map(
         ([playerName, role]) => {
             rolesToPlayers[role] = rolesToPlayers[role] || [];
             rolesToPlayers[role].push(playerName);
@@ -34,14 +46,17 @@ export default function EndRolesInfo(props) {
         }, [[], []])
 
     return (
-        <div>
-            <Typography variant="h3">Winners</Typography>
+        <>
+            <Typography variant="h4" className={clsx(classes.bold,
+                classes.winner)}>Winners</Typography>
             <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={winningRoles}/>
-            <Typography variant="h3">Losers</Typography>
+            <Typography variant="h4"
+                        className={classes.bold}>Losers</Typography>
             <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={losingRoles}/>
-            <Typography variant="h4">Middle Roles</Typography>
+            <Typography variant="h5" className={classes.bold}>Middle
+                Roles</Typography>
             <Typography>{middleRoles.join(", ")}</Typography>
-        </div>
+        </>
     );
 }
 
@@ -52,7 +67,7 @@ EndRolesInfo.propTypes = {
 
 function RoleToPlayer({rolesToPlayers, roles}) {
     const rtp = Object.entries(rolesToPlayers).filter(
-        ([role, name]) => roles.includes(role));
+        ([role]) => roles.includes(role));
     if (rtp.length === 0) return <Typography variant="h5">None</Typography>
     return rtp.map(([role, names]) => (
         <Typography key={"rtp-" + role}>
