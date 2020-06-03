@@ -152,6 +152,7 @@ class GameWorker(AsyncConsumer):
                 'action': next_action,
                 'wait_time': self.get_wait_time(next_action),
                 'roles': self.game.get_full_roles_map(),  # for insomniac
+                'players_not_voted': self.game.player_names,  # for insomniac
             })
             return
 

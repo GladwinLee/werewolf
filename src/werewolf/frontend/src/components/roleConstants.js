@@ -53,7 +53,7 @@ export const roleInfo = {
         team: "village",
     },
     insomniac: {
-        help: "See if own role changed when Day begins",
+        help: "See if own role changed when day begins",
         team: "village",
     }
 }
@@ -70,6 +70,6 @@ Object.entries(roleInfo).map(([role, {team}]) => {
 
 export const teamColor = {
     tanner: "#8d6d03",
-    werewolf: "#610000",
+    werewolf: "#760101",
     village: "#033c79",
 }

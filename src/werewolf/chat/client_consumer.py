@@ -134,7 +134,8 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
         elif page == "DayPage":
             msg = {
                 'page': page,
-                'wait_time': data['wait_time']
+                'wait_time': data['wait_time'],
+                'players_not_voted': data['players_not_voted'],
             }
             msg.update(self.get_action_msg(data['action']))
             msg.update(self.role_manager.get_day_role_info(data))

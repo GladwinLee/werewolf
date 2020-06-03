@@ -13,6 +13,8 @@ import PageGrid from "../PageGrid";
 import {makeStyles} from "@material-ui/core/styles";
 import InfoMessagesDialog from "./InfoMessagesDialog";
 import WebSocketContext from "../WebSocketContext";
+import CheckBoxOutlineBlankOutlinedIcon from '@material-ui/icons/CheckBoxOutlineBlankOutlined';
+import CheckBoxOutlinedIcon from '@material-ui/icons/CheckBoxOutlined';
 
 const useStyles = makeStyles(theme => ({
     choiceGrid: {
@@ -37,6 +39,15 @@ export default function DayPage({roleCount, infoMessages, ...props}) {
     const [showRoleInfoDialog, setShowRoleInfoDialog] = useState(false);
     const [showInfoMessagesDialog, setShowInfoMessagesDialog] = useState(false);
     const [disableChoices, setDisableChoices] = useState(false);
+
+    const newPlayersNotVoted = serverMessage['players_not_voted']
+    const [playersNotVoted, setPlayersNotVoted] = useState(newPlayersNotVoted);
+    useEffect(
+        () => {
+            if (newPlayersNotVoted != null) setPlayersNotVoted(newPlayersNotVoted);
+        },
+        [newPlayersNotVoted]
+    )
 
     useEffect(() => {
         if (defaultChoice) setSelectedChoice(defaultChoice);
@@ -82,6 +93,11 @@ export default function DayPage({roleCount, infoMessages, ...props}) {
                     </Button>
                 </Grid>
             </Grid>
+            <Grid item xs={12}>
+                <Typography>
+                    You cannot change your vote after you submit!
+                </Typography>
+            </Grid>
             <Grid item xs={12} className={classes.choiceGrid}>
                 <RadioChoice
                     choices={choices}
@@ -90,7 +106,12 @@ export default function DayPage({roleCount, infoMessages, ...props}) {
                     default={defaultChoice}
                     disabledChoices={disabledChoices}
                     disableAll={disableChoices}
-                    specialChoiceLabels={getSpecialLabels(playerLabels)}
+                    specialChoiceLabels={getSpecialLabels(
+                        choices,
+                        playerLabels,
+                        playersNotVoted,
+                        disableChoices,
+                    )}
                 />
             </Grid>
             <Grid item xs={12}>
@@ -115,36 +136,40 @@ DayPage.propTypes = {
     infoMessages: PropTypes.arrayOf(PropTypes.string),
 }
 
-DayPage.defaultProps = {
-}
+DayPage.defaultProps = {}
 
-function getSpecialLabels(playerLabels) {
-    if (playerLabels == null) return;
+function getSpecialLabels(players, playerLabels, playersNotVoted, showVoted) {
     const specialLabels = {}
-    Object.entries(playerLabels).forEach(
-        ([playerName, label]) => {
-            if (label === "shielded") {
-                specialLabels[playerName] =
-                    <ShieldedLabel playerName={playerName}/>
-            } else {
-                specialLabels[playerName] =
-                    <span>{`${playerName} (${capitalize(label)})`}</span>
-            }
-        }
-    )
+    players.forEach(playerName => {
+        const label = playerLabels && playerLabels[playerName];
+        specialLabels[playerName] =
+            <Grid container justify="space-between" alignItems="center">
+                {showVoted &&
+                <Grid item xs={1}>{/*empty*/}</Grid>
+                }
+                <Grid container item xs={showVoted ? 10 : 12} justify={"center"} alignItems={"center"}>
+                    <Grid item>
+                        {playerName + ((label != null && label !== "shielded") ? ` (${capitalize(label)})` : "")}
+                    </Grid>
+                    {(label === "shielded") &&
+                    <Grid item>
+                        <Tooltip title={"Shielded by the Sentinel"} arrow>
+                            <SecurityIcon/>
+                        </Tooltip>
+                    </Grid>
+                    }
+                </Grid>
+                {showVoted &&
+                <Grid item xs={1}>
+                    <Tooltip title={"Voted"} arrow>
+                        {(playersNotVoted.includes(playerName)) ?
+                            <CheckBoxOutlineBlankOutlinedIcon fontSize={"large"}/> :
+                            <CheckBoxOutlinedIcon fontSize={"large"}/>
+                        }
+                    </Tooltip>
+                </Grid>
+                }
+            </Grid>
+    })
     return specialLabels;
-}
-
-function ShieldedLabel({playerName}) {
-    return <Grid container justify="center" alignItems="center">
-        <Grid item>
-            {playerName}
-        </Grid>
-        <Grid item>
-            <Tooltip title={"Shielded by the Sentinel"} arrow>
-                <SecurityIcon/>
-            </Tooltip>
-        </Grid>
-    </Grid>
-
 }

@@ -19,7 +19,6 @@ export default function RoleHelp({role}) {
                 {`${capitalize(team)} team`}
             </Typography>
             <Typography
-                variant={"subtitle2"}
                 style={{whiteSpace: "pre-line"}}
             >
                 {help}

@@ -38,7 +38,7 @@ export default function PreNightPage({playerName, knownRoles}) {
                 <Divider/>
                 {teamMates.map(([name, role]) => (
                     <Typography variant="h4" key={`ally-${name}`}>
-                        {`${name} the ${role}`}
+                        {`${name} the ${capitalize(role)}`}
                     </Typography>)
                 )}
             </Grid>

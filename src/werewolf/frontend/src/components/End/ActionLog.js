@@ -34,8 +34,9 @@ export default function ActionLog(props) {
 
     return (
         <>
-            <Typography align={"center"} className={classes.title}>Action
-                Log</Typography>
+            <Typography align={"center"} variant={"h3"}>
+                Action Log
+            </Typography>
             <Table size={"small"} className={classes.table}>
                 <TableBody>
                     {display}
