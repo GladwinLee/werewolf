@@ -5,8 +5,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
 import Grid from "@material-ui/core/Grid";
-import Tooltip from "@material-ui/core/Tooltip";
-import {roleInfo} from "./roleConstants";
+import RoleTooltip from "../RoleTooltip";
 
 const useStyles = makeStyles((theme) => ({
     dialog: {
@@ -34,14 +33,12 @@ export default function RoleInfoDialog({roleCount: propRoleCount, open, handleCl
             <Grid container spacing={3} className={classes.dialogGrid}>
                 {Object.entries(roleCount).map(([role, count]) => (
                     <Grid item xs={12} key={"role-info-" + role}>
-                        <Tooltip title={roleInfo[role]} enterTouchDelay={150}
-                                 arrow
-                                 placement="top">
+                        <RoleTooltip role={role}>
                             <Typography>
                                 {`${capitalize(role)} ${(count) ? `x${count}`
                                     : ""}`}
                             </Typography>
-                        </Tooltip>
+                        </RoleTooltip>
                     </Grid>
                 ))}
             </Grid>

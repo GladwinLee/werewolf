@@ -35,7 +35,7 @@ theme = {
                 color: 'rgba(0,0,0,0.87)',
                 boxShadow: theme.shadows[1],
                 fontSize: "1.3rem",
-            }
+            },
         },
         MuiGrid: {
             item: {

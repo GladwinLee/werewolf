@@ -1,4 +1,5 @@
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
@@ -27,6 +28,17 @@ ch.setFormatter(formatter)
 
 logger.addHandler(fh)
 logger.addHandler(ch)
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    logger.error("Uncaught exception",
+                 exc_info=(exc_type, exc_value, exc_traceback))
+
+
+sys.excepthook = handle_exception
 
 
 class ClientConsumer(AsyncJsonWebsocketConsumer):
@@ -110,7 +122,7 @@ class ClientConsumer(AsyncJsonWebsocketConsumer):
                     'page': page,
                     'known_roles': known_roles,
                     'wait_time': data['wait_time'],
-                    'total_wait_time': data['total_wait_time'],
+                    'final_night_role': data['final_night_role'],
                     'role_count': self.role_manager.get_role_count(roles),
                 }
         elif page == "NightPage":

@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
-import Timer from "./Timer";
+import Timer from "../Timer";
 import Grid from "@material-ui/core/Grid";
 import {makeStyles} from "@material-ui/core/styles";
-import Tooltip from "@material-ui/core/Tooltip";
-import {roleInfo} from "./roleConstants";
+import RoleTooltip from "../RoleTooltip";
 
 const useStyles = makeStyles({
     typography: {
@@ -27,10 +26,8 @@ export default function NightWait({currentRole, roleCount, waitTime, playerRole}
                     if (role === currentRole) color = "textPrimary";
                     if (role === playerRole) color = "primary";
                     return (
-                        <Tooltip
-                            title={roleInfo[role]} enterTouchDelay={150}
-                            arrow
-                            placement="top"
+                        <RoleTooltip
+                            role={role}
                             key={"night-wait-" + role}
                         >
                             <Typography
@@ -39,7 +36,7 @@ export default function NightWait({currentRole, roleCount, waitTime, playerRole}
                             >
                                 {`${capitalize(role)}${(count && `x${count}`)}`}
                             </Typography>
-                        </Tooltip>
+                        </RoleTooltip>
                     )
                 })}
             </Grid>

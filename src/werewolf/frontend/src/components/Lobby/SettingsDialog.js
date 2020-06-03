@@ -25,8 +25,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const defaultPreNightWait = 10
-const defaultRoleWait = 7;
+const defaultPreNightWait = 15;
+const defaultRoleWait = 10;
 const defaultVoteWait = 5;
 const defaultNumWerewolves = 2;
 

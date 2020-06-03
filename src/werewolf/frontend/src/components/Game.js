@@ -1,14 +1,14 @@
 import React, {useContext, useEffect, useReducer} from 'react';
 import Container from "@material-ui/core/Container";
 import {NameSelectPage} from "./NameSelectPage";
-import LobbyPage from "./LobbyPage";
+import LobbyPage from "./Lobby/LobbyPage";
 import PreNightPage from "./PreNightPage";
 import Button from "@material-ui/core/Button";
-import NightPage from "./NightPage";
+import NightPage from "./Night/NightPage";
 import {useSnackbar} from "notistack";
-import DayPage from "./DayPage";
+import DayPage from "./Day/DayPage";
 import Typography from "@material-ui/core/Typography";
-import EndPage from "./EndPage";
+import EndPage from "./End/EndPage";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import WebSocketContext from "./WebSocketContext";
 
@@ -34,7 +34,8 @@ const initialState = {
     knownRoles: {},
     infoMessages: [],
     roleCount: {},
-    totalWaitTime: 0,
+    finalNightRole: "",
+    containerStyle: {},
 }
 
 function reducer(state, {type, value}) {
@@ -67,7 +68,8 @@ export default function Game(props) {
         knownRoles,
         infoMessages,
         roleCount,
-        totalWaitTime,
+        finalNightRole,
+        containerStyle,
     } = state;
     const setState = (type, value) => dispatch({type, value});
     const setIfNotUndefined = (field, value) => {
@@ -87,8 +89,8 @@ export default function Game(props) {
             setIfNotUndefined("blockJoin", serverMessage['block_join']);
             setIfNotUndefined("knownRoles", serverMessage['known_roles']);
             setIfNotUndefined("roleCount", serverMessage['role_count']);
-            setIfNotUndefined("totalWaitTime",
-                serverMessage['total_wait_time']);
+            setIfNotUndefined("finalNightRole",
+                serverMessage['final_night_role']);
         },
         [serverMessage]
     )
@@ -131,7 +133,8 @@ export default function Game(props) {
                 return <NightPage
                     playerRole={knownRoles[playerName]}
                     roleCount={roleCount}
-                    totalWaitTime={totalWaitTime}
+                    finalNightRole={finalNightRole}
+                    changeContainerStyle={changeContainerStyle}
                 />
             case "DayPage":
                 return <DayPage
@@ -152,8 +155,13 @@ export default function Game(props) {
         }));
     }
 
+    const changeContainerStyle = (style) => {
+        setIfNotUndefined("containerStyle", style);
+    }
+
     if (serverMessage && serverMessage['type' === "worker.reset"]) return null;
-    return <Container maxWidth="xs" className={classes.container}>
+    return <Container maxWidth="xs" className={classes.container}
+                      style={containerStyle}>
         {getPageComponent(page)}
         {playerName === "KEN" &&
         <Button

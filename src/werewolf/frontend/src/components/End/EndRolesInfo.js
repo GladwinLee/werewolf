@@ -2,18 +2,14 @@ import React, {useState} from 'react';
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
 import PropTypes from "prop-types";
-import {teamRoles} from "./roleConstants";
+import {teamRoles} from "../roleConstants";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import clsx from "clsx";
 
 const middle = ["Middle 1", "Middle 2", "Middle 3"];
 
 const useStyles = makeStyles(theme => ({
     bold: {
         fontWeight: "bold",
-    },
-    winner: {
-        marginBottom: theme.spacing(3)
     },
 }))
 
@@ -47,8 +43,8 @@ export default function EndRolesInfo(props) {
 
     return (
         <>
-            <Typography variant="h4" className={clsx(classes.bold,
-                classes.winner)}>Winners</Typography>
+            <Typography variant="h4"
+                        className={classes.bold}>Winners</Typography>
             <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={winningRoles}/>
             <Typography variant="h4"
                         className={classes.bold}>Losers</Typography>

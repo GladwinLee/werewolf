@@ -182,7 +182,7 @@ class ConsumerRoleManager:
         elif role_action == WITCH_PART_TWO:
             middle_target, player_target, target_role = result
             if player_target == self.player_name:
-                message = f"You swap roles. You are now a {result.capitalize()}"
+                message = f"You swap roles. You are now a {target_role.capitalize()}"
             else:
                 message = f"Swapped roles for {middle_target} and {player_target}." \
                           f" {player_target} is now a {target_role.capitalize()}"

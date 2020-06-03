@@ -1,4 +1,5 @@
 import logging
+import sys
 from asyncio import run
 from logging.handlers import RotatingFileHandler
 from threading import Timer
@@ -33,6 +34,17 @@ ch.setFormatter(formatter)
 
 logger.addHandler(fh)
 logger.addHandler(ch)
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    logger.error("Uncaught exception",
+                 exc_info=(exc_type, exc_value, exc_traceback))
+
+
+sys.excepthook = handle_exception
 
 
 # This doesn't work with multiple rooms atm
@@ -151,7 +163,7 @@ class GameWorker(AsyncConsumer):
                     'page': "PreNightPage",
                     'roles': self.game.get_full_roles_map(),
                     'wait_time': self.get_wait_time("pre_night"),
-                    'total_wait_time': self.get_total_wait_time(),
+                    'final_night_role': self.get_final_night_role(),
                 })
         else:
             await self.group_send(room_group_name, {
@@ -254,6 +266,12 @@ class GameWorker(AsyncConsumer):
         current_action_roles = [role for role in roles.values() if
                                 role in action_order]
         return len(current_action_roles) * self.wait_times["role"]
+
+    def get_final_night_role(self):
+        active_roles = set(self.game.get_full_roles_map().values())
+        current_action_roles = [role for role in action_order if
+                                role in active_roles]
+        return current_action_roles[-1]
 
     async def reset(self, data):
         logger.info("%s reset the game" % data[NAME_FIELD])

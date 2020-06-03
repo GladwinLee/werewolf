@@ -1,13 +1,13 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
 import Typography from "@material-ui/core/Typography";
-import {roleInfo} from "./roleConstants";
 import Timer from "./Timer";
 import capitalize from "@material-ui/core/utils/capitalize";
 import PageGrid from "./PageGrid";
 import Grid from "@material-ui/core/Grid";
 import Divider from "@material-ui/core/Divider";
 import WebSocketContext from "./WebSocketContext";
+import RoleHelp from "./RoleHelp";
 
 export default function PreNightPage({playerName, knownRoles}) {
     const {serverMessage} = useContext(WebSocketContext)
@@ -54,9 +54,7 @@ export default function PreNightPage({playerName, knownRoles}) {
                     </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                    <Typography style={{whiteSpace: 'pre-line'}}>
-                        {roleInfo[role]}
-                    </Typography>
+                    <RoleHelp role={role}/>
                 </Grid>
                 <Grid item xs={12}>
                     {getTeamMateDisplay()}

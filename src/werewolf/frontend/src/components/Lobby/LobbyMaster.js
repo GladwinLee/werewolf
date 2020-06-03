@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import SettingsDialog from "./SettingsDialog";
-import WebSocketContext from "./WebSocketContext";
+import WebSocketContext from "../WebSocketContext";
 
 export default function LobbyMaster(props) {
     const {socket, serverMessage} = useContext(WebSocketContext)

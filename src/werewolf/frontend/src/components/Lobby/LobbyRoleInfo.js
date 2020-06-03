@@ -3,17 +3,15 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import Grid from "@material-ui/core/Grid";
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
-import {roleInfo} from "./roleConstants";
-import Tooltip from "@material-ui/core/Tooltip";
+import RoleTooltip from "../RoleTooltip";
 
 function Role({role}) {
     return <Grid item xs={6}>
-        <Tooltip title={roleInfo[role]} enterTouchDelay={150} arrow
-                 placement="top">
+        <RoleTooltip role={role}>
             <Typography align="center">
                 {capitalize(role)}
             </Typography>
-        </Tooltip>
+        </RoleTooltip>
     </Grid>
 }
 

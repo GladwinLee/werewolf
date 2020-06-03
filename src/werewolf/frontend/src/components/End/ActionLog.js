@@ -10,6 +10,9 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 const useStyles = makeStyles(theme => ({
         table: {
             padding: theme.spacing(3),
+        },
+        title: {
+            fontWeight: "bold",
         }
     }
 ));
@@ -31,7 +34,8 @@ export default function ActionLog(props) {
 
     return (
         <>
-            <Typography align={"center"}>Action Log</Typography>
+            <Typography align={"center"} className={classes.title}>Action
+                Log</Typography>
             <Table size={"small"} className={classes.table}>
                 <TableBody>
                     {display}

@@ -1,13 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
-import Timer from "./Timer";
+import Timer from "../Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
-import CheckboxListSubmit from "./CheckboxListSubmit";
-import RadioChoice from "./RadioChoice";
+import CheckboxListSubmit from "../CheckboxListSubmit";
+import RadioChoice from "../RadioChoice";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import WebSocketContext from "./WebSocketContext";
+import WebSocketContext from "../WebSocketContext";
 
 const useStyles = makeStyles(theme => ({
     choiceGrid: {

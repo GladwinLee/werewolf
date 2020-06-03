@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import RadioChoice from "./RadioChoice";
-import Timer from "./Timer";
+import RadioChoice from "../RadioChoice";
+import Timer from "../Timer";
 import Typography from "@material-ui/core/Typography";
 import capitalize from "@material-ui/core/utils/capitalize";
 import Button from "@material-ui/core/Button";
@@ -9,10 +9,10 @@ import RoleInfoDialog from "./RoleInfoDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import SecurityIcon from "@material-ui/icons/Security";
 import Grid from "@material-ui/core/Grid";
-import PageGrid from "./PageGrid";
+import PageGrid from "../PageGrid";
 import {makeStyles} from "@material-ui/core/styles";
 import InfoMessagesDialog from "./InfoMessagesDialog";
-import WebSocketContext from "./WebSocketContext";
+import WebSocketContext from "../WebSocketContext";
 
 const useStyles = makeStyles(theme => ({
     choiceGrid: {

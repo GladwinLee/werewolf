@@ -5,15 +5,21 @@ import capitalize from "@material-ui/core/utils/capitalize";
 import Button from "@material-ui/core/Button";
 import ActionLog from "./ActionLog";
 import EndRolesInfo from "./EndRolesInfo";
-import PageGrid from "./PageGrid";
+import PageGrid from "../PageGrid";
 import Grid from "@material-ui/core/Grid";
-import WebSocketContext from "./WebSocketContext";
+import WebSocketContext from "../WebSocketContext";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 
 const useStyles = makeStyles(theme => ({
     actionLog: {
         marginTop: theme.spacing(3),
     },
+    winner: {
+        marginBottom: theme.spacing(3),
+    },
+    button: {
+        padding: theme.spacing(3),
+    }
 }));
 export default function EndPage({master, ...props}) {
     const classes = useStyles(props);
@@ -32,7 +38,7 @@ export default function EndPage({master, ...props}) {
         <PageGrid spacing={3}>
             <Grid container item xs={12}>
                 <Grid item xs={12}>
-                    <Typography variant="h1">
+                    <Typography variant="h1" className={classes.winner}>
                         {`${winners
                         .map(winner => capitalize(winner))
                         .join(" and ")} Victory!`
@@ -43,12 +49,15 @@ export default function EndPage({master, ...props}) {
                     <EndRolesInfo playersToRoles={roles} winners={winners}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <ActionLog actionLog={actionLog}
-                               className={classes.actionLog}/>
+                    <ActionLog
+                        actionLog={actionLog}
+                        className={classes.actionLog}
+                    />
                 </Grid>
             </Grid>
             {master && <Grid container item xs={12} justify="center">
-                <Button onClick={resetSubmit}>Play Again</Button>
+                <Button onClick={resetSubmit} className={classes.button}>Play
+                    Again</Button>
             </Grid>}
         </PageGrid>
     )

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Radio from "@material-ui/core/Radio";
@@ -16,6 +16,9 @@ const useStyles = makeStyles({
 export default function RadioChoice(props) {
     const classes = useStyles();
     const [value, setValue] = useState(props.default);
+    useEffect(() => {
+        if (props.default) setValue(props.default);
+    }, [props.default])
 
     const GetLabel = ({p}) => {
         const specialLabel = props.specialChoiceLabels[p];

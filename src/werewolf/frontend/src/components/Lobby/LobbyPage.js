@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography";
 import PlayerList from "./PlayerList";
 import LobbyRoleInfo from "./LobbyRoleInfo";
 import LobbyMaster from "./LobbyMaster";
-import PageGrid from "./PageGrid";
+import PageGrid from "../PageGrid";
 
 export default function LobbyPage(props) {
     return (
