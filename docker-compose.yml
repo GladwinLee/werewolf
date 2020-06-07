@@ -10,11 +10,14 @@ services:
       - static:/code/static
   backend:
     build: ./src/werewolf
-    command: python src/werewolf/manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python src/werewolf/manage.py collectstatic --noinput &&
+             python src/werewolf/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
       - static:/code/src/werewolf/frontend/static
       - logs:/logs/
+      - /code/static
     ports:
       - "80:8000"
     depends_on:
@@ -22,7 +25,7 @@ services:
       - redis
   worker:
     build: ./src/werewolf
-    command: python src/werewolf/manage.py  runworker werewolf-channel
+    command: python src/werewolf/manage.py runworker werewolf-channel
     volumes:
       - .:/code
       - logs:/logs/

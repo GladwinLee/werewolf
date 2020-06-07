@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -114,9 +115,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+USE_S3 = os.getenv('USE_S3') == 'TRUE'
 
-REDIS_ADDRESS = os.environ.get('REDIS_ADDRESS')
+if USE_S3:
+    try:
+        DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+        STATICFILES_STORAGE = 'chat.ManifestS3Boto3Storage'
+        AWS_STORAGE_BUCKET_NAME = 'kentkhuang-werewolf-static'
+        AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+        AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.ca-central-1.amazonaws.com/'
+    except KeyError:
+        print("USE_S3 set but missing required environment variables", sys.exc_info()[1])
+        raise
+else:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = 'static/'
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
+REDIS_ADDRESS = os.getenv('REDIS_ADDRESS')
 if not REDIS_ADDRESS:
     REDIS_ADDRESS = 'redis'
 
