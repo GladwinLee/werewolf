@@ -63,8 +63,7 @@ class RoleManager:
         current_roles = set(self.full_roles_map.values())
         role_order = []
 
-        werewolf_players = list(self.get_players_to_roles().values()).count(
-            WEREWOLF)
+        werewolf_players = list(self.get_players_to_roles().values()).count(WEREWOLF)
 
         role_order += [role for role in action_order if role in current_roles]
         if WITCH in role_order:
@@ -279,22 +278,27 @@ class RoleManager:
         return special_choices
 
     def calculate_winners(self, dead_roles):
+        exists_player_werewolf = WEREWOLF in self.get_players_to_roles().values()
         if len(dead_roles) == 0:
-            if WEREWOLF in self.get_players_to_roles().values():
-                self.log_append(
-                    f"The Werewolves infiltrated the village")
+            if exists_player_werewolf:
+                self.log_append(f"The Werewolves infiltrated the village")
                 return ["werewolf"]
             else:
-                self.log_append(
-                    f"There were no Werewolves in the village. The village is safe")
+                self.log_append(f"There were no Werewolves in the village. The village is safe")
                 return ["village"]
 
         winners = []
         if WEREWOLF in dead_roles:
+            self.log_append(f"The Village successfully kill a Werewolf")
             winners.append("village")
         if TANNER in dead_roles:
+            self.log_append(f"The Tanner successfully gets themselves killed")
             winners.append("tanner")
         if len(winners) == 0:
+            if exists_player_werewolf:
+                self.log_append("The Werewolves survive")
+            else:
+                self.log_append("The Village failed to realize there were no Werewolves among them")
             winners.append("werewolf")
         return winners
 

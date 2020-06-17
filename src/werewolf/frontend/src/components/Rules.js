@@ -9,12 +9,12 @@ import {teamColor} from "./roleConstants";
 
 const useStyles = makeStyles(theme => ({
     button: {
-        position: "absolute",
+        position: "fixed",
         bottom: "3px",
         right: "3px",
     },
     paper: {
-        overflow: "hidden",
+        overflowX: "hidden",
         padding: theme.spacing(3)
     },
 }))
@@ -55,7 +55,8 @@ const rules = <>
     <p><span style={{color: teamColor["village"]}}>The Village</span> wins if a Werewolf is killed, or if there are no
         Werewolf players AND they vote not to kill anyone.</p>
     <p><span style={{color: teamColor["tanner"]}}>The Tanner</span> wins if they die.</p>
-    <p><span style={{color: teamColor["werewolf"]}}>The Werewolf</span> win otherwise. Don't let any Werewolves die, and
+    <p><span style={{color: teamColor["werewolf"]}}>The Werewolves</span> win otherwise. Don't let any Werewolves die,
+        and
         don't kill the Tanner!</p>
     <p>If there is a tie in votes, all of the highest voted will be killed except in the case where every
         player received 1 vote. In that case, no one is killed.
