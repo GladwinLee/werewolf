@@ -53,7 +53,7 @@ export const roleInfo = {
         team: "village",
     },
     werewolf: {
-        help: "Know the identity of the other Werewolves",
+        help: "Know the identity of the other Werewolves. If there is no other Werewolf, they can look at one middle card",
         team: "werewolf",
     },
 }

@@ -44,9 +44,14 @@ export default function Rules(props) {
 }
 
 const rules = <>
-    <p>Players are assigned a role at the start of the game. Night begins. </p>
+    <p>The game starts with a set of roles, one for each player, and 3 extra in the middle.</p>
+    <p>Night begins.</p>
     <p>Some special roles will have actions during the night in a specific order.</p>
-    <p>After the night ends, everyone votes to kill someone.</p>
+    <p>
+        Be careful! There are special roles that can change the roles of other players.
+        You do not get to check if your role has changed, and it is possible you are now on a different team.
+    </p>
+    <p>After the night ends, vote for who the village will kill.</p>
     <p><span style={{color: teamColor["village"]}}>The Village</span> wins if a Werewolf is killed, or if there are no
         Werewolf players AND they vote not to kill anyone.</p>
     <p><span style={{color: teamColor["tanner"]}}>The Tanner</span> wins if they die.</p>
