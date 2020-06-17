@@ -1,4 +1,8 @@
 export const roleInfo = {
+    sentinel: {
+        help: "Shield a player from any special night abilities, including their own",
+        team: "village",
+    },
     seer: {
         help: "View another player's role, or 2 of roles from the middle",
         team: "village",
@@ -15,13 +19,9 @@ export const roleInfo = {
         help: "Swap the roles of 2 players",
         team: "village",
     },
-    villager: {
-        help: "No special ability",
+    revealer: {
+        help: "View another player's role. If not a Werewolf or Tanner, reveal it to everyone",
         team: "village",
-    },
-    werewolf: {
-        help: "Know the identity of the other Werewolves",
-        team: "werewolf",
     },
     tanner: {
         help: "Get voted out to win",
@@ -44,18 +44,18 @@ export const roleInfo = {
         help: "Vote is protected from death. If target is voted out, next most votes dies instead",
         team: "village",
     },
-    revealer: {
-        help: "View another player's role. If not a Werewolf or Tanner, reveal it to everyone",
-        team: "village",
-    },
-    sentinel: {
-        help: "Shield a player from any special night abilities, including their own",
-        team: "village",
-    },
     insomniac: {
         help: "See if own role changed when day begins",
         team: "village",
-    }
+    },
+    villager: {
+        help: "No special ability",
+        team: "village",
+    },
+    werewolf: {
+        help: "Know the identity of the other Werewolves",
+        team: "werewolf",
+    },
 }
 
 export const teamRoles = {
@@ -71,5 +71,5 @@ Object.entries(roleInfo).map(([role, {team}]) => {
 export const teamColor = {
     tanner: "#8d6d03",
     werewolf: "#760101",
-    village: "#033c79",
+    village: "#2b7bdc",
 }

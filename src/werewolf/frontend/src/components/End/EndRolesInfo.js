@@ -11,6 +11,9 @@ const useStyles = makeStyles(theme => ({
     bold: {
         fontWeight: "bold",
     },
+    bottomMargin: {
+        marginBottom: theme.spacing(2),
+    }
 }))
 
 export default function EndRolesInfo(props) {
@@ -43,15 +46,14 @@ export default function EndRolesInfo(props) {
 
     return (
         <>
-            <Typography variant="h4"
-                        className={classes.bold}>Winners</Typography>
-            <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={winningRoles}/>
-            <Typography variant="h4"
-                        className={classes.bold}>Losers</Typography>
-            <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={losingRoles}/>
-            <Typography variant="h5" className={classes.bold}>Middle
-                Roles</Typography>
-            <Typography>{middleRoles.join(", ")}</Typography>
+            <Typography variant="h4" className={classes.bold}>Winners</Typography>
+            <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={winningRoles} className={classes.bottomMargin}/>
+
+            <Typography variant="h4" className={classes.bold}>Losers</Typography>
+            <RoleToPlayer rolesToPlayers={rolesToPlayers} roles={losingRoles} className={classes.bottomMargin}/>
+
+            <Typography variant="h5" className={classes.bold}>Middle Roles</Typography>
+            <Typography className={classes.bottomMargin}>{middleRoles.join(", ")}</Typography>
         </>
     );
 }

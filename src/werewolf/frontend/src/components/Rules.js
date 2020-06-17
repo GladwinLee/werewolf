@@ -1,23 +1,34 @@
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Typography from "@material-ui/core/Typography";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Link from "@material-ui/core/Link";
-import React from "react";
+import React, {useState} from "react";
+import Dialog from "@material-ui/core/Dialog";
+import IconButton from "@material-ui/core/IconButton";
+import HelpIcon from '@material-ui/icons/Help';
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import {teamColor} from "./roleConstants";
 
-export default function () {
-    return <ExpansionPanel>
-        <ExpansionPanelSummary
-            expandIcon={<ExpandMoreIcon/>}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-        >
-            <Typography>Rules</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-            <Typography
-                style={{whiteSpace: 'pre-line'}}>
+const useStyles = makeStyles(theme => ({
+    button: {
+        position: "absolute",
+        bottom: "3px",
+        right: "3px",
+    },
+    paper: {
+        overflow: "hidden",
+        padding: theme.spacing(3)
+    },
+}))
+export default function Rules(props) {
+    const classes = useStyles(props);
+
+    const [open, setOpen] = useState(false);
+
+    return <>
+        <IconButton onClick={() => setOpen(true)} className={classes.button}>
+            <HelpIcon/>
+        </IconButton>
+        <Dialog open={open} onClose={() => setOpen(false)} classes={{paper: classes.paper}}>
+            <Typography style={{whiteSpace: 'pre-line'}} align={"left"}>
                 {rules}
                 <Link
                     href={"https://www.fgbradleys.com/rules/rules2/OneNightUltimateWerewolf-rules.pdf"}>
@@ -28,17 +39,20 @@ export default function () {
                     -(Daybreak Rules)
                 </Link>
             </Typography>
-        </ExpansionPanelDetails>
-    </ExpansionPanel>
+        </Dialog>
+    </>
 }
 
-const rules = "Players are assigned a role at the start of the game. The game starts at night. "
-    + "Some special roles will have actions during the night, in a specific order. "
-    + "After the night ends, everyone votes to kill someone. "
-    + "\nIf there is a tie, all of the highest voted will "
-    + "be killed except in the case where every player received 1 vote. In that case, no one is killed."
-    + "\nThe Village wins if: "
-    + "\n  - a Werewolf is killed"
-    + "\n  - they vote not to kill anyone when there are no Werewolf players. "
-    + "\nThe Tanner wins if they die. "
-    + "\nThe Werewolves win otherwise. \n"
+const rules = <>
+    <p>Players are assigned a role at the start of the game. Night begins. </p>
+    <p>Some special roles will have actions during the night in a specific order.</p>
+    <p>After the night ends, everyone votes to kill someone.</p>
+    <p><span style={{color: teamColor["village"]}}>The Village</span> wins if a Werewolf is killed, or if there are no
+        Werewolf players AND they vote not to kill anyone.</p>
+    <p><span style={{color: teamColor["tanner"]}}>The Tanner</span> wins if they die.</p>
+    <p><span style={{color: teamColor["werewolf"]}}>The Werewolf</span> win otherwise. Don't let any Werewolves die, and
+        don't kill the Tanner!</p>
+    <p>If there is a tie in votes, all of the highest voted will be killed except in the case where every
+        player received 1 vote. In that case, no one is killed.
+    </p>
+</>

@@ -11,6 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import EndPage from "./End/EndPage";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import WebSocketContext from "./WebSocketContext";
+import Rules from "./Rules";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -163,6 +164,7 @@ export default function Game(props) {
     return <Container maxWidth="xs" className={classes.container}
                       style={containerStyle}>
         {getPageComponent(page)}
+        <Rules/>
         {playerName === "KEN" &&
         <Button
             onClick={() => resetSubmit()}

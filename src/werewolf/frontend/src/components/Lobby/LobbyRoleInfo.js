@@ -4,11 +4,17 @@ import Grid from "@material-ui/core/Grid";
 import PropTypes from 'prop-types';
 import Typography from "@material-ui/core/Typography";
 import RoleTooltip from "../RoleTooltip";
+import {roleInfo} from "../roleConstants";
 
-function Role({role}) {
+function Role({role, strikeThrough: selected}) {
     return <Grid item xs={6}>
         <RoleTooltip role={role}>
-            <Typography align="center">
+            <Typography align="center" style={{
+                borderStyle: selected && "solid",
+                borderWidth: "1px",
+                borderRadius: "6px",
+                borderColor: "#ccc"
+            }}>
                 {capitalize(role)}
             </Typography>
         </RoleTooltip>
@@ -32,8 +38,8 @@ export default function LobbyRoleInfo({settingsMap}) {
         [settingsMap]
     )
 
-    const display = selectedRoles.map(
-        role => <Role role={role} key={"role-" + role}/>);
+    const display = Object.keys(roleInfo).map(
+        role => <Role role={role} strikeThrough={!!selectedRoles.includes(role)} key={"role-" + role}/>);
 
     return (
         <Grid container item xs={12}>
